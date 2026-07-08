@@ -176,12 +176,10 @@
         const btnCalcular = document.getElementById('btn-calcular');
         const resultadoBox = document.getElementById('resultado-box') as HTMLElement;
 
-        // Referencias a los datos obligatorios del cliente
         const inputNombre = document.getElementById('cliente-nombre') as HTMLInputElement;
         const inputEmpresa = document.getElementById('cliente-empresa') as HTMLInputElement;
         const inputRuc = document.getElementById('cliente-ruc') as HTMLInputElement;
 
-        // Función estricta para validar que los datos no estén vacíos
         function validarDatosCliente() {
             if (!inputNombre.value.trim() || !inputEmpresa.value.trim() || !inputRuc.value.trim()) {
                 resultadoBox.innerHTML = `
@@ -194,7 +192,6 @@
             return true;
         }
 
-        // Función para actualizar opciones deshabilitadas
         function actualizarOpcionesDeshabilitadas() {
             const filas = contenedorFilas!.querySelectorAll('.fila-producto');
             const valoresSeleccionados = Array.from(filas)
@@ -216,7 +213,6 @@
             });
         }
 
-        // Agregar fila
         if (btnAddProducto && contenedorFilas) {
             btnAddProducto.addEventListener('click', () => {
                 if (!validarDatosCliente()) return; 
@@ -224,16 +220,11 @@
                 const primeraFila = contenedorFilas.querySelector('.fila-producto');
                 if (primeraFila) {
                     const nuevaFila = primeraFila.cloneNode(true) as HTMLElement;
-                    
-                    // Limpiar valores
                     const inputCantidad = nuevaFila.querySelector('.cantidad-input') as HTMLInputElement;
                     if(inputCantidad) inputCantidad.value = '';
 
-                    // Resetear select a opción vacía o primera disponible
                     const nuevoSelect = nuevaFila.querySelector('.producto-select') as HTMLSelectElement;
-                    if (nuevoSelect) {
-                        nuevoSelect.value = '';
-                    }
+                    if (nuevoSelect) nuevoSelect.value = '';
 
                     const btnEliminar = nuevaFila.querySelector('.btn-eliminar');
                     if (btnEliminar) {
@@ -244,7 +235,6 @@
                         });
                     }
 
-                    // Agregar listener al nuevo select
                     if (nuevoSelect) {
                         nuevoSelect.addEventListener('change', actualizarOpcionesDeshabilitadas);
                     }
@@ -255,16 +245,13 @@
             });
         }
 
-        // Agregar listener a los selects existentes
         const selectsIniciales = contenedorFilas!.querySelectorAll('.producto-select');
         selectsIniciales.forEach(select => {
             (select as HTMLSelectElement).addEventListener('change', actualizarOpcionesDeshabilitadas);
         });
 
-        // Inicializar al cargar
         actualizarOpcionesDeshabilitadas();
 
-        // Calcular total, armar WhatsApp y guardar en Google Sheets
         if (btnCalcular && resultadoBox && contenedorFilas) {
             btnCalcular.addEventListener('click', () => {
                 if (!validarDatosCliente()) return; 
@@ -273,6 +260,11 @@
                 let subtotalGlobal = 0;
                 let cantidadPlanchasTotales = 0;
                 let hayErrores = false;
+
+                // Variables fijas para acumular cantidades por columna
+                let cant25mm = 0;
+                let cant38mm = 0;
+                let cantMalla = 0;
 
                 filas.forEach(fila => {
                     const select = fila.querySelector('.producto-select') as HTMLSelectElement;
@@ -286,6 +278,17 @@
                     } else {
                         subtotalGlobal += (precio * cantidad);
                         cantidadPlanchasTotales += cantidad;
+
+                        // Mapeo técnico: Identificamos qué opción se seleccionó basándonos en el texto de la opción
+                        const textoProducto = select.options[select.selectedIndex].text.toLowerCase();
+                        
+                        if (textoProducto.includes('25 mm') || textoProducto.includes('25mm')) {
+                            cant25mm += cantidad;
+                        } else if (textoProducto.includes('38 mm') || textoProducto.includes('38mm')) {
+                            cant38mm += cantidad;
+                        } else if (textoProducto.includes('malla')) {
+                            cantMalla += cantidad;
+                        }
                     }
                 });
 
@@ -305,7 +308,7 @@
 
                 let totalFinal = subtotalGlobal - descuento;
 
-                // 1. Mostrar resultado visual en la página
+                // 1. Renderizar el HTML en el panel visual
                 resultadoBox.innerHTML = `
                     <div class="flex flex-col items-center justify-center animate-fade-in w-full">
                         <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Precio Total Estimado</span>
@@ -327,11 +330,9 @@
                 `;
                 resultadoBox.className = 'bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300';
 
-                // 2. Construir el mensaje de WhatsApp y empaquetar para el Excel
+                // 2. Armar mensaje de WhatsApp
                 let mensajeWa = `Hola MAKSER PERÚ, soy ${inputNombre.value} de la empresa ${inputEmpresa.value} (RUC: ${inputRuc.value}).\n\n`;
                 mensajeWa += `He cotizado en su página web el siguiente requerimiento:\n\n`;
-
-                let productosParaExcel: string[] = [];
 
                 filas.forEach(fila => {
                     const select = fila.querySelector('.producto-select') as HTMLSelectElement;
@@ -340,37 +341,32 @@
                     
                     if (!isNaN(cantidad) && cantidad > 0) {
                         const nombreProducto = select.options[select.selectedIndex].text;
-                        
-                        // Añadir al string de WhatsApp
                         mensajeWa += `- ${cantidad} und x ${nombreProducto}\n`;
-                        
-                        // Añadir a la lista para Google Sheets
-                        productosParaExcel.push(`${cantidad} und x ${nombreProducto}`);
                     }
                 });
 
                 mensajeWa += `\n*TOTAL ESTIMADO: $${totalFinal.toFixed(2)} USD*\n\n`;
                 mensajeWa += `Por favor, envíenme una cotización formal y confírmenme stock.`;
 
-                // 3. Asignar el enlace dinámico al botón verde de WhatsApp
                 const btnWaSimulador = document.getElementById('btn-whatsapp-simulador') as HTMLAnchorElement;
                 if (btnWaSimulador) {
                     btnWaSimulador.href = `https://wa.me/51984649227?text=${encodeURIComponent(mensajeWa)}`;
                 }
 
                 // ============================================================
-                // 🚀 ENVIAR DATOS A LA HOJA DE GOOGLE SHEETS
+                // 🚀 ENVIAR DATA EN MATRIZ DE COLUMNAS FIJAS A GOOGLE SHEETS
                 // ============================================================
                 const datosCotizacion = {
                     nombre: inputNombre.value,
                     empresa: inputEmpresa.value,
                     ruc: inputRuc.value,
-                    producto: productosParaExcel.join(" | "), // Combina múltiples filas en una sola línea de texto
-                    cantidad: cantidadPlanchasTotales
+                    cant_25mm: cant25mm,   // Pasa la cantidad acumulada o 0 si no se usó
+                    cant_38mm: cant38mm,   // Pasa la cantidad acumulada o 0 si no se usó
+                    cant_malla: cantMalla, // Pasa la cantidad acumulada o 0 si no se usó
+                    total: totalFinal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
                 };
 
-                // Recuerda cambiar esto por el enlace real que te dio Google Apps Script
-                const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbw2yHP1t0kZSsm12fbJKOMy8Tgm5-l94BGjgOp2aQ4sZtS9wiZFloa7L1yU38f93VkyDA/exec";
+                const urlGoogleSheets = "TU_URL_DE_GOOGLE_APPS_SCRIPT";
 
                 fetch(urlGoogleSheets, {
                     method: "POST",
@@ -380,15 +376,14 @@
                     },
                     body: JSON.stringify(datosCotizacion)
                 })
-                .then(() => console.log("Datos de cotización enviados con éxito a Google Sheets."))
-                .catch(err => console.error("Error al intentar guardar en Google Sheets:", err));
+                .then(() => console.log("Datos en columnas fijas guardados correctamente."))
+                .catch(err => console.error("Error al guardar en Google Sheets:", err));
                 // ============================================================
 
             });
         }
     });
 </script>
-
 <style>
     .animate-fade-in {
         animation: fadeIn 0.3s ease-out;
