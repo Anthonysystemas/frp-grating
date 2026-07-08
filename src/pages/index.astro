@@ -4,12 +4,12 @@ import "../styles/global.css";
 import Hero from "../components/Hero.astro";
 import Navbar from "../components/Navbar.astro";
 import Products from "../components/Products.astro";
-import Features from "../components/Features.astro";
 import Simulator from "../components/Simulator.astro";
 import Footer from "../components/Footer.astro";
 import TechnicalSpecs from "../components/TechnicalSpecs.astro";
 import Gallery from "../components/Gallery.astro";
 import TrustBand from "../components/TrustBand.astro";
+import Analytics from '@vercel/analytics/astro';
 ---
 
 <html lang="es">
@@ -46,5 +46,6 @@ import TrustBand from "../components/TrustBand.astro";
         </main>
         
         <Footer />
+        <Analytics />
     </body>
 </html>
