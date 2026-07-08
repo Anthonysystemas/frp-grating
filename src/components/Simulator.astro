@@ -264,7 +264,7 @@
         // Inicializar al cargar
         actualizarOpcionesDeshabilitadas();
 
-        // Calcular total y armar el mensaje de WhatsApp automático
+        // Calcular total, armar WhatsApp y guardar en Google Sheets
         if (btnCalcular && resultadoBox && contenedorFilas) {
             btnCalcular.addEventListener('click', () => {
                 if (!validarDatosCliente()) return; 
@@ -305,7 +305,7 @@
 
                 let totalFinal = subtotalGlobal - descuento;
 
-                // 1. Mostrar resultado en la página
+                // 1. Mostrar resultado visual en la página
                 resultadoBox.innerHTML = `
                     <div class="flex flex-col items-center justify-center animate-fade-in w-full">
                         <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Precio Total Estimado</span>
@@ -327,9 +327,11 @@
                 `;
                 resultadoBox.className = 'bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300';
 
-                // 2. Construir el mensaje secreto para WhatsApp
+                // 2. Construir el mensaje de WhatsApp y empaquetar para el Excel
                 let mensajeWa = `Hola MAKSER PERÚ, soy ${inputNombre.value} de la empresa ${inputEmpresa.value} (RUC: ${inputRuc.value}).\n\n`;
                 mensajeWa += `He cotizado en su página web el siguiente requerimiento:\n\n`;
+
+                let productosParaExcel: string[] = [];
 
                 filas.forEach(fila => {
                     const select = fila.querySelector('.producto-select') as HTMLSelectElement;
@@ -338,18 +340,50 @@
                     
                     if (!isNaN(cantidad) && cantidad > 0) {
                         const nombreProducto = select.options[select.selectedIndex].text;
+                        
+                        // Añadir al string de WhatsApp
                         mensajeWa += `- ${cantidad} und x ${nombreProducto}\n`;
+                        
+                        // Añadir a la lista para Google Sheets
+                        productosParaExcel.push(`${cantidad} und x ${nombreProducto}`);
                     }
                 });
 
                 mensajeWa += `\n*TOTAL ESTIMADO: $${totalFinal.toFixed(2)} USD*\n\n`;
                 mensajeWa += `Por favor, envíenme una cotización formal y confírmenme stock.`;
 
-                // 3. Pegar el mensaje en el botón verde de abajo
+                // 3. Asignar el enlace dinámico al botón verde de WhatsApp
                 const btnWaSimulador = document.getElementById('btn-whatsapp-simulador') as HTMLAnchorElement;
                 if (btnWaSimulador) {
                     btnWaSimulador.href = `https://wa.me/51984649227?text=${encodeURIComponent(mensajeWa)}`;
                 }
+
+                // ============================================================
+                // 🚀 ENVIAR DATOS A LA HOJA DE GOOGLE SHEETS
+                // ============================================================
+                const datosCotizacion = {
+                    nombre: inputNombre.value,
+                    empresa: inputEmpresa.value,
+                    ruc: inputRuc.value,
+                    producto: productosParaExcel.join(" | "), // Combina múltiples filas en una sola línea de texto
+                    cantidad: cantidadPlanchasTotales
+                };
+
+                // Recuerda cambiar esto por el enlace real que te dio Google Apps Script
+                const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbw2yHP1t0kZSsm12fbJKOMy8Tgm5-l94BGjgOp2aQ4sZtS9wiZFloa7L1yU38f93VkyDA/exec";
+
+                fetch(urlGoogleSheets, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(datosCotizacion)
+                })
+                .then(() => console.log("Datos de cotización enviados con éxito a Google Sheets."))
+                .catch(err => console.error("Error al intentar guardar en Google Sheets:", err));
+                // ============================================================
+
             });
         }
     });
