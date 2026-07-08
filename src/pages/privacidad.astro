@@ -1,0 +1,107 @@
+---
+// src/pages/privacidad.astro
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Política de Privacidad | MASKEL PERÚ</title>
+        <meta name="description" content="Política de privacidad y protección de datos personales de MASKEL PERÚ S.A.C. Conoce cómo protegemos tus datos del simulador." />
+        <meta name="robots" content="noindex, follow" /> <!-- Los textos legales no necesitan competir en SEO, pero sí ser indexados de forma limpia -->
+    </head>
+    
+    <body class="min-h-screen bg-[#0E1728] text-white font-sans antialiased">
+        <Navbar />
+        
+        <!-- Contenedor principal con etiqueta semántica -->
+        <main class="pt-28 pb-16">
+            <section class="max-w-4xl mx-auto px-6 grid grid-cols-1 gap-8">
+                
+                <!-- Encabezado Principal -->
+                <div class="border-b border-slate-800 pb-6">
+                    <span class="text-xs uppercase tracking-widest text-blue-400 font-bold block mb-2">Aspectos Legales</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight">
+                        Política de Privacidad
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-2">Última actualización: Junio de 2026</p>
+                </div>
+
+                <!-- Introducción -->
+                <p class="text-slate-300 leading-relaxed text-base">
+                    En <strong class="text-slate-100">MASKEL PERÚ S.A.C.</strong>, nos tomamos muy en serio la privacidad y la seguridad de los datos de nuestros usuarios. En estricto cumplimiento de la <strong class="text-slate-100">Ley N° 29733</strong> (Ley de Protección de Datos Personales en el Perú), te informamos de manera transparente cómo tratamos la información técnica y comercial que ingresas en nuestro simulador interactivo.
+                </p>
+
+                <!-- Sección 1 -->
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                        1. ¿Qué datos recopilamos?
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        Al utilizar nuestro simulador interactivo de presupuesto, recolectamos únicamente los datos mínimos y estrictamente necesarios para procesar tu requerimiento técnico e industrial:
+                    </p>
+                    <ul class="list-disc list-inside pl-4 text-slate-300 space-y-2">
+                        <li><strong class="text-slate-200">Datos Técnicos de Ingeniería:</strong> Medidas de mallas, espesores y tipos de resina seleccionados para las rejillas FRP.</li>
+                        <li><strong class="text-slate-200">Datos de Contacto Comercial:</strong> Tu número de teléfono para comunicación vía WhatsApp y/o tu dirección de correo electrónico corporativo.</li>
+                    </ul>
+                </div>
+
+                <!-- Sección 2 -->
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                        2. ¿Para qué usamos tus datos?
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        La recopilación de la información del simulador responde a una finalidad puramente comercial y de soporte personalizado:
+                    </p>
+                    <ol class="list-decimal list-inside pl-4 text-slate-300 space-y-2">
+                        <li>Elaborar y estructurar la propuesta económica formal del grating industrial solicitado.</li>
+                        <li>Permitir que un asesor comercial se comunique contigo con el fin de coordinar aspectos logísticos críticos como fletes, puntos de entrega (con atención prioritaria en Lima Norte: Carabayllo, Comas, Los Olivos, Puente Piedra) y validaciones técnicas finales.</li>
+                    </ol>
+                </div>
+
+                <!-- Sección 3 -->
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                        3. Consentimiento y Seguridad de la Información
+                    </h2>
+                    <div class="bg-slate-900/40 border border-slate-800/80 rounded-md p-5 space-y-3">
+                        <p class="text-slate-300 leading-relaxed">
+                            <strong class="text-slate-200 block mb-1">🔒 Confidencialidad Absoluta:</strong>
+                            MASKEL PERÚ S.A.C. garantiza que no venderá, cederá ni distribuirá tus datos de contacto a terceras empresas bajo ninguna circunstancia. Toda la información permanece resguardada de forma interna.
+                        </p>
+                        <p class="text-slate-300 leading-relaxed">
+                            <strong class="text-slate-200 block mb-1">🛠️ Protección Técnica:</strong>
+                            Implementamos medidas de seguridad y cifrado digital para asegurar que los datos viajen protegidos desde el formulario web hasta nuestros sistemas comerciales.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Sección 4 -->
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                        4. Tus Derechos (Derechos ARCO)
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        De acuerdo con la legislación peruana, eres dueño de tu información. Tienes pleno derecho a solicitar el acceso, rectificación, cancelación u oposición al uso de tus datos en nuestros registros institucionales. Para hacer efectivo este derecho, puedes ponerte en contacto directo con nuestra administración central escribiendo a nuestro canal oficial:
+                    </p>
+                    <div class="pt-2">
+                        <a 
+                            href="mailto:ventas@maskelperu.com" 
+                            class="inline-flex items-center gap-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/20 px-4 py-2.5 rounded-sm transition-colors text-sm font-semibold"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            ventas@maskelperu.com
+                        </a>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        
+        <Footer />
+    </body>
+</html>

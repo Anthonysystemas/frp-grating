@@ -1,0 +1,50 @@
+---
+// src/pages/index.astro
+import "../styles/global.css";
+import Hero from "../components/Hero.astro";
+import Navbar from "../components/Navbar.astro";
+import Products from "../components/Products.astro";
+import Features from "../components/Features.astro";
+import Simulator from "../components/Simulator.astro";
+import Footer from "../components/Footer.astro";
+import TechnicalSpecs from "../components/TechnicalSpecs.astro";
+import Gallery from "../components/Gallery.astro";
+import TrustBand from "../components/TrustBand.astro";
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <!-- SEO Básico para Google -->
+        <title>Venta de Rejillas FRP y Grating Industrial | MASKEL PERÚ</title>
+        <meta name="description" content="Importación y distribución de rejillas FRP de alta resistencia para minería e industria. Somos MASKEL PERÚ, líderes en grating en Lima. ¡Cotiza hoy!" />
+        <meta name="keywords" content="rejillas frp, grating frp, fibra de vidrio, grating industrial, maskel peru, lima" />
+        <meta name="author" content="MASKEL PERÚ" />
+        
+        <!-- Open Graph para WhatsApp y Redes Sociales -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Rejillas FRP y Grating Industrial | MASKEL PERÚ">
+        <meta property="og:description" content="Importación y distribución de rejillas de alta resistencia. ¡Calcula tu presupuesto en nuestro simulador en línea!">
+        <meta property="og:image" content="/logo.webp"/>
+        <meta property="og:site_name" content="MASKEL PERÚ">
+    </head>
+    
+    <body class="min-h-screen bg-[#0E1728] text-white">
+        <Navbar />
+        
+        <!-- Etiqueta MAIN obligatoria para accesibilidad y SEO -->
+        <main>
+            <Hero />
+            <TrustBand />
+            <Gallery />
+            <TechnicalSpecs />
+
+            <Products />
+            <Simulator />
+        </main>
+        
+        <Footer />
+    </body>
+</html>

@@ -1,0 +1,48 @@
+<section
+    id="video-demostrativo"
+    class="relative w-full bg-[#0A0E1A] py-20 px-6 overflow-hidden border-b border-slate-900/50"
+>
+    <!-- Malla técnica sutil de fondo -->
+    <div
+        class="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style="background-image: linear-gradient(#3B82F6 1px, transparent 1px), linear-gradient(90deg, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"
+    ></div>
+
+    <div class="relative max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- COLUMNA IZQUIERDA: TEXTO COMERCIAL -->
+            <div class="lg:col-span-5 max-w-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="h-px w-8 bg-blue-500"></span>
+                    <span class="text-blue-400 text-sm font-bold tracking-widest uppercase font-mono">
+                        Demostración técnica
+                    </span>
+                </div>
+                <h2 class="text-3xl md:text-5xl font-black text-white leading-[1.05] mb-5 uppercase font-['Arial_Narrow',sans-serif-condensed]">
+                    El Grating FRP <br /> <span class="text-blue-500">en la realidad</span>
+                </h2>
+                <p class="text-slate-400 text-base md:text-lg leading-relaxed mb-6">
+                    Mira detalladamente los acabados, la robustez estructural y la textura antideslizante de nuestras rejillas de fibra de vidrio. Una inspección visual rápida para comprobar el estándar de ingeniería que llevamos a tu obra.
+                </p>
+            </div>
+
+            <!-- COLUMNA DERECHA: VIDEO DE YOUTUBE RESPONSIVO -->
+            <div class="lg:col-span-7 w-full">
+                <div class="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-800 bg-[#0D1220] shadow-2xl shadow-black/50 group hover:border-blue-500/30 transition-all">
+                    <!-- Contenedor del Iframe de YouTube -->
+                    <iframe 
+                        class="absolute inset-0 w-full h-full"
+                        src="https://www.youtube.com/embed/3eT7hLoJty0?si=0dNXFcbyWoD8mFcH" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" 
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

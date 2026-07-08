@@ -1,0 +1,292 @@
+<!-- src/components/Navbar.astro -->
+<header class="w-full bg-[#0E1728] text-white border-b border-slate-900/50">
+    <!-- Top Bar Superior (Contactos) -->
+    <div class="hidden md:block border-b border-white/10 bg-[#09111F]">
+        <div
+            class="max-w-6xl mx-auto px-6 h-11 flex items-center justify-between text-[13px]"
+        >
+            <div
+                class="w-full flex items-center justify-center gap-6 text-slate-200"
+            >
+                <a
+                    href="tel:+51988168786"
+                    class="inline-flex items-center gap-2 hover:text-white transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-orange-400 shrink-0"
+                    >
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.09 4.18 2 2 0 0 1 4.07 2h3a2 2 0 0 1 2 1.72c.12.86.32 1.7.59 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.12a2 2 0 0 1 2.11-.45c.8.27 1.64.47 2.5.59A2 2 0 0 1 22 16.92z"
+                        ></path>
+                    </svg>
+                    <span>(+51) 988 168 786</span>
+                </a>
+
+                <span class="h-5 w-px bg-white/20"></span>
+
+                <a
+                    href="tel:+51944898564"
+                    class="inline-flex items-center gap-2 hover:text-white transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-orange-400 shrink-0"
+                    >
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.09 4.18 2 2 0 0 1 4.07 2h3a2 2 0 0 1 2 1.72c.12.86.32 1.7.59 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.12a2 2 0 0 1 2.11-.45c.8.27 1.64.47 2.5.59A2 2 0 0 1 22 16.92z"
+                        ></path>
+                    </svg>
+                    <span>(+51) 944 898 564</span>
+                </a>
+
+                <span class="h-5 w-px bg-white/20"></span>
+
+                <a
+                    href="mailto:ventas@maskelperu.com"
+                    class="inline-flex items-center gap-2 hover:text-white transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-orange-400 shrink-0"
+                    >
+                        <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                        <path d="m22 7-10 6L2 7"></path>
+                    </svg>
+                    <span>ventas@maskelperu.com</span>
+                </a>
+
+                <span class="h-5 w-px bg-white/20"></span>
+
+                <span class="inline-flex items-center gap-2 text-slate-200">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-orange-400 shrink-0"
+                    >
+                        <path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12z"
+                        ></path>
+                        <circle cx="12" cy="9" r="2.5"></circle>
+                    </svg>
+                    <span>SMP, Lima - Perú</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Navegación Principal -->
+    <nav class="max-w-6xl mx-auto w-full px-6 py-4">
+        <div class="flex justify-between items-center gap-4">
+            <!-- Logo -->
+            <a
+                href="/#home"
+                class="flex items-center cursor-pointer shrink-0"
+                aria-label="Ir al inicio"
+            >
+                <img
+                    src="/logo.png"
+                    alt="Logo MASKEL PERÚ"
+                    class="h-10 w-auto object-contain"
+                />
+            </a>
+
+            <!-- Menú desktop centrado y alineado -->
+            <!-- Menú desktop centrado, alineado y animado con efectos interactivos -->
+            <div
+                class="hidden md:flex gap-6 flex-1 justify-center items-center"
+            >
+                <a
+                    href="/#home"
+                    class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
+                >
+                    Inicio
+                    <span
+                        class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full group-hover:left-0"
+                    ></span>
+                </a>
+
+                <a
+                    href="/#galeria"
+                    class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
+                >
+                    Galería
+                    <span
+                        class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full group-hover:left-0"
+                    ></span>
+                </a>
+
+                <a
+                    href="/#especificaciones-tecnicas"
+                    class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
+                >
+                    Ficha Técnica
+                    <span
+                        class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full group-hover:left-0"
+                    ></span>
+                </a>
+
+                <a
+                    href="/#productos"
+                    class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
+                >
+                    Productos
+                    <span
+                        class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full group-hover:left-0"
+                    ></span>
+                </a>
+
+                <a
+                    href="/#location"
+                    class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
+                >
+                    Ubicación
+                    <span
+                        class="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full group-hover:left-0"
+                    ></span>
+                </a>
+            </div>
+
+            <!-- Botón Cotizar alineado verticalmente -->
+            <a
+                href="/#simulator"
+                class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2.5 rounded cursor-pointer transition-all duration-200 inline-flex items-center gap-2 whitespace-nowrap"
+            >
+                Cotizar
+            </a>
+
+            <!-- Menú hamburguesa móvil -->
+            <button
+                id="menu-toggle"
+                class="md:hidden ml-2 p-2 text-slate-300 hover:text-white transition-colors"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+            >
+                <svg
+                    class="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Menú móvil limpio (Actualizado con las secciones reales) -->
+    <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-[#0A0E1A] border-t border-slate-800/50 px-6 py-4 space-y-3"
+    >
+        <div
+            class="pb-3 mb-3 border-b border-slate-800/60 space-y-2 text-sm text-slate-300"
+        >
+            <a
+                href="tel:+51988168786"
+                class="block hover:text-white transition-colors"
+                >(+51) 988 168 786</a
+            >
+            <a
+                href="tel:+51944898564"
+                class="block hover:text-white transition-colors"
+                >(+51) 944 898 564</a
+            >
+            <a
+                href="mailto:ventas@maskelperu.com"
+                class="block hover:text-white transition-colors"
+                >ventas@maskelperu.com</a
+            >
+            <span class="block">SMP, Lima - Perú</span>
+        </div>
+        <a
+            href="/#home"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Inicio</a
+        >
+        <a
+            href="/#galeria"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Galería</a
+        >
+        <a
+            href="/#especificaciones-tecnicas"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Ficha Técnica</a
+        >
+        <a
+            href="/#productos"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Productos</a
+        >
+        <a
+            href="/#simulator"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Simular Cotización</a
+        >
+        <a
+            href="/#location"
+            class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+            >Ubicación</a
+        >
+    </div>
+</header>
+
+<script>
+    const menuToggle = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+            menuToggle.setAttribute(
+                "aria-expanded",
+                String(!mobileMenu.classList.contains("hidden")),
+            );
+        });
+
+        // Cerrar menú al hacer clic en un enlace
+        const links = mobileMenu.querySelectorAll("a");
+        links.forEach((link) => {
+            link.addEventListener("click", () => {
+                mobileMenu.classList.add("hidden");
+                menuToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+</script>

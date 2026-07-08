@@ -1,0 +1,107 @@
+---
+// src/pages/terminos.astro
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Términos y Condiciones | MASKEL PERÚ</title>
+        <meta name="description" content="Términos y condiciones de uso de la plataforma web y el simulador técnico de MASKEL PERÚ S.A.C." />
+        <meta name="robots" content="noindex, follow" />
+    </head>
+    
+    <body class="min-h-screen bg-[#0E1728] text-white font-sans antialiased">
+        <Navbar />
+        
+        <main class="pt-28 pb-16">
+            <section class="max-w-4xl mx-auto px-6 grid grid-cols-1 gap-8">
+                
+                <div class="border-b border-slate-800 pb-6">
+                    <span class="text-xs uppercase tracking-widest text-blue-400 font-bold block mb-2">Marco Legal</span>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight">
+                        Términos y Condiciones de Uso
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-2">Última actualización: Junio de 2026</p>
+                </div>
+
+                <p class="text-slate-300 leading-relaxed">
+                    Le rogamos leer detenidamente los presentes Términos y Condiciones antes de utilizar el simulador técnico y los servicios informativos de la plataforma web de <strong class="text-slate-100">MASKEL PERÚ S.A.C.</strong> Al navegar por este sitio, usted acepta de manera implícita las cláusulas descritas a continuación.
+                </p>
+
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400">
+                        1. Naturaleza Referencial del Simulador Técnico
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        El simulador de presupuesto en línea disponible en nuestra plataforma es una herramienta automatizada diseñada exclusivamente para proporcionar <strong>estimaciones dimensionales y aproximaciones comerciales</strong> de nuestras rejillas de plástico reforzado con fibra de vidrio (FRP) y grating industrial.
+                    </p>
+                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-md p-4 text-slate-300 text-sm">
+                        <strong class="text-amber-400 block mb-1">⚠️ Deslinde de Obligación Contractual:</strong>
+                        <p class="text-slate-300">
+                            Los valores monetarios, cantidades y cálculos resultantes del simulador <strong>no constituyen una cotización formal, oferta vinculante ni contrato de compraventa</strong>. MASKEL PERÚ S.A.C. se reserva el derecho de modificar los precios finales tras la evaluación técnica definitiva por parte de nuestro equipo de ingeniería.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400">
+                        2. Validaciones Técnicas y Cotizaciones Formales
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        Para que un presupuesto adquiera validez comercial y legal, el usuario deberá finalizar el proceso de simulación enviando sus datos para recibir una propuesta formal. Esta cotización formal estará sujeta a:
+                    </p>
+                    <ul class="list-disc list-inside pl-4 text-slate-300 space-y-2">
+                        <li>Validación de planos, tolerancias estructurales y condiciones de carga en obra.</li>
+                        <li>Verificación de la compatibilidad química de la resina seleccionada (Isoftálica, Viniléster, etc.) según el entorno del proyecto.</li>
+                        <li>Confirmación de disponibilidad de stock o plazos de importación y manufactura.</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400">
+                        3. Despachos y Condiciones Logísticas
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        Nuestra planta y centro de operaciones se encuentra ubicada en <strong class="text-slate-200">Carabayllo, Lima, Perú</strong>. Brindamos atención prioritaria y despachos directos en la zona de Lima Norte (Carabayllo, Comas, Los Olivos, Puente Piedra). 
+                    </p>
+                    <p class="text-slate-300 leading-relaxed">
+                        Cualquier costo asociado al flete urbano, distribución a obras en Lima Metropolitana o transportes interprovinciales para proyectos mineros a nivel nacional <strong>no está incluido en el cálculo del simulador web</strong> y se detallará de manera independiente en la propuesta económica formal.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400">
+                        4. Propiedad Intelectual
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        Todos los contenidos de este sitio web, incluyendo de forma enunciativa pero no limitativa: códigos fuente (arquitectura Astro), algoritmos matemáticos del simulador, textos, logotipos de la marca, gráficos, interfaces y designs visuales son propiedad exclusiva de <strong class="text-slate-100">MASKEL PERÚ S.A.C.</strong> Queda prohibida su reproducción parcial o total sin autorización expresa por escrito.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-xl font-bold text-blue-400">
+                        5. Canales de Contacto Comercial
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed">
+                        Para cualquier duda, aclaración técnica o solicitud de rectificación de datos comerciales relacionados con estos términos de servicio, el usuario puede comunicarse a través de nuestros canales oficiales corporativos:
+                    </p>
+                    <ul class="list-none space-y-2 pt-2">
+                        <li class="text-slate-300 text-sm">
+                            <strong class="text-slate-200">Correo Central:</strong> ventas@maskelperu.com
+                        </li>
+                        <li class="text-slate-300 text-sm">
+                            <strong class="text-slate-200">Operaciones Planta:</strong> Av. Huarangal, Carabayllo, Lima.
+                        </li>
+                    </ul>
+                </div>
+
+            </section>
+        </main>
+        
+        <Footer />
+    </body>
+</html>

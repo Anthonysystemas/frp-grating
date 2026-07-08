@@ -1,0 +1,220 @@
+---
+// src/components/Footer.astro
+---
+
+<footer
+    id="location"
+    class="w-full bg-[#070A13] text-slate-300 py-16 px-6 border-t border-slate-900/50"
+>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+        <div class="flex flex-col items-start space-y-4">
+            <img
+                src="/logo.png"
+                alt="Logo MASKEL PERÚ"
+                class="h-12 w-auto object-contain cursor-pointer opacity-90 contrast-125 brightness-95 filter"
+            />
+            <div class="space-y-2">
+                <h3
+                    class="text-2xl font-black text-white tracking-tight uppercase mb-4 font-['Arial_Narrow',sans-serif-condensed]"
+                >
+                    MASKEL PERÚ S.A.C.
+                </h3>
+                <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                    Especialistas en la importación y distribución de rejillas
+                    FRP (Grating) de alta resistencia para el sector industrial,
+                    minero y de construcción civil a nivel nacional.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-start w-full">
+            <h4
+                class="text-sm font-bold text-white uppercase tracking-widest mb-4"
+            >
+                Planta y Operaciones
+            </h4>
+
+            <ul class="text-sm text-slate-300 space-y-3 mb-5 w-full">
+                <li class="flex items-start gap-3">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-blue-400 mt-0.5 shrink-0"
+                    >
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"
+                        ></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span class="leading-snug">
+                        <strong class="text-slate-200 block">Ubicación</strong>
+                        5X87+8C8, Av. Huarangal<br />
+                        Carabayllo, Lima - Perú
+                    </span>
+                </li>
+            </ul>
+
+            <div
+                class="w-full rounded-sm overflow-hidden border border-slate-800/50 bg-slate-900/30 shadow-inner"
+            >
+                <div
+                    class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-800/40 bg-slate-900/20"
+                >
+                    <div class="flex items-center gap-2">
+                        <span class="text-blue-400 text-sm">🗺️</span>
+                        <span
+                            class="text-xs font-bold uppercase tracking-widest text-slate-200"
+                            >Google Maps</span
+                        >
+                    </div>
+                    <span
+                        class="text-[10px] uppercase tracking-[0.2em] text-slate-300"
+                        >Ubicación</span
+                    >
+                </div>
+                <div class="relative w-full aspect-4/3 md:aspect-16/10">
+                    <iframe
+                        src="https://maps.google.com/maps?q=5X87+8C8,+Av.+Huarangal+Carabayllo+Lima&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        class="absolute inset-0 h-full w-full"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    >
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-start md:pl-8">
+            <h4
+                class="text-sm font-bold text-white uppercase tracking-widest mb-4"
+            >
+                Contacto Directo
+            </h4>
+
+            <ul class="text-sm text-slate-300 space-y-4">
+                <li class="flex items-center gap-3">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-blue-400 mt-0.5 shrink-0"
+                    >
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                        ></path>
+                    </svg>
+                    <div>
+                        <span
+                            class="block text-[10px] uppercase tracking-wider text-slate-300"
+                            >Ventas Corporativas</span
+                        >
+                        <a
+                            href="tel:+51999999999"
+                            class="text-slate-200 hover:text-blue-400 font-bold transition-colors"
+                            >+51 999 999 999</a
+                        >
+                    </div>
+                </li>
+                <li class="flex items-center gap-3">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-blue-400 mt-0.5 shrink-0"
+                    >
+                        <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"
+                        ></path>
+                    </svg>
+                    <div>
+                        <span
+                            class="block text-[10px] uppercase tracking-wider text-slate-300"
+                            >Cotizaciones</span
+                        >
+                        <a
+                            href="mailto:ventas@maskelperu.com"
+                            class="text-slate-200 hover:text-blue-400 transition-colors"
+                            >ventas@maskelperu.com</a
+                        >
+                    </div>
+                </li>
+                <li class="flex items-center gap-3 mt-4">
+                    <a
+                        href="/catalogo-maskel.pdf"
+                        download="Catalogo_Completo_MASKEL_PERU.pdf"
+                        class="hover:text-blue-400 transition-colors flex items-center gap-2"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-download"
+                            ><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                            ></path><polyline points="7 10 12 15 17 10"
+                            ></polyline><line x1="12" x2="12" y1="15" y2="3"
+                            ></line></svg
+                        >
+                        Descargar Catálogo Completo PDF
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div
+        class="max-w-6xl mx-auto pt-8 pb-24 md:pb-6 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400"
+    >
+        <div class="text-center md:text-left space-y-1">
+            <p>
+                © 2026 <span class="text-slate-200 font-medium"
+                    >MASKEL PERÚ S.A.C.</span
+                > Todos los derechos reservados.
+            </p>
+            <p class="text-slate-300 text-[11px]">RUC: 20XXXXXXXXX</p>
+        </div>
+        <div
+            class="text-center space-y-1 bg-slate-900/30 px-4 py-2 border border-slate-800/40 rounded-sm"
+        >
+            <span
+                class="block text-[10px] uppercase tracking-wider text-blue-400 font-bold"
+                >Horario de Atención</span
+            >
+            <p class="text-slate-300">Lun - Vie: 8:00 AM - 5:00 PM</p>
+            <p class="text-slate-300">Sáb: 8:00 AM - 1:00 PM</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="/terminos" class="hover:text-blue-400 transition-colors"
+                >Términos y Condiciones</a
+            >
+            <a href="/privacidad" class="hover:text-blue-400 transition-colors"
+                >Políticas de Privacidad</a
+            >
+        </div>
+    </div>
+</footer>
