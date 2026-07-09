@@ -339,6 +339,19 @@
             btnAddProducto.addEventListener("click", () => {
                 if (!validarDatosCliente()) return;
 
+                const totalFilasActuales = contenedorFilas.querySelectorAll(".fila-producto")
+                    .length;
+                
+                if (totalFilasActuales >= 3) {
+                    resultadoBox.innerHTML = `
+                        <span class="text-4xl mb-4">⚠️</span>
+                        <p class="text-red-500 text-sm font-bold">No puedes añadir más de 3 productos.</p>
+                    `;
+                    resultadoBox.className =
+                        "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
+                    return;
+                }
+
                 const primeraFila =
                     contenedorFilas.querySelector(".fila-producto");
                 if (primeraFila) {
