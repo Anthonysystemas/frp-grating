@@ -10,16 +10,21 @@
     <div
         class="pointer-events-none absolute inset-0 opacity-[0.04]"
         style="background-image: linear-gradient(#3B82F6 1px, transparent 1px), linear-gradient(90deg, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"
-    ></div>
+    >
+    </div>
 
     <div class="relative max-w-6xl mx-auto mb-14">
         <div class="flex items-center gap-3 mb-6">
             <span class="h-px w-8 bg-blue-500"></span>
-            <span class="text-blue-500 text-sm font-bold tracking-widest uppercase">
+            <span
+                class="text-blue-500 text-sm font-bold tracking-widest uppercase"
+            >
                 Simulador de cotización
             </span>
         </div>
-        <h2 class="text-4xl md:text-6xl font-black text-white leading-[1.05] mb-6">
+        <h2
+            class="text-4xl md:text-6xl font-black text-white leading-[1.05] mb-6"
+        >
             CALCULA TU<br />
             <span class="text-blue-500">PRESUPUESTO</span>
         </h2>
@@ -30,13 +35,21 @@
         </p>
     </div>
 
-    <div class="relative max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+    <div
+        class="relative max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
+    >
         <!-- Formulario -->
-        <div class="md:col-span-7 bg-[#0D1220] border border-slate-800/40 rounded-2xl p-6 md:p-8">
+        <div
+            class="md:col-span-7 bg-[#0D1220] border border-slate-800/40 rounded-2xl p-6 md:p-8"
+        >
             <form id="simulador-form" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6 border-b border-slate-800/30">
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6 border-b border-slate-800/30"
+                >
                     <div class="flex flex-col gap-2">
-                        <label class="text-sm font-mono uppercase tracking-widest text-slate-200">
+                        <label
+                            class="text-sm font-mono uppercase tracking-widest text-slate-200"
+                        >
                             Nombre completo *
                         </label>
                         <input
@@ -48,7 +61,9 @@
                         />
                     </div>
                     <div class="flex flex-col gap-2">
-                        <label class="text-sm font-mono uppercase tracking-widest text-slate-200">
+                        <label
+                            class="text-sm font-mono uppercase tracking-widest text-slate-200"
+                        >
                             Empresa *
                         </label>
                         <input
@@ -59,8 +74,10 @@
                             required
                         />
                     </div>
-                    <div class="flex flex-col gap-2 sm:col-span-2">
-                        <label class="text-sm font-mono uppercase tracking-widest text-slate-200">
+                    <div class="flex flex-col gap-2">
+                        <label
+                            class="text-sm font-mono uppercase tracking-widest text-slate-200"
+                        >
                             RUC *
                         </label>
                         <input
@@ -71,22 +88,49 @@
                             required
                         />
                     </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label
+                            class="text-sm font-mono uppercase tracking-widest text-slate-200"
+                        >
+                            Correo Electronico
+                        </label>
+                        <input
+                            type="email"
+                            id="cliente-correo"
+                            placeholder="juan.perez@miempresa.com"
+                            class="w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex flex-col gap-4">
-                    <label class="text-sm font-mono uppercase tracking-widest text-slate-200">
+                    <label
+                        class="text-sm font-mono uppercase tracking-widest text-slate-200"
+                    >
                         Requerimientos técnicos *
                     </label>
 
-                    <div id="contenedor-filas" class="space-y-3 border-b border-slate-800/30 pb-6">
-                        <div class="fila-producto grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div
+                        id="contenedor-filas"
+                        class="space-y-3 border-b border-slate-800/30 pb-6"
+                    >
+                        <div
+                            class="fila-producto grid grid-cols-1 sm:grid-cols-12 gap-3 items-end"
+                        >
                             <div class="sm:col-span-8 flex flex-col gap-2">
                                 <select
                                     class="producto-select w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all cursor-pointer"
                                 >
-                                    <option value="120">Grating FRP 38×38×25 mm (1 pulgada)</option>
-                                    <option value="150">Grating FRP 38×38×38 mm (1.5 pulgadas)</option>
-                                    <option value="180">Grating FRP 19×19×38 mm (malla fina)</option>
+                                    <option value="120"
+                                        >Grating FRP 38×38×25 mm (1 pulgada)</option
+                                    >
+                                    <option value="150"
+                                        >Grating FRP 38×38×38 mm (1.5 pulgadas)</option
+                                    >
+                                    <option value="180"
+                                        >Grating FRP 19×19×38 mm (malla fina)</option
+                                    >
                                 </select>
                             </div>
                             <div class="sm:col-span-3 flex flex-col gap-2">
@@ -104,8 +148,17 @@
                                     class="btn-eliminar hidden w-full p-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                     title="Eliminar fila"
                                 >
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    <svg
+                                        class="w-4 h-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
                             </div>
@@ -117,8 +170,17 @@
                         id="btn-add-producto"
                         class="self-start text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5 py-2 transition-colors"
                     >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 4v16m8-8H4"></path>
                         </svg>
                         Añadir otro producto
                     </button>
@@ -129,8 +191,18 @@
                     id="btn-calcular"
                     class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider py-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 mt-4"
                 >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 7h6m-6 4h6m-6 4h3M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"
+                        ></path>
                     </svg>
                     Calcular presupuesto
                 </button>
@@ -143,18 +215,28 @@
                 id="resultado-box"
                 class="bg-[#0D1220] border border-dashed border-slate-800/50 rounded-2xl p-8 flex flex-col items-center justify-center text-center min-h-70 transition-all duration-300"
             >
-                <svg class="w-9 h-9 text-blue-500/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                <svg
+                    class="w-9 h-9 text-blue-500/30 mb-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 7h6m-6 4h6m-6 4h3M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"
+                    ></path>
                 </svg>
                 <p class="text-slate-400 text-sm max-w-xs leading-relaxed">
                     Completa tus datos, añade los productos y pulsa
-                    <strong class="text-slate-300"> Calcular presupuesto </strong>
+                    <strong class="text-slate-300">
+                        Calcular presupuesto
+                    </strong>
                     para ver el estimado.
                 </p>
             </div>
             <a
-
-            
                 href="https://wa.me/51984649227"
                 id="btn-whatsapp-simulador"
                 target="_blank"
@@ -162,7 +244,9 @@
                 class="w-full bg-transparent border border-green-500/40 hover:bg-green-500/10 text-green-400 font-bold py-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"
             >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 004.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.84 14.13c-.25.7-1.45 1.34-2 1.43-.51.08-1.15.11-1.86-.12a16.7 16.7 0 01-1.69-.62c-2.98-1.29-4.92-4.3-5.07-4.5-.15-.2-1.21-1.61-1.21-3.07 0-1.46.77-2.18 1.04-2.48.27-.3.6-.37.8-.37.2 0 .4 0 .57.01.18.01.43-.07.67.52.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.49-.15.17-.31.38-.45.51-.15.15-.3.31-.13.61.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.38 1.47.3.15.48.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.13.08.74-.17 1.44z"/>
+                    <path
+                        d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 004.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.84 14.13c-.25.7-1.45 1.34-2 1.43-.51.08-1.15.11-1.86-.12a16.7 16.7 0 01-1.69-.62c-2.98-1.29-4.92-4.3-5.07-4.5-.15-.2-1.21-1.61-1.21-3.07 0-1.46.77-2.18 1.04-2.48.27-.3.6-.37.8-.37.2 0 .4 0 .57.01.18.01.43-.07.67.52.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.49-.15.17-.31.38-.45.51-.15.15-.3.31-.13.61.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.38 1.47.3.15.48.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.13.08.74-.17 1.44z"
+                    ></path>
                 </svg>
                 Contactar por WhatsApp
             </a>
@@ -170,73 +254,122 @@
     </div>
 </section>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const btnAddProducto = document.getElementById('btn-add-producto');
-        const contenedorFilas = document.getElementById('contenedor-filas');
-        const btnCalcular = document.getElementById('btn-calcular');
-        const resultadoBox = document.getElementById('resultado-box') as HTMLElement;
+    document.addEventListener("DOMContentLoaded", () => {
+        const btnAddProducto = document.getElementById("btn-add-producto");
+        const contenedorFilas = document.getElementById("contenedor-filas");
+        const btnCalcular = document.getElementById("btn-calcular");
+        const resultadoBox = document.getElementById(
+            "resultado-box",
+        ) as HTMLElement;
 
-        const inputNombre = document.getElementById('cliente-nombre') as HTMLInputElement;
-        const inputEmpresa = document.getElementById('cliente-empresa') as HTMLInputElement;
-        const inputRuc = document.getElementById('cliente-ruc') as HTMLInputElement;
+        const inputNombre = document.getElementById(
+            "cliente-nombre",
+        ) as HTMLInputElement;
+        const inputEmpresa = document.getElementById(
+            "cliente-empresa",
+        ) as HTMLInputElement;
+        const inputRuc = document.getElementById(
+            "cliente-ruc",
+        ) as HTMLInputElement;
+        const inputCorreo = document.getElementById(
+            "cliente-correo",
+        ) as HTMLInputElement;
+
+        function validarEstructuraCorreo(correo: string): boolean {
+            const patronCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return patronCorreo.test(correo);
+        }
 
         function validarDatosCliente() {
-            if (!inputNombre.value.trim() || !inputEmpresa.value.trim() || !inputRuc.value.trim()) {
+            if (
+                !inputNombre.value.trim() ||
+                !inputEmpresa.value.trim() ||
+                !inputRuc.value.trim() ||
+                !inputCorreo.value.trim()
+            ) {
                 resultadoBox.innerHTML = `
                     <span class="text-4xl mb-4">⚠️</span>
-                    <p class="text-red-500 text-sm font-bold">Por favor, completa tu Nombre, Empresa y RUC para utilizar el simulador.</p>
+                    <p class="text-red-500 text-sm font-bold">Por favor, completa tu Nombre, Empresa, RUC y Correo para utilizar el simulador.</p>
                 `;
-                resultadoBox.className = 'bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300';
+                resultadoBox.className =
+                    "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
+                return false;
+            }
+            if (!validarEstructuraCorreo(inputCorreo.value.trim())) {
+                resultadoBox.innerHTML = `
+                    <span class="text-4xl mb-4">⚠️</span>
+                    <p class="text-red-500 text-sm font-bold">Por favor, ingresa un correo electrónico válido.</p>
+                `;
+                resultadoBox.className =
+                    "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
                 return false;
             }
             return true;
         }
 
         function actualizarOpcionesDeshabilitadas() {
-            const filas = contenedorFilas!.querySelectorAll('.fila-producto');
+            const filas = contenedorFilas!.querySelectorAll(".fila-producto");
             const valoresSeleccionados = Array.from(filas)
-                .map(fila => {
-                    const select = fila.querySelector('.producto-select') as HTMLSelectElement;
+                .map((fila) => {
+                    const select = fila.querySelector(
+                        ".producto-select",
+                    ) as HTMLSelectElement;
                     return select?.value;
                 })
-                .filter(valor => valor && valor !== '');
+                .filter((valor) => valor && valor !== "");
 
-            filas.forEach(fila => {
-                const select = fila.querySelector('.producto-select') as HTMLSelectElement;
+            filas.forEach((fila) => {
+                const select = fila.querySelector(
+                    ".producto-select",
+                ) as HTMLSelectElement;
                 const valorActual = select.value;
-                
-                Array.from(select.options).forEach(option => {
+
+                Array.from(select.options).forEach((option) => {
                     const valor = (option as HTMLOptionElement).value;
-                    const estahSeleccionadaEnOtraFila = valoresSeleccionados.includes(valor) && valor !== valorActual;
-                    (option as HTMLOptionElement).disabled = estahSeleccionadaEnOtraFila;
+                    const estahSeleccionadaEnOtraFila =
+                        valoresSeleccionados.includes(valor) &&
+                        valor !== valorActual;
+                    (option as HTMLOptionElement).disabled =
+                        estahSeleccionadaEnOtraFila;
                 });
             });
         }
 
         if (btnAddProducto && contenedorFilas) {
-            btnAddProducto.addEventListener('click', () => {
-                if (!validarDatosCliente()) return; 
+            btnAddProducto.addEventListener("click", () => {
+                if (!validarDatosCliente()) return;
 
-                const primeraFila = contenedorFilas.querySelector('.fila-producto');
+                const primeraFila =
+                    contenedorFilas.querySelector(".fila-producto");
                 if (primeraFila) {
-                    const nuevaFila = primeraFila.cloneNode(true) as HTMLElement;
-                    const inputCantidad = nuevaFila.querySelector('.cantidad-input') as HTMLInputElement;
-                    if(inputCantidad) inputCantidad.value = '';
+                    const nuevaFila = primeraFila.cloneNode(
+                        true,
+                    ) as HTMLElement;
+                    const inputCantidad = nuevaFila.querySelector(
+                        ".cantidad-input",
+                    ) as HTMLInputElement;
+                    if (inputCantidad) inputCantidad.value = "";
 
-                    const nuevoSelect = nuevaFila.querySelector('.producto-select') as HTMLSelectElement;
-                    if (nuevoSelect) nuevoSelect.value = '';
+                    const nuevoSelect = nuevaFila.querySelector(
+                        ".producto-select",
+                    ) as HTMLSelectElement;
+                    if (nuevoSelect) nuevoSelect.value = "";
 
-                    const btnEliminar = nuevaFila.querySelector('.btn-eliminar');
+                    const btnEliminar =
+                        nuevaFila.querySelector(".btn-eliminar");
                     if (btnEliminar) {
-                        btnEliminar.classList.remove('hidden');
-                        btnEliminar.addEventListener('click', () => {
+                        btnEliminar.classList.remove("hidden");
+                        btnEliminar.addEventListener("click", () => {
                             nuevaFila.remove();
                             actualizarOpcionesDeshabilitadas();
                         });
                     }
 
                     if (nuevoSelect) {
-                        nuevoSelect.addEventListener('change', actualizarOpcionesDeshabilitadas);
+                        nuevoSelect.addEventListener(
+                            "change",
+                            actualizarOpcionesDeshabilitadas,
+                        );
                     }
 
                     contenedorFilas.appendChild(nuevaFila);
@@ -245,18 +378,23 @@
             });
         }
 
-        const selectsIniciales = contenedorFilas!.querySelectorAll('.producto-select');
-        selectsIniciales.forEach(select => {
-            (select as HTMLSelectElement).addEventListener('change', actualizarOpcionesDeshabilitadas);
+        const selectsIniciales =
+            contenedorFilas!.querySelectorAll(".producto-select");
+        selectsIniciales.forEach((select) => {
+            (select as HTMLSelectElement).addEventListener(
+                "change",
+                actualizarOpcionesDeshabilitadas,
+            );
         });
 
         actualizarOpcionesDeshabilitadas();
 
         if (btnCalcular && resultadoBox && contenedorFilas) {
-            btnCalcular.addEventListener('click', () => {
-                if (!validarDatosCliente()) return; 
+            btnCalcular.addEventListener("click", () => {
+                if (!validarDatosCliente()) return;
 
-                const filas = contenedorFilas.querySelectorAll('.fila-producto');
+                const filas =
+                    contenedorFilas.querySelectorAll(".fila-producto");
                 let subtotalGlobal = 0;
                 let cantidadPlanchasTotales = 0;
                 let hayErrores = false;
@@ -266,9 +404,13 @@
                 let cant38mm = 0;
                 let cantMalla = 0;
 
-                filas.forEach(fila => {
-                    const select = fila.querySelector('.producto-select') as HTMLSelectElement;
-                    const input = fila.querySelector('.cantidad-input') as HTMLInputElement;
+                filas.forEach((fila) => {
+                    const select = fila.querySelector(
+                        ".producto-select",
+                    ) as HTMLSelectElement;
+                    const input = fila.querySelector(
+                        ".cantidad-input",
+                    ) as HTMLInputElement;
 
                     const precio = parseFloat(select.value);
                     const cantidad = parseInt(input.value);
@@ -276,17 +418,26 @@
                     if (isNaN(cantidad) || cantidad <= 0) {
                         hayErrores = true;
                     } else {
-                        subtotalGlobal += (precio * cantidad);
+                        subtotalGlobal += precio * cantidad;
                         cantidadPlanchasTotales += cantidad;
 
                         // Mapeo técnico: Identificamos qué opción se seleccionó basándonos en el texto de la opción
-                        const textoProducto = select.options[select.selectedIndex].text.toLowerCase();
-                        
-                        if (textoProducto.includes('25 mm') || textoProducto.includes('25mm')) {
+                        const textoProducto =
+                            select.options[
+                                select.selectedIndex
+                            ].text.toLowerCase();
+
+                        if (
+                            textoProducto.includes("25 mm") ||
+                            textoProducto.includes("25mm")
+                        ) {
                             cant25mm += cantidad;
-                        } else if (textoProducto.includes('38 mm') || textoProducto.includes('38mm')) {
+                        } else if (
+                            textoProducto.includes("38 mm") ||
+                            textoProducto.includes("38mm")
+                        ) {
                             cant38mm += cantidad;
-                        } else if (textoProducto.includes('malla')) {
+                        } else if (textoProducto.includes("malla")) {
                             cantMalla += cantidad;
                         }
                     }
@@ -297,7 +448,8 @@
                         <span class="text-4xl mb-4">⚠️</span>
                         <p class="text-red-500 text-sm font-bold">Por favor, ingresa una cantidad válida en todas las filas de productos.</p>
                     `;
-                    resultadoBox.className = 'bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300';
+                    resultadoBox.className =
+                        "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
                     return;
                 }
 
@@ -312,35 +464,45 @@
                 resultadoBox.innerHTML = `
                     <div class="flex flex-col items-center justify-center animate-fade-in w-full">
                         <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Precio Total Estimado</span>
-                        <h3 class="text-5xl font-black text-white font-['Arial_Narrow']">$${totalFinal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span class="text-xl text-blue-300">USD</span></h3>
+                        <h3 class="text-5xl font-black text-white font-['Arial_Narrow']">$${totalFinal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span class="text-xl text-blue-300">USD</span></h3>
                         
                         <div class="w-full flex justify-between text-xs text-slate-300 mt-4 px-4 border-t border-slate-700 pt-3">
                             <span>Total Planchas:</span>
                             <span class="font-bold">${cantidadPlanchasTotales}</span>
                         </div>
 
-                        ${descuento > 0 ? `
+                        ${
+                            descuento > 0
+                                ? `
                             <div class="mt-3 bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-sm text-xs font-bold border border-emerald-500/40 flex items-center gap-1">
                                 <span>🎉</span> Descuento del 5% Aplicado (-$${descuento.toFixed(2)})
                             </div>
-                        ` : `
+                        `
+                                : `
                             <p class="text-[10px] text-slate-400 mt-2">Añade ${10 - cantidadPlanchasTotales} planchas más en total para un 5% de descuento.</p>
-                        `}
+                        `
+                        }
                     </div>
                 `;
-                resultadoBox.className = 'bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300';
+                resultadoBox.className =
+                    "bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
 
                 // 2. Armar mensaje de WhatsApp
-                let mensajeWa = `Hola MAKSER PERÚ, soy ${inputNombre.value} de la empresa ${inputEmpresa.value} (RUC: ${inputRuc.value}).\n\n`;
+                let mensajeWa = `Hola MAKSER PERÚ, soy ${inputNombre.value} de la empresa ${inputEmpresa.value} (RUC: ${inputRuc.value} , Correo: ${inputCorreo.value} ).\n\n`;
                 mensajeWa += `He cotizado en su página web el siguiente requerimiento:\n\n`;
 
-                filas.forEach(fila => {
-                    const select = fila.querySelector('.producto-select') as HTMLSelectElement;
-                    const input = fila.querySelector('.cantidad-input') as HTMLInputElement;
+                filas.forEach((fila) => {
+                    const select = fila.querySelector(
+                        ".producto-select",
+                    ) as HTMLSelectElement;
+                    const input = fila.querySelector(
+                        ".cantidad-input",
+                    ) as HTMLInputElement;
                     const cantidad = parseInt(input.value);
-                    
+
                     if (!isNaN(cantidad) && cantidad > 0) {
-                        const nombreProducto = select.options[select.selectedIndex].text;
+                        const nombreProducto =
+                            select.options[select.selectedIndex].text;
                         mensajeWa += `- ${cantidad} und x ${nombreProducto}\n`;
                     }
                 });
@@ -348,7 +510,9 @@
                 mensajeWa += `\n*TOTAL ESTIMADO: $${totalFinal.toFixed(2)} USD*\n\n`;
                 mensajeWa += `Por favor, envíenme una cotización formal y confírmenme stock.`;
 
-                const btnWaSimulador = document.getElementById('btn-whatsapp-simulador') as HTMLAnchorElement;
+                const btnWaSimulador = document.getElementById(
+                    "btn-whatsapp-simulador",
+                ) as HTMLAnchorElement;
                 if (btnWaSimulador) {
                     btnWaSimulador.href = `https://wa.me/51984649227?text=${encodeURIComponent(mensajeWa)}`;
                 }
@@ -360,26 +524,39 @@
                     nombre: inputNombre.value,
                     empresa: inputEmpresa.value,
                     ruc: inputRuc.value,
-                    cant_25mm: cant25mm,   // Pasa la cantidad acumulada o 0 si no se usó
-                    cant_38mm: cant38mm,   // Pasa la cantidad acumulada o 0 si no se usó
+                    correo: inputCorreo.value,
+                    cant_25mm: cant25mm, // Pasa la cantidad acumulada o 0 si no se usó
+                    cant_38mm: cant38mm, // Pasa la cantidad acumulada o 0 si no se usó
                     cant_malla: cantMalla, // Pasa la cantidad acumulada o 0 si no se usó
-                    total: totalFinal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                    total: totalFinal.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }),
                 };
 
-                const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbwcnVvzYZdy5pwklxXWayh1uhUmcWxq-WHeSW9EPj0aYSXVlo6I1Q5oo9rInlyHf9rpyQ/exec";
+                const urlGoogleSheets =
+                    "https://script.google.com/macros/s/AKfycbyUc3jXffHrq6e56R8Ljoa2OLQVUca1hOOZ2O39TvOZK3JDwynAxcq4NIVD5w4c5hjNZA/exec";
 
                 fetch(urlGoogleSheets, {
                     method: "POST",
                     mode: "no-cors",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(datosCotizacion)
+                    body: JSON.stringify(datosCotizacion),
                 })
-                .then(() => console.log("Datos en columnas fijas guardados correctamente."))
-                .catch(err => console.error("Error al guardar en Google Sheets:", err));
+                    .then(() =>
+                        console.log(
+                            "Datos en columnas fijas guardados correctamente.",
+                        ),
+                    )
+                    .catch((err) =>
+                        console.error(
+                            "Error al guardar en Google Sheets:",
+                            err,
+                        ),
+                    );
                 // ============================================================
-
             });
         }
     });
