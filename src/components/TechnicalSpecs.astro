@@ -1,5 +1,88 @@
 ---
 // src/components/TechnicalSpecs.astro
+
+interface TableRow {
+    label: string;
+    value: string;
+}
+
+interface ChemItem {
+    label: string;
+    value: string;
+}
+
+interface Props {
+    // Encabezado principal
+    headerBadge?: string;
+    headerTitle?: string;
+    headerHighlight?: string;
+    headerDescription?: string;
+
+    // Tarjeta 1: Propiedades Físicas
+    card1Badge1?: string;
+    card1Badge2?: string;
+    card1Title?: string;
+    tableRow1?: TableRow;
+    tableRow2?: TableRow;
+    tableRow3?: TableRow;
+    tableRow4?: TableRow;
+    
+    // Sistema de fijación
+    fixationTitle?: string;
+    fixationText1?: string;
+    fixationBold1?: string;
+    fixationText2?: string;
+    fixationBold2?: string;
+    fixationText3?: string;
+    card1Footer?: string;
+
+    // Tarjeta 2: Inmunidad Química
+    card2Badge1?: string;
+    card2Badge2?: string;
+    card2Title?: string;
+    card2Description?: string;
+    chemItem1?: ChemItem;
+    chemItem2?: ChemItem;
+    chemItem3?: ChemItem;
+    chemItem4?: ChemItem;
+    card2Footer?: string;
+}
+
+const {
+    headerBadge = "Datos de Ingeniería • Ensayo",
+    headerTitle = "Especificaciones",
+    headerHighlight = "Técnicas",
+    headerDescription = "Datos duros y tolerancia de materiales probados en laboratorio. Información certificada para aprobación en proyectos y obras.",
+    
+    card1Badge1 = "Estructura y Dimensiones",
+    card1Badge2 = "Matriz Estándar",
+    card1Title = "Propiedades Físicas del Panel",
+    
+    tableRow1 = { label: "Composición Estructural", value: "68% Resina / 32% Fibra de Vidrio" },
+    tableRow2 = { label: "Dimensiones del Panel", value: "1220 x 3660 mm / 1000 x 4000 mm" },
+    tableRow3 = { label: "Peso Promedio Estructural", value: "21.5 Kg / m²" },
+    tableRow4 = { label: "Acabado de Superficie", value: "Grit (Antideslizante de alta fricción)" },
+
+    fixationTitle = "⚙️ Sistema de Fijación Recomendado",
+    fixationText1 = "Uso estricto de",
+    fixationBold1 = "Clip Tipo M en Acero Inoxidable (Inox M-50)",
+    fixationText2 = "con perno, tuerca y arandela de 1/4\" x 2\". Se exige anclar un mínimo de",
+    fixationBold2 = "4 fijaciones por cada m²",
+    fixationText3 = "de rejilla.",
+    card1Footer = "Material Dieléctrico • Ignífugo • Liviano",
+
+    card2Badge1 = "Límites Térmicos",
+    card2Badge2 = "Grado Industrial",
+    card2Title = "Inmunidad Química",
+    card2Description = "Tolerancia térmica máxima sugerida para resinas de grado Premium expuestas a fluidos agresivos comunes en minas y refinerías peruanas:",
+    
+    chemItem1 = { label: "💧 Agua de Mar", value: "Hasta 100°C" },
+    chemItem2 = { label: "🧪 Ácido Clorhídrico (15%)", value: "Hasta 100°C" },
+    chemItem3 = { label: "⛽ Combustible Diésel", value: "Hasta 60°C" },
+    chemItem4 = { label: "🧂 Salmuera Avanzada", value: "Hasta 100°C" },
+    
+    card2Footer = "Cero Corrosión en Entornos Ácidos"
+} = Astro.props;
 ---
 
 <section id="especificaciones-tecnicas" class="w-full bg-[#0A0E1A] py-16 md:py-24 px-4 sm:px-6 relative overflow-hidden text-white border-b border-slate-900/50">
@@ -10,13 +93,13 @@
         
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800/60 pb-8">
             <div class="space-y-2">
-                <span class="text-[10px] font-mono tracking-widest text-blue-400 uppercase font-bold">Datos de Ingeniería • Ensayo</span>
+                <span class="text-[10px] font-mono tracking-widest text-blue-400 uppercase font-bold">{headerBadge}</span>
                 <h2 class="text-3xl md:text-5xl font-black tracking-tight text-white font-['Arial_Narrow',sans-serif-condensed] uppercase leading-none">
-                    Especificaciones <span class="text-blue-500">Técnicas</span>
+                    {headerTitle} <span class="text-blue-500">{headerHighlight}</span>
                 </h2>
             </div>
             <p class="text-slate-400 text-xs md:text-sm max-w-sm font-normal leading-relaxed">
-                Datos duros y tolerancia de materiales probados en laboratorio. Información certificada para aprobación en proyectos y obras.
+                {headerDescription}
             </p>
         </div>
 
@@ -25,82 +108,82 @@
             <div class="lg:col-span-7 bg-[#0D1220] border border-slate-800/40 rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col justify-between hover:border-blue-500/20 transition-all duration-300 shadow-xl shadow-black/30">
                 <div class="space-y-6 w-full">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <span class="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-blue-500/20">Estructura y Dimensiones</span>
-                        <span class="text-[11px] font-mono text-slate-500">Matriz Estándar</span>
+                        <span class="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-blue-500/20">{card1Badge1}</span>
+                        <span class="text-[11px] font-mono text-slate-500">{card1Badge2}</span>
                     </div>
                     
-                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight font-['Arial_Narrow',sans-serif-condensed]">Propiedades Físicas del Panel</h3>
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight font-['Arial_Narrow',sans-serif-condensed]">{card1Title}</h3>
                     
                     <div class="w-full overflow-x-auto text-xs font-mono">
                         <table class="w-full text-left divide-y divide-slate-800/60">
                             <tbody>
                                 <tr class="border-b border-slate-800/40">
-                                    <td class="py-3 pr-4 text-slate-400 align-top">Composición Estructural</td>
-                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">68% Resina / 32% Fibra de Vidrio</td>
+                                    <td class="py-3 pr-4 text-slate-400 align-top">{tableRow1.label}</td>
+                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">{tableRow1.value}</td>
                                 </tr>
                                 <tr class="border-b border-slate-800/40">
-                                    <td class="py-3 pr-4 text-slate-400 align-top">Dimensiones del Panel</td>
-                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">1220 x 3660 mm / 1000 x 4000 mm</td>
+                                    <td class="py-3 pr-4 text-slate-400 align-top">{tableRow2.label}</td>
+                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">{tableRow2.value}</td>
                                 </tr>
                                 <tr class="border-b border-slate-800/40">
-                                    <td class="py-3 pr-4 text-slate-400 align-top">Peso Promedio Estructural</td>
-                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">21.5 Kg / m²</td>
+                                    <td class="py-3 pr-4 text-slate-400 align-top">{tableRow3.label}</td>
+                                    <td class="py-3 text-white font-bold text-right wrap-break-word align-top">{tableRow3.value}</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-3 pr-4 text-slate-400 align-top">Acabado de Superficie</td>
-                                    <td class="py-3 text-blue-400 font-bold text-right wrap-break-word align-top">Grit (Antideslizante de alta fricción)</td>
+                                    <td class="py-3 pr-4 text-slate-400 align-top">{tableRow4.label}</td>
+                                    <td class="py-3 text-blue-400 font-bold text-right wrap-break-word align-top">{tableRow4.value}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 mt-4">
-                        <h4 class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider mb-1">⚙️ Sistema de Fijación Recomendado</h4>
+                        <h4 class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider mb-1">{fixationTitle}</h4>
                         <p class="text-slate-400 text-xs leading-relaxed">
-                            Uso estricto de <strong class="text-slate-200">Clip Tipo M en Acero Inoxidable (Inox M-50)</strong> con perno, tuerca y arandela de 1/4" x 2". Se exige anclar un mínimo de <strong class="text-white">4 fijaciones por cada m²</strong> de rejilla.
+                            {fixationText1} <strong class="text-slate-200">{fixationBold1}</strong> {fixationText2} <strong class="text-white">{fixationBold2}</strong> {fixationText3}
                         </p>
                     </div>
                 </div>
 
                 <div class="pt-6 text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-2 border-t border-slate-800/40 mt-6">
-                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Material Dieléctrico • Ignífugo • Liviano
+                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> {card1Footer}
                 </div>
             </div>
 
             <div class="lg:col-span-5 bg-[#0D1220] border border-slate-800/40 rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col justify-between hover:border-amber-500/20 transition-all duration-300 shadow-xl shadow-black/30">
                 <div class="space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <span class="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-amber-500/20">Límites Térmicos</span>
-                        <span class="text-[11px] font-mono text-slate-500">Grado Industrial</span>
+                        <span class="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-amber-500/20">{card2Badge1}</span>
+                        <span class="text-[11px] font-mono text-slate-500">{card2Badge2}</span>
                     </div>
                     
-                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight font-['Arial_Narrow',sans-serif-condensed]">Inmunidad Química</h3>
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight font-['Arial_Narrow',sans-serif-condensed]">{card2Title}</h3>
                     <p class="text-slate-400 text-xs font-normal leading-relaxed">
-                        Tolerancia térmica máxima sugerida para resinas de grado Premium expuestas a fluidos agresivos comunes en minas y refinerías peruanas:
+                        {card2Description}
                     </p>
 
                     <div class="space-y-3 font-mono text-xs pt-2">
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-300 flex items-center gap-2 min-w-0">💧 Agua de Mar</span>
-                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">Hasta 100°C</span>
+                            <span class="text-slate-300 flex items-center gap-2 min-w-0">{chemItem1.label}</span>
+                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">{chemItem1.value}</span>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-300 flex items-center gap-2 min-w-0">🧪 Ácido Clorhídrico (15%)</span>
-                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">Hasta 100°C</span>
+                            <span class="text-slate-300 flex items-center gap-2 min-w-0">{chemItem2.label}</span>
+                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">{chemItem2.value}</span>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-300 flex items-center gap-2 min-w-0">⛽ Combustible Diésel</span>
-                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">Hasta 60°C</span>
+                            <span class="text-slate-300 flex items-center gap-2 min-w-0">{chemItem3.label}</span>
+                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">{chemItem3.value}</span>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-300 flex items-center gap-2 min-w-0">🧂 Salmuera Avanzada</span>
-                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">Hasta 100°C</span>
+                            <span class="text-slate-300 flex items-center gap-2 min-w-0">{chemItem4.label}</span>
+                            <span class="text-emerald-400 font-bold sm:text-right shrink-0">{chemItem4.value}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="pt-6 text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-2 border-t border-slate-800/40 mt-6">
-                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Cero Corrosión en Entornos Ácidos
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> {card2Footer}
                 </div>
             </div>
 
