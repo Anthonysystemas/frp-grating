@@ -1,0 +1,103 @@
+---
+// src/components/PeldanosSection.astro
+const phone = "51984649227";
+const defaultMessage = encodeURIComponent("Hola Makser, deseo solicitar una cotización de Peldaños Metálicos a medida.");
+---
+
+<section id="peldanos" class="relative w-full bg-[#0A0E1A] py-20 px-4 sm:px-6 border-b border-slate-900/50">
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      
+      <!-- COLUMNA IZQUIERDA: INFORMACIÓN TÉCNICA -->
+      <div class="space-y-6">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-[2px] bg-blue-500 inline-block"></span>
+          <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">
+            Máxima Seguridad Estructural
+          </span>
+        </div>
+
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase">
+          Peldaños <span class="text-blue-500">Metálicos</span>
+        </h2>
+
+        <p class="text-slate-300 text-base leading-relaxed">
+          Fabricamos peldaños a la medida de tu proyecto, configurables con platinas <strong class="text-white font-semibold">LISAS</strong> o <strong class="text-white font-semibold">DENTADAS</strong> en acabado de acero natural o <strong class="text-white font-semibold">galvanizado en caliente</strong>.
+        </p>
+
+        <!-- CAJA DESTACADA: CORROSIÓN Y FIJACIÓN -->
+        <div class="bg-[#0D1220] border-l-4 border-blue-500 p-5 rounded-r-xl border-y border-r border-slate-800/80">
+          <h3 class="text-white font-bold text-sm uppercase tracking-wide mb-1 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Resistencia en Ambientes Severos
+          </h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Para ambientes de alta humedad o contacto con agentes corrosivos donde el galvanizado sufre mayor desgaste, recomendamos el uso de peldaños con <strong class="text-slate-200">sistema de fijación mediante tornillos</strong> para un mantenimiento o reemplazo ágil.
+          </p>
+        </div>
+
+        <!-- USOS PRINCIPALES -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Usos Recomendados:</h4>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+            <li class="flex items-center gap-2 bg-[#060913] p-3 rounded-lg border border-slate-800">
+              <span class="text-blue-500">✓</span> Escaleras de emergencia
+            </li>
+            <li class="flex items-center gap-2 bg-[#060913] p-3 rounded-lg border border-slate-800">
+              <span class="text-blue-500">✓</span> Alto tránsito peatonal
+            </li>
+            <li class="flex items-center gap-2 bg-[#060913] p-3 rounded-lg border border-slate-800">
+              <span class="text-blue-500">✓</span> Pisos antideslizantes
+            </li>
+            <li class="flex items-center gap-2 bg-[#060913] p-3 rounded-lg border border-slate-800">
+              <span class="text-blue-500">✓</span> Plataformas críticas e industriales
+            </li>
+          </ul>
+        </div>
+
+        <!-- BOTÓN DE CONTACTO RÁPIDO -->
+        <div class="pt-2">
+          <a 
+            href={`https://wa.me/${phone}?text=${defaultMessage}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg hover:shadow-blue-500/20 transition-all duration-200 text-xs uppercase tracking-wider"
+          >
+            Cotizar Peldaños por WhatsApp
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: TARJETA DE VISTA PREVIA / IMAGEN -->
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+        <div class="relative bg-[#0D1220] border border-slate-800 rounded-xl overflow-hidden shadow-2xl aspect-video sm:aspect-square flex flex-col justify-end p-6">
+          <img 
+            src="/images/peldanos1.jpg" 
+            alt="Peldaños metálicos antideslizantes"
+            class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0D1220] via-[#0D1220]/40 to-transparent"></div>
+          
+          <div class="relative z-10 space-y-1">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-blue-400 bg-blue-950/80 px-2 py-1 rounded border border-blue-800/50 inline-block">
+              Fabricación a Medida
+            </span>
+            <h3 class="text-xl font-bold text-white">Superficie Antideslizante</h3>
+            <p class="text-xs text-slate-300">Evita resbalones y caídas en zonas industriales de alto riesgo.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
