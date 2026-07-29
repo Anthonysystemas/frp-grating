@@ -1,0 +1,145 @@
+---
+// src/components/QuoteFormMetalico.astro
+const phone = "51984649227";
+---
+
+<section id="cotizar-metalico" class="relative w-full bg-[#0A0E1A] py-16 px-4 sm:px-6 border-b border-slate-900/50">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- ENCABEZADO DE LA SECCIÓN -->
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <div class="flex items-center justify-center gap-2 mb-3">
+        <span class="w-8 h-[2px] bg-blue-500 inline-block"></span>
+        <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">
+          Cotización Especializada
+        </span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight uppercase">
+        Cotizar <span class="text-blue-500">Grating Metálico</span>
+      </h2>
+      <p class="mt-2 text-slate-400 text-sm sm:text-base">
+        Ingresa las especificaciones técnicas de tu proyecto y recibe atención inmediata por WhatsApp.
+      </p>
+    </div>
+
+    <!-- FORMULARIO DE COTIZACIÓN -->
+    <form id="metalForm" class="bg-[#0D1220] border border-slate-800 rounded-xl p-6 sm:p-8 shadow-2xl max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- COLUMNA 1: PLATINA -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+              Platina Portante
+            </label>
+            <input 
+              type="text" 
+              id="platinaPortante" 
+              placeholder="Ej: Espesor x Altura (1/8 x 1)" 
+              class="w-full bg-[#060913] border border-slate-700/60 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+              Acabado Platina
+            </label>
+            <select 
+              id="acabadoPlatina" 
+              class="w-full bg-[#060913] border border-slate-700/60 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            >
+              <option value="Lisa">Lisa</option>
+              <option value="Dentada (Antideslizante)">Dentada (Antideslizante)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- COLUMNA 2: DIMENSIONES -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+              Dimensiones Exteriores / Cantidad
+            </label>
+            <input 
+              type="text" 
+              id="dimensionesCantidad" 
+              placeholder="Largo x Ancho / Cantidad" 
+              class="w-full bg-[#060913] border border-slate-700/60 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+              Acabado Grating
+            </label>
+            <select 
+              id="acabadoGrating" 
+              class="w-full bg-[#060913] border border-slate-700/60 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            >
+              <option value="Galvanizado en Caliente">Galvanizado en Caliente</option>
+              <option value="Negro / Natural (Sin galvanizar)">Negro / Natural (Sin galvanizar)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- COLUMNA 3: CONTACTO -->
+        <div class="space-y-4 flex flex-col justify-between">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+              Empresa / Correo 
+            </label>
+            <input 
+              type="text" 
+              id="empresaCorreo" 
+              placeholder="Nombre de empresa o correo" 
+              class="w-full bg-[#060913] border border-slate-700/60 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          <!-- BOTÓN ENVIAR -->
+          <div class="pt-2">
+            <button 
+              type="submit" 
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-6 rounded-lg shadow-lg hover:shadow-blue-500/25 transition-all duration-200 uppercase tracking-wider text-sm flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Enviar Datos por WhatsApp</span>
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+</section>
+
+<script is:inline define:vars={{ phone }}>
+  document.getElementById('metalForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const platina = document.getElementById('platinaPortante').value.trim() || 'No especificado';
+    const acabadoPlat = document.getElementById('acabadoPlatina').value;
+    const dimensiones = document.getElementById('dimensionesCantidad').value.trim() || 'No especificado';
+    const acabadoGrat = document.getElementById('acabadoGrating').value;
+    const contacto = document.getElementById('empresaCorreo').value.trim() || 'No especificado';
+
+    // Generar mensaje estructurado
+    const textMessage = 
+      `*COTIZACIÓN DE GRATING METÁLICO - MAKSER PERÚ*\n\n` +
+      `📌 *Platina Portante:* ${platina}\n` +
+      `📌 *Acabado Platina:* ${acabadoPlat}\n` +
+      `📐 *Dimensiones / Cantidad:* ${dimensiones}\n` +
+      `⚙️ *Acabado Grating:* ${acabadoGrat}\n` +
+      `🏢 *Empresa / Contacto:* ${contacto}\n\n` +
+      `Hola, solicito el presupuesto para las especificaciones arriba detalladas.`;
+
+    const encodedText = encodeURIComponent(textMessage);
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodedText}`;
+
+    // Abrir WhatsApp en pestaña nueva
+    window.open(whatsappUrl, '_blank');
+  });
+</script>

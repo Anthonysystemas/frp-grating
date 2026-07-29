@@ -1,0 +1,153 @@
+---
+// src/pages/rejillas-de-ducha.astro
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import CotizadorDucha from '../components/CotizadorDucha.astro';
+
+import '../styles/global.css';
+
+const modelos = [
+  { id: 'MK1', img: '/images/modelo_duchas/mk1.jpg' },
+  { id: 'MK2', img: '/images/modelo_duchas/mk2.jpg' },
+  { id: 'MK3', img: '/images/modelo_duchas/mk3.jpg' },
+  { id: 'MK4', img: '/images/modelo_duchas/mk4.jpg' },
+  { id: 'MK5', img: '/images/modelo_duchas/mk5.jpg' },
+  { id: 'MK6', img: '/images/modelo_duchas/mk6.jpg' },
+  { id: 'MK7', img: '/images/modelo_duchas/mk7.jpg' },
+  { id: 'MK8', img: '/images/modelo_duchas/mk8.jpg' },
+  { id: 'MK9', img: '/images/modelo_duchas/mk9.jpg' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rejillas Lineales de Ducha en Acero Inoxidable | Maskel Perú</title>
+  <meta name="description" content="Rejillas lineales de ducha delgadas y únicas en Acero Inoxidable AISI 304. Medidas de 80cm, 90cm y 1m, profundidad 2cm. Modelos del MK1 al MK9." />
+</head>
+<body class="bg-[#080C16] text-slate-100 min-h-screen antialiased flex flex-col justify-between">
+
+  <Navbar />
+
+  <main class="pt-28 pb-16 px-4 sm:px-6 flex-grow">
+    <div class="max-w-7xl mx-auto space-y-12">
+      
+      <!-- BREADCRUMB -->
+      <nav class="text-xs text-slate-400">
+        <a href="/" class="hover:text-blue-400 transition-colors">← Volver al Inicio</a> 
+        <span class="mx-2">/</span> 
+        <a href="/#productos" class="hover:text-blue-400 transition-colors">Productos</a> 
+        <span class="mx-2">/</span> 
+        <span class="text-blue-400 font-semibold">Rejilla Lineal de Ducha</span>
+      </nav>
+
+      <!-- SECCIÓN PRINCIPAL: PRODUCTO Y MEDIDAS -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-[#0D1322] border border-blue-500/20 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+        
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- FOTO PRINCIPAL -->
+        <div class="lg:col-span-6 relative group">
+          <div class="rounded-xl overflow-hidden border border-slate-800 bg-[#0A0E1A]">
+            <img 
+              src="/images/rejilladucha.jpg" 
+              alt="Rejilla Lineal de Ducha Acero Inoxidable AISI 304 Maskel Perú" 
+              class="w-full h-[350px] sm:h-[420px] object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          <div class="absolute top-4 left-4 bg-blue-600/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md">
+            Acero Inoxidable AISI 304
+          </div>
+        </div>
+
+        <!-- DETALLES TÉCNICOS -->
+        <div class="lg:col-span-6 space-y-6">
+          <div>
+            <span class="text-blue-400 text-xs font-bold uppercase tracking-widest">
+              Línea Sanitaria & Arquitectónica
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight mt-1">
+              Rejilla Lineal de Ducha
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
+              Diseño súper delgado, elegante y único. Fabricadas enteramente en <strong class="text-white">Acero Inoxidable Calidad AISI 304</strong>, garantizando durabilidad extrema y excelente capacidad de drenaje.
+            </p>
+          </div>
+
+          <!-- MEDIDAS DISPONIBLES -->
+          <div class="space-y-2 border-t border-b border-slate-800 py-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Medidas Estándar (Ancho × Largo × Profundidad)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="bg-[#0A0E1A] border border-slate-800 p-2.5 rounded-lg text-center">
+                <span class="block text-blue-400 font-bold text-sm">7 cm × 80 cm</span>
+                <span class="text-[11px] text-slate-400">2 cm prof.</span>
+              </div>
+              <div class="bg-[#0A0E1A] border border-slate-800 p-2.5 rounded-lg text-center">
+                <span class="block text-blue-400 font-bold text-sm">7 cm × 90 cm</span>
+                <span class="text-[11px] text-slate-400">2 cm prof.</span>
+              </div>
+              <div class="bg-[#0A0E1A] border border-slate-800 p-2.5 rounded-lg text-center">
+                <span class="block text-blue-400 font-bold text-sm">7 cm × 1 m</span>
+                <span class="text-[11px] text-slate-400">2 cm prof.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COMPONENTE SIMULADOR COTIZADOR -->
+      
+
+      <!-- SECCIÓN MODELOS MK1 - MK9 CON FOTOS REALES -->
+      <section class="space-y-6">
+        <div class="border-l-4 border-blue-500 pl-4">
+          <h2 class="text-2xl font-black uppercase text-white tracking-tight">
+            Catálogo de Modelos (MK1 al MK9)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Diseños y patrones de grabado en Acero Inoxidable AISI 304
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+          {
+            modelos.map((modelo) => (
+              <div class="bg-[#0D1322] border border-slate-800 rounded-xl p-4 hover:border-blue-500/50 transition-all group">
+                <div class="bg-[#0A0E1A] rounded-lg aspect-video flex items-center justify-center border border-slate-800/80 mb-3 overflow-hidden relative">
+                  <img 
+                    src={modelo.img} 
+                    alt={`Modelo ${modelo.id} - Rejilla de Ducha Maskel Perú`}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">
+                    Modelo {modelo.id}
+                  </h3>
+                  <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+                    AISI 304
+                  </span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <CotizadorDucha />
+
+    </div>
+  </main>
+
+  <WhatsAppButton />
+  <Footer />
+
+</body>
+</html>

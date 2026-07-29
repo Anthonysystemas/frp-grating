@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import Gallery from '../components/Gallery.astro';
+import QuoteFormMetalico from '../components/QuoteFormMetalico.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+---
+
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth bg-[#0A0E1A]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Básico -->
+    <title>Grating Metálico - Rejillas de Acero Electroforjado | Makser Perú</title>
+    <meta 
+      name="description" 
+      content="Importación y distribución de rejillas de acero electroforjado y galvanizado (Grating Metálico) en Perú. Alta resistencia estructural para minería e industria." 
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Redes Sociales -->
+    <meta property="og:title" content="Grating Metálico | Makser Perú" />
+    <meta property="og:description" content="Rejillas de acero electroforjado y galvanizado de alta resistencia para plataformas e industrias." />
+    <meta property="og:type" content="website" />
+  </head>
+
+  <body class="text-slate-100 min-h-screen flex flex-col justify-between">
+    
+    <Navbar />
+
+    <main class="flex-1">
+      
+      <!-- Galería de Rejillas Metálicas -->
+      <Gallery 
+        tagline="Galería de producto · Acero Electroforjado"
+        titleNormal="REJILLAS"
+        titleHighlight="METÁLICAS"
+        description="Rejillas de acero electroforjado y galvanizado de alta resistencia para uso industrial, pasarelas y plataformas."
+        images={[
+          { src: "/images/metalico1.jpg", alt: "Rejilla Metálica Electroforjada", hoverColor: "hover:shadow-blue-500/20" },
+          { src: "/images/metalico2.jpg", alt: "Plataforma de Grating Metálico", hoverColor: "hover:shadow-amber-500/20" },
+          { src: "/images/metalico3.jpg", alt: "Rejilla Galvanizada Industrial", hoverColor: "hover:shadow-cyan-500/20" },
+          { src: "/images/metalico4.jpg", alt: "Detalle Rejilla Metálica", hoverColor: "hover:shadow-blue-500/20" },
+        ]}
+      />
+
+      <!-- Simulador de Cotización / Selección -->
+      <QuoteFormMetalico />
+
+    </main>
+
+    <!-- Botón flotante de WhatsApp dinámico -->
+    <WhatsAppButton 
+      message="Hola Makser, deseo una cotización de rejillas Grating Metálico / Acero Electroforjado" 
+    />
+
+    <Footer />
+
+  </body>
+</html>

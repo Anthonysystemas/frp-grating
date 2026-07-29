@@ -1,0 +1,322 @@
+---
+// src/components/CotizadorDucha.astro
+---
+
+<section class="bg-[#0D1322] border border-blue-500/30 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden my-10">
+  <div class="border-l-4 border-blue-500 pl-4 mb-6">
+    <h2 class="text-xl sm:text-2xl font-black uppercase text-white tracking-tight">
+      Cotizador B2B - Rejillas Lineales de Ducha
+    </h2>
+    <p class="text-xs text-slate-400 mt-1">
+      Ingrese los datos de su empresa y configure su pedido combinando múltiples modelos.
+    </p>
+  </div>
+
+  <form id="form-cotizador" class="space-y-6">
+    
+    <!-- DATOS DE LA EMPRESA -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-[#0A0E1A] border border-slate-800 rounded-xl">
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold uppercase text-slate-300 block">
+          Razón Social / Empresa <span class="text-blue-400">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="empresa-nombre" 
+          required
+          placeholder="Ej. Constructora S.A.C." 
+          class="w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:border-blue-500 focus:outline-none"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold uppercase text-slate-300 block">
+          RUC de la Empresa <span class="text-blue-400">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="empresa-ruc" 
+          required
+          maxlength="11"
+          placeholder="Ej. 20123456789" 
+          class="w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:border-blue-500 focus:outline-none font-mono"
+        />
+        <span id="ruc-error" class="text-[10px] text-red-400 hidden">RUC inválido (Debe iniciar con 10 o 20 y tener 11 dígitos)</span>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold uppercase text-slate-300 block">
+          Correo Electrónico <span class="text-blue-400">*</span>
+        </label>
+        <input 
+          type="email" 
+          id="empresa-correo" 
+          required
+          placeholder="contacto@empresa.com" 
+          class="w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:border-blue-500 focus:outline-none"
+        />
+      </div>
+    </div>
+
+    <!-- SECCIÓN DE SELECCIÓN DE PRODUCTOS (MULTI-MODELO) -->
+    <div class="space-y-4 pt-2">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase text-slate-300 tracking-wider">
+          Selección de Productos y Modelos:
+        </h3>
+        <button 
+          type="button" 
+          id="btn-add-item"
+          class="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg transition-colors font-semibold flex items-center gap-1.5"
+        >
+          <span>+ Añadir otro modelo</span>
+        </button>
+      </div>
+
+      <!-- CONTENEDOR DE FILAS DE PRODUCTOS -->
+      <div id="items-container" class="space-y-3">
+        <!-- Fila por defecto -->
+        <div class="item-row grid grid-cols-1 sm:grid-cols-12 gap-3 p-3 bg-[#0A0E1A] border border-slate-800 rounded-xl items-center">
+          <div class="sm:col-span-5 space-y-1">
+            <label class="text-[10px] text-slate-400 uppercase">Medida:</label>
+            <select class="item-medida w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2 focus:border-blue-500 focus:outline-none">
+              <option value="7 cm x 80 cm (Prof. 2 cm)" data-precio="120">7 cm × 80 cm (S/ 120)</option>
+              <option value="7 cm x 90 cm (Prof. 2 cm)" data-precio="135">7 cm × 90 cm (S/ 135)</option>
+              <option value="7 cm x 1 m (Prof. 2 cm)" data-precio="150">7 cm × 1 m (S/ 150)</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-4 space-y-1">
+            <label class="text-[10px] text-slate-400 uppercase">Diseño / Modelo:</label>
+            <select class="item-modelo w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2 focus:border-blue-500 focus:outline-none">
+              <option value="MK1">Modelo MK1</option>
+              <option value="MK2">Modelo MK2</option>
+              <option value="MK3">Modelo MK3</option>
+              <option value="MK4">Modelo MK4</option>
+              <option value="MK5">Modelo MK5</option>
+              <option value="MK6">Modelo MK6</option>
+              <option value="MK7">Modelo MK7</option>
+              <option value="MK8">Modelo MK8</option>
+              <option value="MK9">Modelo MK9</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2 space-y-1">
+            <label class="text-[10px] text-slate-400 uppercase">Cantidad:</label>
+            <input type="number" value="1" min="1" class="item-cantidad w-full bg-[#080C16] border border-slate-700 text-white text-xs rounded-lg p-2 text-center focus:border-blue-500 focus:outline-none" />
+          </div>
+
+          <div class="sm:col-span-1 flex items-end justify-center pt-5 sm:pt-0">
+            <button type="button" class="btn-remove-item text-slate-500 hover:text-red-400 p-2 transition-colors hidden" title="Eliminar fila">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+      <p id="duplicado-warning" class="text-xs text-amber-400 hidden">⚠️ Ya tienes este mismo modelo y medida en la lista. Se ha sumado la cantidad automáticamente.</p>
+    </div>
+
+    <!-- RESUMEN, TOTAL Y BOTÓN DE WHATSAPP -->
+    <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left space-y-1">
+        <span class="text-xs text-slate-400 block uppercase tracking-wider">Total Estimado de la Cotización:</span>
+        <div>
+          <span id="precio-total-general" class="text-2xl font-black text-blue-400">S/ 120.00</span>
+          <span class="text-[10px] text-slate-500 block italic">*Precios referenciales en Acero AISI 304</span>
+        </div>
+      </div>
+
+      <button 
+        type="submit"
+        id="btn-enviar-cotizacion"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-600/20 cursor-pointer"
+      >
+        💬 Enviar Cotización por WhatsApp
+      </button>
+    </div>
+
+  </form>
+</section>
+
+<script>
+  const numeroWhatsApp = "51984649227";
+  const form = document.getElementById('form-cotizador') as HTMLFormElement;
+  const inputRuc = document.getElementById('empresa-ruc') as HTMLInputElement;
+  const rucError = document.getElementById('ruc-error');
+  const itemsContainer = document.getElementById('items-container') as HTMLElement;
+  const btnAddItem = document.getElementById('btn-add-item');
+  const precioTotalGeneral = document.getElementById('precio-total-general');
+  const duplicadoWarning = document.getElementById('duplicado-warning');
+
+  // Validar formato de RUC (11 dígitos, inicia con 10 o 20)
+  function validarRuc(ruc: string): boolean {
+    const regexRuc = /^(10|20)\d{9}$/;
+    return regexRuc.test(ruc);
+  }
+
+  inputRuc?.addEventListener('input', () => {
+    // Solo permitir números
+    inputRuc.value = inputRuc.value.replace(/\D/g, '');
+    if (inputRuc.value.length === 11) {
+      if (validarRuc(inputRuc.value)) {
+        rucError?.classList.add('hidden');
+        inputRuc.classList.remove('border-red-500');
+        inputRuc.classList.add('border-emerald-500');
+      } else {
+        rucError?.classList.remove('hidden');
+        inputRuc.classList.add('border-red-500');
+        inputRuc.classList.remove('border-emerald-500');
+      }
+    } else {
+      rucError?.classList.add('hidden');
+      inputRuc.classList.remove('border-red-500', 'border-emerald-500');
+    }
+    actualizarCalculos();
+  });
+
+  // Calcular precio total y actualizar estado de botones de eliminar
+  function actualizarCalculos() {
+    let totalGeneral = 0;
+    const filas = itemsContainer.querySelectorAll('.item-row');
+
+    filas.forEach((fila) => {
+      const selectMedida = fila.querySelector('.item-medida') as HTMLSelectElement;
+      const inputCantidad = fila.querySelector('.item-cantidad') as HTMLInputElement;
+      
+      const option = selectMedida.options[selectMedida.selectedIndex];
+      const precioUnitario = parseFloat(option.getAttribute('data-precio') || "0");
+      const cantidad = Math.max(1, parseInt(inputCantidad.value) || 1);
+
+      totalGeneral += precioUnitario * cantidad;
+    });
+
+    if (precioTotalGeneral) {
+      precioTotalGeneral.textContent = `S/ ${totalGeneral.toFixed(2)}`;
+    }
+
+    // Mostrar u ocultar botón de eliminar si hay más de 1 fila
+    filas.forEach((fila, index) => {
+      const btnRemove = fila.querySelector('.btn-remove-item');
+      if (filas.length > 1) {
+        btnRemove?.classList.remove('hidden');
+      } else {
+        btnRemove?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Añadir nueva fila asegurando que no se repita la combinación idéntica por defecto
+  btnAddItem?.addEventListener('click', () => {
+    duplicadoWarning?.classList.add('hidden');
+    const templateFila = itemsContainer.firstElementChild?.cloneNode(true) as HTMLElement;
+    
+    // Resetear valores de la nueva fila
+    const selectModelo = templateFila.querySelector('.item-modelo') as HTMLSelectElement;
+    const inputCantidad = templateFila.querySelector('.item-cantidad') as HTMLInputElement;
+    inputCantidad.value = "1";
+
+    // Adjuntar eventos a los nuevos elementos
+    templateFila.querySelectorAll('select, input').forEach(el => {
+      el.addEventListener('change', () => {
+        verificarDuplicadosYActualizar();
+      });
+      el.addEventListener('input', () => {
+        verificarDuplicadosYActualizar();
+      });
+    });
+
+    templateFila.querySelector('.btn-remove-item')?.addEventListener('click', () => {
+      templateFila.remove();
+      actualizarCalculos();
+    });
+
+    itemsContainer.appendChild(templateFila);
+    actualizarCalculos();
+  });
+
+  // Comprobar si hay elementos exactamente iguales (misma medida y mismo modelo)
+  function verificarDuplicadosYActualizar() {
+    const filas = Array.from(itemsContainer.querySelectorAll('.item-row'));
+    const combinaciones = new Set();
+    let hayDuplicado = false;
+
+    filas.forEach(fila => {
+      const medida = (fila.querySelector('.item-medida') as HTMLSelectElement).value;
+      const modelo = (fila.querySelector('.item-modelo') as HTMLSelectElement).value;
+      const clave = `${medida}_${modelo}`;
+
+      if (combinaciones.has(clave)) {
+        hayDuplicado = true;
+        // Si detecta duplicado, sumamos la cantidad al elemento original y removemos este
+        filas.forEach(f => {
+          const mMedida = (f.querySelector('.item-medida') as HTMLSelectElement).value;
+          const mModelo = (f.querySelector('.item-modelo') as HTMLSelectElement).value;
+          if (f !== fila && mMedida === medida && mModelo === modelo) {
+            const cantOriginal = parseInt((f.querySelector('.item-cantidad') as HTMLInputElement).value) || 1;
+            const cantRepetida = parseInt((fila.querySelector('.item-cantidad') as HTMLInputElement).value) || 1;
+            (f.querySelector('.item-cantidad') as HTMLInputElement).value = String(cantOriginal + cantRepetida);
+            fila.remove();
+          }
+        });
+      } else {
+        combinaciones.add(clave);
+      }
+    });
+
+    if (hayDuplicado) {
+      duplicadoWarning?.classList.remove('hidden');
+    } else {
+      duplicadoWarning?.classList.add('hidden');
+    }
+
+    actualizarCalculos();
+  }
+
+  // Escuchar cambios en la primera fila existente
+  itemsContainer.querySelectorAll('select, input').forEach(el => {
+    el.addEventListener('change', verificarDuplicadosYActualizar);
+    el.addEventListener('input', verificarDuplicadosYActualizar);
+  });
+
+  itemsContainer.querySelector('.btn-remove-item')?.addEventListener('click', (e) => {
+    const target = e.currentTarget as HTMLElement;
+    target.closest('.item-row')?.remove();
+    actualizarCalculos();
+  });
+
+  // Manejar envío por WhatsApp
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const empresa = (document.getElementById('empresa-nombre') as HTMLInputElement).value.trim();
+    const ruc = (document.getElementById('empresa-ruc') as HTMLInputElement).value.trim();
+    const correo = (document.getElementById('empresa-correo') as HTMLInputElement).value.trim();
+
+    if (!validarRuc(ruc)) {
+      alert("Por favor, ingrese un RUC válido de 11 dígitos que comience con 10 o 20.");
+      inputRuc.focus();
+      return;
+    }
+
+    let detalleProductos = "";
+    let totalGeneralNum = 0;
+
+    const filas = itemsContainer.querySelectorAll('.item-row');
+    filas.forEach((fila, idx) => {
+      const medida = (fila.querySelector('.item-medida') as HTMLSelectElement).value;
+      const modelo = (fila.querySelector('.item-modelo') as HTMLSelectElement).value;
+      const cantidad = (fila.querySelector('.item-cantidad') as HTMLInputElement).value;
+      const selectMedida = fila.querySelector('.item-medida') as HTMLSelectElement;
+      const precioUnitario = parseFloat(selectMedida.options[selectMedida.selectedIndex].getAttribute('data-precio') || "0");
+      const subtotal = precioUnitario * parseInt(cantidad);
+      totalGeneralNum += subtotal;
+
+      detalleProductos += `\n${idx + 1}. ${cantidad}x Rejilla Medida: ${medida} | Modelo: ${modelo} (Subtotal: S/ ${subtotal.toFixed(2)})`;
+    });
+
+    const mensaje = `Hola Maskel Perú, solicitamos una cotización corporativa:\n\n*DATOS DE LA EMPRESA*\n- Razón Social: ${empresa}\n- RUC: ${ruc}\n- Correo: ${correo}\n\n*DETALLE DE PRODUCTOS (AISI 304)*:${detalleProductos}\n\n*TOTAL ESTIMADO: S/ ${totalGeneralNum.toFixed(2)}*\n\nQuedamos a la espera de su confirmación y factura formal.`;
+
+    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+    window.open(urlWhatsApp, '_blank');
+  });
+</script>
