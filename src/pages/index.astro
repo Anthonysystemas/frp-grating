@@ -11,31 +11,46 @@ import FrpSeccion from "../components/FrpSeccion.astro";
 
 const makserProducts = [
   {
-  title: "Rejilla Lineal de Ducha",
-  description: "Rejillas delgadas y únicas para baño en Acero Inoxidable AISI 304. Diseño moderno de alta durabilidad, disponible en modelos desde MK1 hasta MK9.",
-  image: "/images/rejilladucha.jpg",
-  link: "/rejillas-de-ducha",
-  badge: "Acero Inoxidable AISI 304",
-  buttonText: "Ver catálogo de diseños (MK1 - MK9)",
-  specifications: [
-    "Material: Acero Inoxidable Calidad AISI 304",
-    "Medidas: 7cm × 80cm × 2cm | 7cm × 90cm × 2cm | 7cm × 1m × 2cm (Profundidad)",
-    "Modelos disponibles: Serie MK1, MK2, MK3, MK4, MK5, MK6, MK7, MK8 y MK9",
-    "Propiedad: Alta resistencia a la corrosión y acabado de lujo"
-  ],
-},
-  {
-    title: "Rejillas de Drenaje y Canaletas",
-    description: "Canaletas y rejillas metálicas o de FRP diseñadas para la evacuación fluida y tránsito pesado.",
-    image: "/images/drenaje.jpg",
-    link: "/rejillas-de-drenaje", // <--- Esta es la ruta exacta del archivo que creamos
-    badge: "Fabricación / Importación",
+    title: "Rejillas de  Ducha",
+    description:
+      "Rejillas delgadas y únicas para baño en Acero Inoxidable AISI 304. Diseño moderno de alta durabilidad, disponible en modelos desde MK1 hasta MK9.",
+    image: "/images/rejilladucha.jpg",
+    link: "/rejillas-de-ducha",
+    badge: "Acero Inoxidable AISI 304",
+    buttonText: "Ver catálogo de diseños (MK1 - MK9)",
     specifications: [
-        "Material: Acero Galvanizado / FRP",
-        "Alta resistencia a cargas de tránsito",
-        "Diseño a medida según plano"
+      "Material: Acero Inoxidable Calidad AISI 304",
+      "Medidas: 7cm × 80cm × 2cm | 7cm × 90cm × 2cm | 7cm × 1m × 2cm (Profundidad)",
+      "Modelos disponibles: Serie MK1, MK2, MK3, MK4, MK5, MK6, MK7, MK8 y MK9",
+      "Propiedad: Alta resistencia a la corrosión y acabado de lujo",
     ],
-},
+  },
+  {
+    title: "Rejillas de Drenaje",
+    description:
+      "Rejillas de alta resistencia en Acero Estructural A36 para tránsito liviano y pesado. Longitud estándar de 1m.",
+    image: "/images/drenaje.jpg", // Asegúrate de tener esta imagen
+    link: "/rejillas-de-drenaje",
+    badge: "Fabricación a Medida",
+    specifications: [
+      "Material: Acero Estructural A36",
+      "Anchos: 20cm, 25cm, 30cm (o a pedido)",
+      "Acabado: Natural, Pintado o Galvanizado",
+    ],
+  },
+  {
+    title: "Canaletas de Acero Inoxidable",
+    description:
+      "Sistemas de drenaje higiénico con cesta de sólidos para la industria, cocinas comerciales y uso doméstico.",
+    image: "/images/canaletas.jpg", // Asegúrate de tener esta imagen
+    link: "/canaletas-metalicas", // Nueva ruta sugerida
+    badge: "Acero Inoxidable",
+    specifications: [
+      "Líneas: Industrial, Cocina y Doméstica",
+      "Incluye: Cesta de recogida de sólidos",
+      "Diseño de reja adaptable al tráfico",
+    ],
+  },
   {
     title: "Peldaños de Escalera",
     description:
@@ -53,7 +68,7 @@ const makserProducts = [
     title: "Fabricación de Grating Metálico",
     description:
       "Rejillas electrosoldadas en Acero ASTM A36 Tipo 19W-4 (lisas o dentadas) para tránsito peatonal y pesado. Fabricadas bajo norma NAAMM MBG 531/532.",
-    image: "/images/rejillas3.jpg", // Asegúrate de que la foto sea de grating metálico
+    image: "/images/grating_metalico.jpg", // Asegúrate de que la foto sea de grating metálico
     link: "/grating-metalico",
     badge: "Norma NAAMM",
     specifications: [
@@ -84,7 +99,6 @@ const makserProducts = [
   >
     <!-- Navbar Global -->
     <Navbar />
-    
 
     <main class="grow">
       <!-- Sección Hero Principal -->
@@ -97,8 +111,8 @@ const makserProducts = [
         secondaryCtaLink="#catalogo"
       />
       <About />
-      
-      <FrpSeccion/>
+
+      <FrpSeccion />
 
       <!-- Sección de Productos / Catálogo -->
       <section id="catalogo">
@@ -110,8 +124,6 @@ const makserProducts = [
       </section>
 
       <Simulator />
-
-    
     </main>
 
     <!-- Footer Global -->
