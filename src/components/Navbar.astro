@@ -4,7 +4,7 @@
 
 <header class="fixed top-0 left-0 w-full z-50 bg-[#0A0E1A]/90 backdrop-blur-md border-b border-slate-800">
   <!-- Barra de Navegación Principal -->
-  <nav class="max-w-6xl mx-auto w-full px-6 py-4">
+  <nav class="max-w-6xl mx-auto w-full px-4 sm:px-6 py-3 sm:py-4">
     <div class="flex justify-between items-center gap-4">
       <!-- Logo -->
       <a
@@ -15,7 +15,7 @@
         <img
           src="/logo.png"
           alt="Logo MASKEL PERÚ"
-          class="h-10 w-auto object-contain"
+          class="h-8 sm:h-10 w-auto object-contain"
         />
       </a>
 
@@ -31,8 +31,8 @@
           ></span>
         </a>
 
-        <!-- Opción Productos con Dropdown Desplegable -->
-        <div class="relative group inline-block py-1">
+        <!-- Opción Productos con Dropdown Desplegable (accesible por mouse Y teclado) -->
+        <div class="relative group focus-within:[&>div]:opacity-100 focus-within:[&>div]:visible inline-block py-1">
           <a
             href="/#productos"
             class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative inline-flex items-center gap-1.5"
@@ -49,42 +49,39 @@
           <!-- Submenú Flotante -->
           <div class="absolute left-0 top-full pt-2 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
             <div class="bg-[#0D1220] border border-slate-800 rounded-xl shadow-2xl p-2 flex flex-col gap-1 backdrop-blur-md">
-                 <a
-                 href="/grating-frp" 
-                 data-astro-reload
-                 class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-blue-600/20 transition-colors flex items-center justify-between group/item"
-               >
-                 <span>Fibra de Vidrio (FRP)</span>
-                 <span class="text-blue-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">→</span>
-                </a>
-              <a 
-                href="/drenajes-y-canaletas" 
+              <a
+                href="/grating-frp"
                 class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-blue-600/20 transition-colors flex items-center justify-between group/item"
               >
-                <span>Drenajes y Canaletas</span>
+                <span>Fibra de Vidrio (FRP)</span>
                 <span class="text-blue-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">→</span>
               </a>
-              <a 
-                href="/grating-metalico" 
+              <a
+                href="/rejillas-de-drenaje"
                 class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-blue-600/20 transition-colors flex items-center justify-between group/item"
               >
-                <span>Grating Metálico</span>
+                <span>Rejillas de Drenajes</span>
+                <span class="text-blue-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">→</span>
+              </a>
+              <a
+                href="/canaletas-metalicas"
+                class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-blue-600/20 transition-colors flex items-center justify-between group/item"
+              >
+                <span>Canaletas</span>
                 <span class="text-blue-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">→</span>
               </a>
               <a
                 href="/peldanos"
                 class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-blue-600/20 transition-colors flex items-center justify-between group/item"
               >
-                <span>Peldaños </span>
+                <span>Peldaños</span>
                 <span class="text-blue-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">→</span>
-                </a>
-              
-               
+              </a>
             </div>
           </div>
         </div>
 
-        <a 
+        <a
           href="/#nosotros"
           class="text-sm font-bold tracking-wider text-slate-300 hover:text-white transition-all duration-300 transform hover:scale-105 relative group py-1"
         >
@@ -119,14 +116,14 @@
       <div class="flex items-center gap-2">
         <a
           href="/#simulator"
-          class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2.5 rounded cursor-pointer transition-all duration-200 inline-flex items-center gap-2 whitespace-nowrap"
+          class="bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold px-3 sm:px-4 py-2 sm:py-2.5 rounded cursor-pointer transition-all duration-200 inline-flex items-center gap-2 whitespace-nowrap"
         >
           Cotizar
         </a>
 
         <button
           id="menu-toggle"
-          class="md:hidden p-2 text-slate-300 hover:text-white transition-colors"
+          class="md:hidden p-2.5 text-slate-300 hover:text-white transition-colors"
           aria-label="Abrir menú"
           aria-expanded="false"
           aria-controls="mobile-menu"
@@ -148,10 +145,10 @@
     </div>
   </nav>
 
-  <!-- Menú móvil (Desplegable) -->
+  <!-- Menú móvil (Desplegable) — mismas secciones que desktop, mismo orden -->
   <div
     id="mobile-menu"
-    class="hidden md:hidden bg-[#0A0E1A] border-t border-slate-800/50 px-6 py-4 space-y-3"
+    class="hidden md:hidden bg-[#0A0E1A] border-t border-slate-800/50 px-6 py-4 space-y-3 max-h-[calc(100vh-4.5rem)] overflow-y-auto"
   >
     <div
       class="pb-3 mb-3 border-b border-slate-800/60 space-y-2 text-sm text-slate-300"
@@ -170,18 +167,39 @@
       >ventas@maskelperu.com</a>
       <span class="block text-slate-500">SMP, Lima - Perú</span>
     </div>
+
     <a
       href="/#home"
       class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
     >Inicio</a>
-    <a
-      href="/drenajes-y-canaletas"
-      class="block text-sm font-bold text-blue-400 tracking-wider hover:text-blue-300 transition-colors duration-200"
-    >↳ Drenajes y Canaletas</a>
+
     <a
       href="/#productos"
       class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
-    >Productos (Grating)</a>
+    >Productos</a>
+    <div class="pl-4 space-y-2 border-l border-slate-800/60 ml-1">
+      <a
+        href="/grating-frp"
+        class="block text-xs font-medium text-blue-400 tracking-wider hover:text-blue-300 transition-colors duration-200"
+      >↳ Fibra de Vidrio (FRP)</a>
+      <a
+        href="/rejillas-de-drenaje"
+        class="block text-xs font-medium text-blue-400 tracking-wider hover:text-blue-300 transition-colors duration-200"
+      >↳ Rejillas de Drenajes</a>
+      <a
+        href="/canaletas-metalicas"
+        class="block text-xs font-medium text-blue-400 tracking-wider hover:text-blue-300 transition-colors duration-200"
+      >↳ Canaletas</a>
+      <a
+        href="/peldanos"
+        class="block text-xs font-medium text-blue-400 tracking-wider hover:text-blue-300 transition-colors duration-200"
+      >↳ Peldaños</a>
+    </div>
+
+    <a
+      href="/#nosotros"
+      class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
+    >Nosotros</a>
     <a
       href="/#galeria"
       class="block text-sm font-bold text-slate-300 tracking-wider hover:text-white transition-colors duration-200"
@@ -201,7 +219,28 @@
   const toggleBtn = document.getElementById('menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
 
+  const closeMenu = () => {
+    mobileMenu?.classList.add('hidden');
+    toggleBtn?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('overflow-hidden');
+  };
+
+  const openMenu = () => {
+    mobileMenu?.classList.remove('hidden');
+    toggleBtn?.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('overflow-hidden');
+  };
+
   toggleBtn?.addEventListener('click', () => {
-    mobileMenu?.classList.toggle('hidden');
+    const isHidden = mobileMenu?.classList.contains('hidden');
+    if (isHidden) {
+      openMenu();
+    } else {
+      closeMenu();
+    }
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
   });
 </script>
