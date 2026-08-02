@@ -1,0 +1,140 @@
+---
+// src/components/SpecsFRP.astro
+interface MedidaItem {
+  medida: string;
+  peralte: string;
+  uso: string;
+  descripcion: string;
+  badgeColor: string;
+}
+
+const medidas: MedidaItem[] = [
+  {
+    medida: "25 mm",
+    peralte: "1 pulgada",
+    uso: "Carga Peatonal / Ligera",
+    descripcion: "Tránsito peatonal ligero, pasarelas de inspección y cubiertas pequeñas. La opción ideal cuando se busca reducir peso y costo sin comprometer la resistencia anticorrosiva.",
+    badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+  },
+  {
+    medida: "38 mm",
+    peralte: "1.5 pulgadas",
+    uso: "Estándar Industrial",
+    descripcion: "El estándar para plantas industriales, plataformas operativas y muelles. Ofrece el equilibrio perfecto entre resistencia estructural, capacidad de carga y versatilidad.",
+    badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/30"
+  },
+  {
+    medida: "50 mm",
+    peralte: "2 pulgadas",
+    uso: "Carga Pesada / Tramos Largos",
+    descripcion: "Diseñada para máxima rigidez en áreas con alta exigencia mecánica, movimiento de equipos pesados o tramos donde la distancia entre soportes estructurales es mayor.",
+    badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+  }
+];
+
+const beneficios = [
+  {
+    titulo: "Resistencia a la Corrosión",
+    desc: "Inmune al agua salada, humedad extrema y agentes químicos. No se oxida jamás.",
+    icon: "🧪"
+  },
+  {
+    titulo: "Superficie Antideslizante",
+    desc: "Acabado Grit Top con grano de sílice para máxima tracción y prevención de accidentes.",
+    icon: "🛡️"
+  },
+  {
+    titulo: "Dieléctrico e Incombustible",
+    desc: "No conduce electricidad ni calor. Ideal para subestaciones y áreas de alto riesgo.",
+    icon: "⚡"
+  },
+  {
+    titulo: "Instalación Rápida y Menor Peso",
+    desc: "Pesa 70% menos que el acero. Se corta en campo sin necesidad de soldadura.",
+    icon: "⚙️"
+  }
+];
+---
+
+<section id="especificaciones" class="relative w-full bg-[#0A0E1A] py-24 px-6 overflow-hidden border-b border-slate-900/50">
+  <!-- Fondo Grid idéntico a Galería y Simulador -->
+  <div
+    class="pointer-events-none absolute inset-0 opacity-[0.04]"
+    style="background-image: linear-gradient(#3B82F6 1px, transparent 1px), linear-gradient(90deg, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"
+  ></div>
+
+  <div class="relative max-w-7xl mx-auto px-4">
+    
+    <!-- ENCABEZADO -->
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="flex items-center justify-center gap-2 mb-3">
+        <span class="w-8 h-0.5 bg-blue-500 inline-block"></span>
+        <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">
+          Especificaciones Técnicas
+        </span>
+        <span class="w-8 h-0.5 bg-blue-500 inline-block"></span>
+      </div>
+
+      <h2 class="text-4xl md:text-5xl font-black text-white tracking-tight">
+        MEDIDAS Y <span class="text-blue-500">BENEFICIOS CLAVE</span>
+      </h2>
+
+      <p class="mt-4 text-slate-400 text-lg leading-relaxed">
+        Selecciona el espesor adecuado según las necesidades operativas de tu proyecto industrial o minero.
+      </p>
+    </div>
+
+    <!-- IMAGEN COMPARATIVA DE LAS 3 MEDIDAS -->
+    <div class="mb-16 rounded-2xl overflow-hidden border border-slate-800/60 bg-[#0D1220] p-3 shadow-2xl">
+      <div class="relative aspect-video md:aspect-21/9 w-full overflow-hidden rounded-xl">
+        <img 
+          src="/images/3frp.png" 
+          alt="Comparativa de medidas Rejillas FRP 25mm 38mm 50mm" 
+          class="w-full h-full object-cover object-center"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-linear-to-t from-[#0D1220] via-transparent to-transparent opacity-60"></div>
+      </div>
+    </div>
+
+    <!-- TARJETAS CON LAS 3 MEDIDAS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+      {medidas.map((item) => (
+        <div class="bg-[#0D1220] border border-slate-800/50 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/40 transition-all duration-300">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-4">
+              <div>
+                <span class="text-3xl font-black text-white">{item.medida}</span>
+                <span class="text-xs text-slate-500 block font-mono">({item.peralte})</span>
+              </div>
+              <span class={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${item.badgeColor}`}>
+                {item.uso}
+              </span>
+            </div>
+            <p class="text-slate-400 text-sm leading-relaxed mt-2">
+              {item.descripcion}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- VENTAJAS DEL FRP VS ACERO -->
+    <div class="bg-[#0D1220]/80 border border-slate-800/60 rounded-2xl p-8 md:p-12">
+      <h3 class="text-2xl font-bold text-white mb-8 text-center md:text-left">
+        Ventajas Competitivas del FRP frente al Acero
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {beneficios.map((b) => (
+          <div class="flex flex-col gap-2 p-4 rounded-xl bg-[#070A13]/50 border border-slate-800/30">
+            <span class="text-3xl mb-1">{b.icon}</span>
+            <h4 class="text-white font-bold text-base">{b.titulo}</h4>
+            <p class="text-slate-400 text-xs leading-relaxed">{b.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</section>
