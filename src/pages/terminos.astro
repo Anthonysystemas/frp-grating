@@ -1,20 +1,15 @@
 ---
 // src/pages/terminos.astro
-import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import Layout from "../layouts/Layout.astro";
 ---
 
-<html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Términos y Condiciones | MASKEL PERÚ</title>
-        <meta name="description" content="Términos y condiciones de uso de la plataforma web y el simulador técnico de MASKEL PERÚ S.A.C." />
-        <meta name="robots" content="noindex, follow" />
-    </head>
-    
-    <body class="min-h-screen bg-[#0E1728] text-white font-sans antialiased">
+<Layout
+    title="Términos y Condiciones | MASKEL PERÚ"
+    description="Términos y condiciones de uso de la plataforma web y el simulador técnico de MASKEL PERÚ S.A.C."
+    robots="noindex, follow"
+>
         <Navbar />
         
         <main class="pt-28 pb-16">
@@ -103,5 +98,4 @@ import Footer from "../components/Footer.astro";
         </main>
         
         <Footer />
-    </body>
-</html>
+    </Layout>

@@ -4,85 +4,93 @@ import Footer from "../components/Footer.astro";
 import Hero from "../components/Hero.astro";
 import Products from "../components/Products.astro";
 import Simulator from "../components/Simulator.astro";
-import SolutionsSection from "../components/SolutionsSection.astro";
 import About from "../components/About.astro";
-import "../styles/global.css";
 import FrpSeccion from "../components/FrpSeccion.astro";
+import Layout from "../layouts/Layout.astro";
 
 const makserProducts = [
-  
   {
-    title: "Rejillas de Drenaje",
+    title: "FRP Grating",
     description:
-      "Rejillas de alta resistencia en Acero Estructural A36 para tránsito liviano y pesado. Longitud estándar de 1m.",
-    image: "/images/drenaje.jpg", // Asegúrate de tener esta imagen
-    link: "/rejillas-de-drenaje",
-    badge: "Fabricación a Medida",
+      "Rejillas de plástico reforzado con fibra de vidrio, alta resistencia química y a la corrosión.",
+    image: "/images/rejilla-frp.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
+    link: "/rejilla-frp.jpg",
+    badge: "Resina Vinilester",
     specifications: [
-      "Material: Acero Estructural A36",
-      "Anchos: 20cm, 25cm, 30cm (o a pedido)",
-      "Acabado: Natural, Pintado o Galvanizado",
+      "Malla 38x38mm",
+      "Espesores 38mm y 25mm",
+      "Superficie arenada (Gritted)",
     ],
   },
   {
-    title: "Canaletas de Acero Inoxidable",
+    title: "Toothed Steel Grating",
     description:
-      "Sistemas de drenaje higiénico con cesta de sólidos para la industria, cocinas comerciales y uso doméstico.",
-    image: "/images/canaletas.jpg", // Asegúrate de tener esta imagen
-    link: "/canaletas-metalicas", // Nueva ruta sugerida
-    badge: "Acero Inoxidable",
+      "Rejilla metálica dentada de alta tracción para tráfico pesado e industrial.",
+    image: "/images/rejillametalica.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
+    link: "/rejillametalica.jpg",
+    badge: "Black Iron",
     specifications: [
-      "Líneas: Industrial, Cocina y Doméstica",
-      "Incluye: Cesta de recogida de sólidos",
-      "Diseño de reja adaptable al tráfico",
+      "Panel 1000x3000mm",
+      "Altura 32mm",
+      "Espesor 32mm",
+      "Peso unitario 2.5kg/m²",
+      "Platina portante 4.75mm",
+      "Superficie Dentada",
     ],
   },
   {
-    title: "Peldaños de Escalera",
+    title: "Grapas M Inoxidables",
     description:
-      "Peldaños estructurales de alta seguridad con borde de contraste visual y superficie rugosa para prevención de caídas.",
-    image: "/images/peldaños.jpg",
-    link: "/peldanos",
-    badge: "Seguridad Industrial",
+      "Clips de fijación tipo M para anclaje seguro de rejillas de fibra de vidrio (FRP).",
+    image: "/images/grapa.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
+    link: "/grapa.jpg",
+    badge: "Acero Inox SS 304",
     specifications: [
-      "Borde: Nariz de seguridad integrada",
-      "Superficie: Grit antideslizante",
-      "Carga: Alta capacidad de impacto",
+      "Compatibles con FRP grating de 38mm y 25mm de espesor",
     ],
   },
   {
-    title: "Fabricación de Grating Metálico",
+    title: "Clips Tipo M Galvanizados",
     description:
-      "Rejillas electrosoldadas en Acero ASTM A36 Tipo 19W-4 (lisas o dentadas) para tránsito peatonal y pesado. Fabricadas bajo norma NAAMM MBG 531/532.",
-    image: "/images/grating_metalico.jpg", // Asegúrate de que la foto sea de grating metálico
-    link: "/grating-metalico",
-    badge: "Norma NAAMM",
+      "Pernos y grapas de sujeción resistentes a la oxidación para grating metálico.",
+    image: "/images/clip-M.png", // TODO: placeholder temporal hasta subir foto real a /public/images/
+    link: "/clip-M.png",
+    badge: "Galvanizado",
     specifications: [
-      "Material: Acero ASTM A36 (Electrosoldado)",
-      "Norma: NAAMM MBG 531 (Peatonal) / 532 (Pesado)",
-      "Formato: Paneles de 1m x 6m, 1.2m x 6m y a medida",
+      "Medida estándar de 1/4 x 2 pulgadas",
     ],
+  },
+];
+const makserAccessories = [
+  {
+    title: "Grapas M en Acero Inoxidable",
+    description: "Grapas tipo M para fijación de FRP grating.",
+    link: "#catalogo",
+    badge: "SS 304",
+    specifications: [
+      "Material: Acero Inoxidable SS 304",
+      "Uso: Fijación de FRP grating",
+    ],
+    buttonText: "Consultar accesorio",
+  },
+  {
+    title: "Grapas de Acero Galvanizado",
+    description: "Grapas para sujeción de grating metálico dentado.",
+    link: "#catalogo",
+    badge: "Galvanizado",
+    specifications: [
+      'Perno de 1/4" x 2"',
+      "Uso: Sujeción de grating metálico dentado",
+    ],
+    buttonText: "Consultar accesorio",
   },
 ];
 ---
 
-<!doctype html>
-<html lang="es" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>
-      Makser Perú | Soluciones Industriales en Grating, Drenaje y Peldaños FRP
-    </title>
-    <meta
-      name="description"
-      content="Fabricación e importación de Grating, Rejillas de Drenaje y Peldaños FRP de alta resistencia anticorrosiva para minería e industria."
-    />
-  </head>
-  <body
-    class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between"
-  >
+<Layout
+  title="Makser Perú | Soluciones Industriales en Grating, Drenaje y Peldaños FRP"
+  description="Fabricación e Importación y distribución directa de Grating Metálico y FRP de alta resistencia anticorrosiva para minería e industria."
+>
     <!-- Navbar Global -->
     <Navbar />
 
@@ -90,7 +98,7 @@ const makserProducts = [
       <!-- Sección Hero Principal -->
       <Hero
         title="Soluciones Industriales en Grating Metálico y FRP"
-        subtitle="Importación directa de Grating FRP y fabricación a medida de Grating Metálico, Peldaños y Rejillas de Drenaje."
+        subtitle="Importación y distribución directa de Grating Metálico, Grating FRP y accesorios de fijación industrial. Stock estandarizado para entrega inmediata."
         ctaText="Cotizar por WhatsApp"
         ctaLink="https://wa.me/51984649227?text=Hola%20Makser,%20deseo%20una%20cotizacion%20de%20productos%20FRP"
         secondaryCtaText="Ver Catálogo FRP"
@@ -103,9 +111,10 @@ const makserProducts = [
       <!-- Sección de Productos / Catálogo -->
       <section id="catalogo">
         <Products
-          title="Nuestras Líneas de Productos FRP"
-          subtitle="Selecciona la solución que necesitas para ver especificaciones detalladas y solicitar una cotización a medida."
+          title="NUESTRO CATÁLOGO DE PRODUCTOS"
+          subtitle="Selecciona el producto que necesitas para ver sus especificaciones detalladas y consultar disponibilidad."
           products={makserProducts}
+          accessories={makserAccessories}
         />
       </section>
 
@@ -114,5 +123,4 @@ const makserProducts = [
 
     <!-- Footer Global -->
     <Footer />
-  </body>
-</html>
+</Layout>

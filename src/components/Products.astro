@@ -3,7 +3,7 @@
 export interface ProductItem {
   title: string;
   description: string;
-  image: string;
+  image?: string;
   link: string;
   badge?: string;
   specifications?: string[];
@@ -14,13 +14,15 @@ interface Props {
   title?: string;
   subtitle?: string;
   products?: ProductItem[];
+  accessories?: ProductItem[];
 }
 
 // 2. Extraer Props con valores por defecto
 const {
   title = "Nuestros Productos",
   subtitle = "Soluciones avanzadas en plástico reforzado con fibra de vidrio (FRP) para la industria.",
-  products = []
+  products = [],
+  accessories = []
 } = Astro.props;
 ---
 
@@ -45,6 +47,7 @@ const {
           
           <!-- Imagen y Badge -->
           <div>
+            {product.image && (
             <div class="relative h-52 overflow-hidden bg-slate-900">
               {product.badge && (
                 <span class="absolute top-3 right-3 z-10 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
@@ -58,9 +61,15 @@ const {
                 loading="lazy"
               />
             </div>
+            )}
 
             <!-- Contenido de la tarjeta -->
             <div class="p-6">
+              {!product.image && product.badge && (
+                <span class="inline-block bg-blue-600/15 text-blue-400 border border-blue-500/30 text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3">
+                  {product.badge}
+                </span>
+              )}
               <h3 class="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
                 {product.title}
               </h3>

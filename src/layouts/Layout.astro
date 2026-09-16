@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  robots?: string;
+}
+
+import "../styles/global.css";
+
+const {
+  title,
+  description = "Especialistas en la importación y distribución directa de  Grating FRP y accesorios de fijación industrial . Stock estandarizado",
+  robots,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
+  </head>
+  <body class="bg-[#0A0E1A] text-slate-100 antialiased min-h-screen flex flex-col justify-between">
+    <slot />
+  </body>
+</html>

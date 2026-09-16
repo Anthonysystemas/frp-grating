@@ -1,5 +1,4 @@
 ---
-import '../styles/global.css';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import Gallery from '../components/Gallery.astro';
@@ -7,16 +6,13 @@ import Simulator from '../components/Simulator.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import SpecsFRP from '../components/SpecsFRP.astro';
 import BenefitsFRP from '../components/BenefitsFRP.astro';
+import Layout from '../layouts/Layout.astro';
 ---
 
-<!DOCTYPE html>
-<html lang="es" class="scroll-smooth bg-[#0A0E1A]">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grating FRP - Rejillas de Fibra de Vidrio | Makser Perú</title>
-  </head>
-  <body class="text-slate-100 min-h-screen flex flex-col justify-between">
+<Layout
+  title="Grating FRP - Rejillas de Fibra de Vidrio | Makser Perú"
+  description="Rejillas de fibra de vidrio FRP de alta resistencia y protección anticorrosiva para minería, industria y proyectos en Perú."
+>
     
     <Navbar />
 
@@ -32,5 +28,4 @@ import BenefitsFRP from '../components/BenefitsFRP.astro';
 
     <Footer />
 
-  </body>
-</html>
+</Layout>

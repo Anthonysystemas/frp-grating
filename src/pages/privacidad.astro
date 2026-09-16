@@ -1,20 +1,15 @@
 ---
 // src/pages/privacidad.astro
-import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import Layout from "../layouts/Layout.astro";
 ---
 
-<html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Política de Privacidad | MASKEL PERÚ</title>
-        <meta name="description" content="Política de privacidad y protección de datos personales de MASKEL PERÚ S.A.C. Conoce cómo protegemos tus datos del simulador." />
-        <meta name="robots" content="noindex, follow" /> <!-- Los textos legales no necesitan competir en SEO, pero sí ser indexados de forma limpia -->
-    </head>
-    
-    <body class="min-h-screen bg-[#0E1728] text-white font-sans antialiased">
+<Layout
+    title="Política de Privacidad | MASKEL PERÚ"
+    description="Política de privacidad y protección de datos personales de MASKEL PERÚ S.A.C. Conoce cómo protegemos tus datos del simulador."
+    robots="noindex, follow"
+>
         <Navbar />
         
         <!-- Contenedor principal con etiqueta semántica -->
@@ -103,5 +98,4 @@ import Footer from "../components/Footer.astro";
         </main>
         
         <Footer />
-    </body>
-</html>
+</Layout>
