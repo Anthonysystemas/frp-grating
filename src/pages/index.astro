@@ -6,9 +6,10 @@ import Products from "../components/Products.astro";
 import Simulator from "../components/Simulator.astro";
 import About from "../components/About.astro";
 import FrpSeccion from "../components/FrpSeccion.astro";
+import WhatsAppButton from '../components/WhatsAppButton.astro';
 import Layout from "../layouts/Layout.astro";
 
-const makserProducts = [
+const maskelProducts = [
   {
     title: "FRP Grating",
     description:
@@ -16,6 +17,7 @@ const makserProducts = [
     image: "/images/rejilla-frp.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
     link: "/rejilla-frp.jpg",
     badge: "Resina Vinilester",
+    tag: "Producto Principal",
     specifications: [
       "Malla 38x38mm",
       "Espesores 38mm y 25mm",
@@ -29,6 +31,7 @@ const makserProducts = [
     image: "/images/rejillametalica.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
     link: "/rejillametalica.jpg",
     badge: "Black Iron",
+    tag: "Producto Principal",
     specifications: [
       "Panel 1000x3000mm",
       "Altura 32mm",
@@ -45,6 +48,7 @@ const makserProducts = [
     image: "/images/grapa.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
     link: "/grapa.jpg",
     badge: "Acero Inox SS 304",
+    tag: "Accesorio",
     specifications: [
       "Compatibles con FRP grating de 38mm y 25mm de espesor",
     ],
@@ -56,12 +60,13 @@ const makserProducts = [
     image: "/images/clip-M.png", // TODO: placeholder temporal hasta subir foto real a /public/images/
     link: "/clip-M.png",
     badge: "Galvanizado",
+    tag: "Accesorio",
     specifications: [
       "Medida estándar de 1/4 x 2 pulgadas",
     ],
   },
 ];
-const makserAccessories = [
+const maskelAccessories = [
   {
     title: "Grapas M en Acero Inoxidable",
     description: "Grapas tipo M para fijación de FRP grating.",
@@ -88,7 +93,7 @@ const makserAccessories = [
 ---
 
 <Layout
-  title="Makser Perú | Soluciones Industriales en Grating, Drenaje y Peldaños FRP"
+  title="Maskel Perú | Soluciones Industriales en Grating, Drenaje y Peldaños FRP"
   description="Fabricación e Importación y distribución directa de Grating Metálico y FRP de alta resistencia anticorrosiva para minería e industria."
 >
     <!-- Navbar Global -->
@@ -97,12 +102,12 @@ const makserAccessories = [
     <main class="grow">
       <!-- Sección Hero Principal -->
       <Hero
-        title="Soluciones Industriales en Grating Metálico y FRP"
-        subtitle="Importación y distribución directa de Grating Metálico, Grating FRP y accesorios de fijación industrial. Stock estandarizado para entrega inmediata."
+        title="Grating FRP y Rejillas de Ducha para Aplicaciones Industriales"
+        subtitle="Importación y distribución directa de Grating FRP, rejillas de ducha y clips de fijación. Stock estandarizado para entrega inmediata."
         ctaText="Cotizar por WhatsApp"
-        ctaLink="https://wa.me/51984649227?text=Hola%20Makser,%20deseo%20una%20cotizacion%20de%20productos%20FRP"
-        secondaryCtaText="Ver Catálogo FRP"
-        secondaryCtaLink="#catalogo"
+        ctaLink="https://wa.me/51984649227?text=Hola%20Maskel%20Per%C3%BA%2C%20deseo%20una%20cotizaci%C3%B3n%20de%20productos"
+        secondaryCtaText="Ver Productos"
+        secondaryCtaLink="#productos"
       />
       <About />
 
@@ -113,14 +118,17 @@ const makserAccessories = [
         <Products
           title="NUESTRO CATÁLOGO DE PRODUCTOS"
           subtitle="Selecciona el producto que necesitas para ver sus especificaciones detalladas y consultar disponibilidad."
-          products={makserProducts}
-          accessories={makserAccessories}
+          products={maskelProducts}
+          accessories={maskelAccessories}
         />
       </section>
 
       <Simulator />
+
     </main>
 
     <!-- Footer Global -->
     <Footer />
+
+    <WhatsAppButton message="Hola Maskel Perú, vengo de la página principal y deseo cotizar stock." />
 </Layout>

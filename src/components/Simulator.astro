@@ -1,5 +1,5 @@
 ---
-// src/components/Simulator.astro
+// src/components/Simulator.astro — Cotizador de stock fijo (importación B2B)
 ---
 
 <section
@@ -19,18 +19,18 @@
             <span
                 class="text-blue-500 text-sm font-bold tracking-widest uppercase"
             >
-                Simulador de cotización
+                Cotizador de stock
             </span>
              <span class="h-px w-8 bg-blue-500"></span>
         </div>
         <h2
             class="text-4xl md:text-6xl font-black text-white leading-[1.05] mb-6"
         >
-            CALCULA TU<br />
-            <span class="text-blue-500">PRESUPUESTO EN FRP</span>
+            COTIZA NUESTRO<br />
+            <span class="text-blue-500">STOCK DISPONIBLE</span>
         </h2>
         <p class="text-slate-400 text-lg max-w-xl leading-relaxed">
-            Ingresa tus datos, añade las planchas FRP que necesitas y obtén un precio estimado al instante. Descuento automático del 5% en pedidos de 10 planchas o más.
+            Selecciona los productos de nuestro stock de importación, indica la cantidad de unidades o paneles y obtén un precio estimado al instante. Descuento automático del 5% en pedidos desde $1,000 USD.
         </p>
     </div>
 
@@ -47,6 +47,7 @@
                 >
                     <div class="flex flex-col gap-2">
                         <label
+                            for="cliente-nombre"
                             class="text-sm font-mono uppercase tracking-widest text-slate-200"
                         >
                             Nombre completo *
@@ -61,6 +62,7 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <label
+                            for="cliente-empresa"
                             class="text-sm font-mono uppercase tracking-widest text-slate-200"
                         >
                             Empresa *
@@ -75,6 +77,7 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <label
+                            for="cliente-ruc"
                             class="text-sm font-mono uppercase tracking-widest text-slate-200"
                         >
                             RUC *
@@ -90,15 +93,17 @@
 
                     <div class="flex flex-col gap-2">
                         <label
+                            for="cliente-correo"
                             class="text-sm font-mono uppercase tracking-widest text-slate-200"
                         >
-                            Correo Electronico
+                            Correo Electronico *
                         </label>
                         <input
                             type="email"
                             id="cliente-correo"
                             placeholder="juan.perez@miempresa.com"
                             class="w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                            required
                         />
                     </div>
                 </div>
@@ -107,61 +112,14 @@
                     <label
                         class="text-sm font-mono uppercase tracking-widest text-slate-200"
                     >
-                        Requerimientos técnicos *
+                        Productos en stock *
                     </label>
 
                     <div
                         id="contenedor-filas"
                         class="space-y-3 border-b border-slate-800/30 pb-6"
                     >
-                        <div
-                            class="fila-producto grid grid-cols-1 sm:grid-cols-12 gap-3 items-end"
-                        >
-                            <div class="sm:col-span-8 flex flex-col gap-2">
-                                <select
-                                    class="producto-select w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all cursor-pointer"
-                                >
-                                    <option value="120"
-                                        >Grating FRP 38×38×25 mm (1 pulgada)</option
-                                    >
-                                    <option value="150"
-                                        >Grating FRP 38×38×38 mm (1.5 pulgadas)</option
-                                    >
-                                    <option value="180"
-                                        >Grating FRP 19×19×38 mm (malla fina)</option
-                                    >
-                                </select>
-                            </div>
-                            <div class="sm:col-span-3 flex flex-col gap-2">
-                                <input
-                                    type="number"
-                                    min="1"
-                                    placeholder="Cant. planchas"
-                                    class="cantidad-input w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
-                                    required
-                                />
-                            </div>
-                            <div class="sm:col-span-1">
-                                <button
-                                    type="button"
-                                    class="btn-eliminar hidden w-full p-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                    title="Eliminar fila"
-                                >
-                                    <svg
-                                        class="w-4 h-4"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Las filas se generan dinámicamente desde CATALOGO_PRODUCTOS -->
                     </div>
 
                     <button
@@ -240,7 +198,8 @@
                 id="btn-whatsapp-simulador"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-full bg-transparent border-2 border-green-500/60 hover:border-green-500 text-green-400 font-bold py-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"
+                aria-disabled="true"
+                class="w-full bg-transparent border-2 border-green-500/60 text-green-400 font-bold py-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 opacity-50 pointer-events-none"
             >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path
@@ -253,325 +212,439 @@
     </div>
 </section>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const btnAddProducto = document.getElementById("btn-add-producto");
-        const contenedorFilas = document.getElementById("contenedor-filas");
-        const btnCalcular = document.getElementById("btn-calcular");
-        const resultadoBox = document.getElementById(
-            "resultado-box",
-        ) as HTMLElement;
+    function initSimulador() {
+        // Guardia anti-doble-inicialización (HMR / View Transitions)
+        const w = window as unknown as { __simuladorInit?: boolean };
+        if (w.__simuladorInit) return;
+        w.__simuladorInit = true;
 
-        const inputNombre = document.getElementById(
-            "cliente-nombre",
-        ) as HTMLInputElement;
-        const inputEmpresa = document.getElementById(
-            "cliente-empresa",
-        ) as HTMLInputElement;
-        const inputRuc = document.getElementById(
-            "cliente-ruc",
-        ) as HTMLInputElement;
-        const inputCorreo = document.getElementById(
-            "cliente-correo",
-        ) as HTMLInputElement;
+        // ============================================================
+        // ÚNICA FUENTE DE VERDAD (SSOT) — catálogo de stock fijo (JS puro)
+        // ============================================================
+        const CATALOGO_PRODUCTOS = [
+            { id: "frp_grating", nombre: "FRP Grating (Resina Vinilester)", precio: 145 },
+            { id: "steel_grating", nombre: "Grating Metálico Dentado (Panel 1000x3000mm)", precio: 185 },
+            { id: "m_clips", nombre: "Grapas M (Acero Inox SS 304)", precio: 4.5 },
+            { id: "galv_clips", nombre: 'Clips Galvanizados (1/4" x 2")', precio: 2.5 },
+        ];
 
-        function validarEstructuraCorreo(correo: string): boolean {
+        const MAPA_PRECIOS = Object.fromEntries(
+            CATALOGO_PRODUCTOS.map(function (p) { return [p.id, p.precio]; }),
+        );
+
+        const MAPA_NOMBRES = Object.fromEntries(
+            CATALOGO_PRODUCTOS.map(function (p) { return [p.id, p.nombre]; }),
+        );
+
+        // Umbral de descuento por monto (USD, antes del descuento)
+        const DISCOUNT_THRESHOLD = 1000;
+
+        const formulario = document.getElementById("simulador-form") as HTMLFormElement | null;
+        const btnAddProducto = document.getElementById("btn-add-producto") as HTMLButtonElement | null;
+        const contenedorFilas = document.getElementById("contenedor-filas") as HTMLDivElement | null;
+        const btnCalcular = document.getElementById("btn-calcular") as HTMLButtonElement | null;
+        const resultadoBox = document.getElementById("resultado-box") as HTMLDivElement | null;
+        const btnWaSimulador = document.getElementById("btn-whatsapp-simulador") as HTMLAnchorElement | null;
+
+        // Null guards: abortar si falta estructura esencial del DOM
+        if (!contenedorFilas) return;
+        if (!formulario) return;
+        if (!btnCalcular) return;
+        if (!resultadoBox) return;
+
+        const filasContainer = contenedorFilas;
+        const panelResultado = resultadoBox;
+
+        // Helper: exige un elemento del DOM (tipo no-nulo garantizado)
+        function exigir<T extends object>(el: T | null, id: string): T {
+            if (!el) throw new Error("Falta el elemento #" + id);
+            return el;
+        }
+
+        const nombreInput = exigir(document.getElementById("cliente-nombre") as HTMLInputElement | null, "cliente-nombre");
+        const empresaInput = exigir(document.getElementById("cliente-empresa") as HTMLInputElement | null, "cliente-empresa");
+        const rucInput = exigir(document.getElementById("cliente-ruc") as HTMLInputElement | null, "cliente-ruc");
+        const correoInput = exigir(document.getElementById("cliente-correo") as HTMLInputElement | null, "cliente-correo");
+
+        // ---------- Helpers de catálogo ----------
+        function poblarSelect(select: HTMLSelectElement, seleccionado: string = "") {
+            select.innerHTML = "";
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.disabled = true;
+            placeholder.selected = seleccionado === "";
+            placeholder.textContent = "Selecciona un producto...";
+            select.appendChild(placeholder);
+
+            CATALOGO_PRODUCTOS.forEach(function (p) {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = p.nombre + " — $" + p.precio + " USD";
+                if (p.id === seleccionado) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function crearFila() {
+            const fila = document.createElement("div");
+            fila.className =
+                "fila-producto grid grid-cols-1 sm:grid-cols-12 gap-3 items-end";
+            fila.innerHTML =
+                '<div class="sm:col-span-8 flex flex-col gap-2">' +
+                    '<select aria-label="Producto" class="producto-select w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all cursor-pointer"></select>' +
+                '</div>' +
+                '<div class="sm:col-span-3 flex flex-col gap-2">' +
+                    '<input type="number" min="1" step="1" placeholder="Cantidad" aria-label="Cantidad" class="cantidad-input w-full bg-[#070A13] border border-slate-800/50 rounded-lg px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all" required />' +
+                '</div>' +
+                '<div class="sm:col-span-1">' +
+                    '<button type="button" class="btn-eliminar w-full p-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Eliminar fila">' +
+                        '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>' +
+                        '</svg>' +
+                    '</button>' +
+                '</div>';
+            const select = fila.querySelector<HTMLSelectElement>(".producto-select");
+            if (!select) return fila;
+            poblarSelect(select);
+            return fila;
+        }
+
+        // Null-safe: nunca devuelve NaN, devuelve 0 si falta el input
+        function leerCantidad(input: HTMLInputElement | null) {
+            if (!input || input.value === "" || input.value === null || input.value === undefined) return 0;
+            const n = parseInt(input.value, 10);
+            return isNaN(n) ? 0 : n;
+        }
+
+        function setWaEnabled(enabled: boolean) {
+            if (!btnWaSimulador) return;
+            btnWaSimulador.setAttribute("aria-disabled", String(!enabled));
+            btnWaSimulador.classList.toggle("opacity-50", !enabled);
+            btnWaSimulador.classList.toggle("pointer-events-none", !enabled);
+            btnWaSimulador.classList.toggle("hover:border-green-500", enabled);
+        }
+
+        // El botón solo vive tras un cálculo válido; cualquier cambio lo invalida
+        function invalidarCotizacion() {
+            setWaEnabled(false);
+        }
+
+        // Oculta el botón eliminar cuando solo queda una fila
+        function actualizarVisibilidadEliminar() {
+            const filas = filasContainer.querySelectorAll(".fila-producto");
+            filas.forEach(function (fila) {
+                const btn = fila.querySelector(".btn-eliminar");
+                if (!btn) return;
+                btn.classList.toggle("hidden", filas.length <= 1);
+            });
+        }
+
+        // ---------- Init: primera fila ----------
+        contenedorFilas.appendChild(crearFila());
+
+        function validarEstructuraCorreo(correo: string) {
             const patronCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return patronCorreo.test(correo);
         }
 
         function validarDatosCliente() {
             if (
-                !inputNombre.value.trim() ||
-                !inputEmpresa.value.trim() ||
-                !inputRuc.value.trim() ||
-                !inputCorreo.value.trim()
+                !nombreInput.value.trim() ||
+                !empresaInput.value.trim() ||
+                !rucInput.value.trim() ||
+                !correoInput.value.trim()
             ) {
-                resultadoBox.innerHTML = `
+                panelResultado.innerHTML = `
                     <span class="text-4xl mb-4">⚠️</span>
                     <p class="text-red-500 text-sm font-bold">Por favor, completa tu Nombre, Empresa, RUC y Correo para utilizar el simulador.</p>
                 `;
-                resultadoBox.className =
+                panelResultado.className =
                     "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
                 return false;
             }
-            if (!validarEstructuraCorreo(inputCorreo.value.trim())) {
-                resultadoBox.innerHTML = `
+            if (!validarEstructuraCorreo(correoInput.value.trim())) {
+                panelResultado.innerHTML = `
                     <span class="text-4xl mb-4">⚠️</span>
                     <p class="text-red-500 text-sm font-bold">Por favor, ingresa un correo electrónico válido.</p>
                 `;
-                resultadoBox.className =
+                panelResultado.className =
                     "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
                 return false;
             }
             return true;
         }
 
+        // Anti-duplicados POR ID (nunca por precio)
         function actualizarOpcionesDeshabilitadas() {
-            const filas = contenedorFilas!.querySelectorAll(".fila-producto");
-            const valoresSeleccionados = Array.from(filas)
-                .map((fila) => {
-                    const select = fila.querySelector(
-                        ".producto-select",
-                    ) as HTMLSelectElement;
-                    return select?.value;
-                })
-                .filter((valor) => valor && valor !== "");
+            const filas = filasContainer.querySelectorAll(".fila-producto");
+            const idsSeleccionados: string[] = [];
+            filas.forEach(function (fila) {
+                const sel = fila.querySelector<HTMLSelectElement>(".producto-select");
+                if (sel && sel.value && sel.value !== "") idsSeleccionados.push(sel.value);
+            });
 
-            filas.forEach((fila) => {
-                const select = fila.querySelector(
-                    ".producto-select",
-                ) as HTMLSelectElement;
+            filas.forEach(function (fila) {
+                const select = fila.querySelector<HTMLSelectElement>(".producto-select");
+                if (!select) return;
                 const valorActual = select.value;
-
-                Array.from(select.options).forEach((option) => {
-                    const valor = (option as HTMLOptionElement).value;
-                    const estahSeleccionadaEnOtraFila =
-                        valoresSeleccionados.includes(valor) &&
-                        valor !== valorActual;
-                    (option as HTMLOptionElement).disabled =
-                        estahSeleccionadaEnOtraFila;
+                Array.from(select.options).forEach(function (option: HTMLOptionElement) {
+                    if (option.value === "") return; // placeholder siempre disponible
+                    option.disabled =
+                        idsSeleccionados.includes(option.value) &&
+                        option.value !== valorActual;
                 });
             });
         }
 
-        if (btnAddProducto && contenedorFilas) {
-            btnAddProducto.addEventListener("click", () => {
-                if (!validarDatosCliente()) return;
+        // ============================================================
+        // DELEGACIÓN DE EVENTOS — listeners adjuntados UNA sola vez
+        // ============================================================
+        // Añadir fila (sin fricción: NO valida datos de contacto aquí)
+        if (btnAddProducto) btnAddProducto.addEventListener("click", function () {
+            const totalFilas = filasContainer.querySelectorAll(".fila-producto").length;
+            if (totalFilas >= CATALOGO_PRODUCTOS.length) {
+                panelResultado.innerHTML = `
+                    <span class="text-4xl mb-4">⚠️</span>
+                    <p class="text-red-500 text-sm font-bold">No puedes añadir más de ${CATALOGO_PRODUCTOS.length} productos.</p>
+                `;
+                panelResultado.className =
+                    "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
+                return;
+            }
 
-                const totalFilasActuales = contenedorFilas.querySelectorAll(".fila-producto")
-                    .length;
-                
-                if (totalFilasActuales >= 3) {
-                    resultadoBox.innerHTML = `
-                        <span class="text-4xl mb-4">⚠️</span>
-                        <p class="text-red-500 text-sm font-bold">No puedes añadir más de 3 productos.</p>
-                    `;
-                    resultadoBox.className =
-                        "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
-                    return;
-                }
+            contenedorFilas.appendChild(crearFila());
+            actualizarOpcionesDeshabilitadas();
+            actualizarVisibilidadEliminar();
+            invalidarCotizacion();
+        });
 
-                const primeraFila =
-                    contenedorFilas.querySelector(".fila-producto");
-                if (primeraFila) {
-                    const nuevaFila = primeraFila.cloneNode(
-                        true,
-                    ) as HTMLElement;
-                    const inputCantidad = nuevaFila.querySelector(
-                        ".cantidad-input",
-                    ) as HTMLInputElement;
-                    if (inputCantidad) inputCantidad.value = "";
+        // Delegación: eliminar fila (un solo listener, no uno por botón)
+        if (contenedorFilas) contenedorFilas.addEventListener("click", function (e) {
+            const target = e.target;
+            const btn = target instanceof Element ? target.closest(".btn-eliminar") : null;
+            if (!btn) return;
+            const filas = filasContainer.querySelectorAll(".fila-producto");
+            if (filas.length <= 1) return; // conservar al menos una fila
+            const fila = btn.closest(".fila-producto");
+            if (fila) fila.remove();
+            actualizarOpcionesDeshabilitadas();
+            actualizarVisibilidadEliminar();
+            invalidarCotizacion();
+        });
 
-                    const nuevoSelect = nuevaFila.querySelector(
-                        ".producto-select",
-                    ) as HTMLSelectElement;
-                    if (nuevoSelect) nuevoSelect.value = "";
+        // Delegación: cambios en selects e inputs de cantidad
+        if (contenedorFilas) contenedorFilas.addEventListener("change", function (e) {
+            const target = e.target;
+            if (target instanceof Element && target.matches(".producto-select")) {
+                actualizarOpcionesDeshabilitadas();
+            }
+            invalidarCotizacion();
+        });
+        if (contenedorFilas) contenedorFilas.addEventListener("input", function () {
+            invalidarCotizacion();
+        });
 
-                    const btnEliminar =
-                        nuevaFila.querySelector(".btn-eliminar");
-                    if (btnEliminar) {
-                        btnEliminar.classList.remove("hidden");
-                        btnEliminar.addEventListener("click", () => {
-                            nuevaFila.remove();
-                            actualizarOpcionesDeshabilitadas();
-                        });
-                    }
+        // Cualquier cambio en contacto invalida la cotización anterior
+        [nombreInput, empresaInput, rucInput, correoInput].forEach(function (input) {
+            if (input) input.addEventListener("input", invalidarCotizacion);
+        });
 
-                    if (nuevoSelect) {
-                        nuevoSelect.addEventListener(
-                            "change",
-                            actualizarOpcionesDeshabilitadas,
-                        );
-                    }
-
-                    contenedorFilas.appendChild(nuevaFila);
-                    actualizarOpcionesDeshabilitadas();
-                }
-            });
-        }
-
-        const selectsIniciales =
-            contenedorFilas!.querySelectorAll(".producto-select");
-        selectsIniciales.forEach((select) => {
-            (select as HTMLSelectElement).addEventListener(
-                "change",
-                actualizarOpcionesDeshabilitadas,
-            );
+        // Guardia: bloquear clic en WhatsApp mientras esté deshabilitado
+        if (btnWaSimulador) btnWaSimulador.addEventListener("click", function (e) {
+            if (btnWaSimulador.getAttribute("aria-disabled") === "true") {
+                e.preventDefault();
+            }
         });
 
         actualizarOpcionesDeshabilitadas();
+        actualizarVisibilidadEliminar();
+        setWaEnabled(false);
 
-        if (btnCalcular && resultadoBox && contenedorFilas) {
-            btnCalcular.addEventListener("click", () => {
-                if (!validarDatosCliente()) return;
+        // ---------- Cálculo (único punto de validación de contacto) ----------
+        function ejecutarCalculo() {
+            if (!validarDatosCliente()) { invalidarCotizacion(); return; }
 
-                const filas =
-                    contenedorFilas.querySelectorAll(".fila-producto");
-                let subtotalGlobal = 0;
-                let cantidadPlanchasTotales = 0;
-                let hayErrores = false;
+            let subtotalGlobal = 0;
+            let cantidadUnidadesTotales = 0;
+            let hayErrores = false;
 
-                // Variables fijas para acumular cantidades por columna
-                let cant25mm = 0;
-                let cant38mm = 0;
-                let cantMalla = 0;
+            let qtyFrpGrating = 0;
+            let qtySteelGrating = 0;
+            let qtyMClips = 0;
+            let qtyGalvClips = 0;
 
-                filas.forEach((fila) => {
-                    const select = fila.querySelector(
-                        ".producto-select",
-                    ) as HTMLSelectElement;
-                    const input = fila.querySelector(
-                        ".cantidad-input",
-                    ) as HTMLInputElement;
+            const filas = filasContainer.querySelectorAll(".fila-producto");
+            if (filas.length === 0) hayErrores = true;
 
-                    const precio = parseFloat(select.value);
-                    const cantidad = parseInt(input.value);
+            filas.forEach(function (fila) {
+                const select = fila.querySelector<HTMLSelectElement>(".producto-select");
+                const input = fila.querySelector<HTMLInputElement>(".cantidad-input");
 
-                    if (isNaN(cantidad) || cantidad <= 0) {
-                        hayErrores = true;
-                    } else {
-                        subtotalGlobal += precio * cantidad;
-                        cantidadPlanchasTotales += cantidad;
+                const id = select ? select.value : "";
+                const precio = id ? MAPA_PRECIOS[id] : undefined;
+                const cantidad = leerCantidad(input);
 
-                        // Mapeo técnico: Identificamos qué opción se seleccionó basándonos en el texto de la opción
-                        const textoProducto =
-                            select.options[
-                                select.selectedIndex
-                            ].text.toLowerCase();
+                if (!id || precio === undefined || cantidad <= 0) {
+                    hayErrores = true;
+                } else {
+                    // Total por fila: Precio Unitario × Cantidad
+                    subtotalGlobal += precio * cantidad;
+                    cantidadUnidadesTotales += cantidad;
 
-                        if (
-                            textoProducto.includes("25 mm") ||
-                            textoProducto.includes("25mm")
-                        ) {
-                            cant25mm += cantidad;
-                        } else if (
-                            textoProducto.includes("38 mm") ||
-                            textoProducto.includes("38mm")
-                        ) {
-                            cant38mm += cantidad;
-                        } else if (textoProducto.includes("malla")) {
-                            cantMalla += cantidad;
-                        }
-                    }
-                });
-
-                if (hayErrores || cantidadPlanchasTotales === 0) {
-                    resultadoBox.innerHTML = `
-                        <span class="text-4xl mb-4">⚠️</span>
-                        <p class="text-red-500 text-sm font-bold">Por favor, ingresa una cantidad válida en todas las filas de productos.</p>
-                    `;
-                    resultadoBox.className =
-                        "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
-                    return;
+                    if (id === "frp_grating") qtyFrpGrating += cantidad;
+                    else if (id === "steel_grating") qtySteelGrating += cantidad;
+                    else if (id === "m_clips") qtyMClips += cantidad;
+                    else if (id === "galv_clips") qtyGalvClips += cantidad;
                 }
+            });
 
-                let descuento = 0;
-                if (cantidadPlanchasTotales >= 10) {
-                    descuento = subtotalGlobal * 0.05;
-                }
-
-                let totalFinal = subtotalGlobal - descuento;
-
-                // 1. Renderizar el HTML en el panel visual
-                resultadoBox.innerHTML = `
-                    <div class="flex flex-col items-center justify-center animate-fade-in w-full">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Precio Total Estimado</span>
-                        <h3 class="text-5xl font-black text-white font-['Arial_Narrow']">$${totalFinal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span class="text-xl text-blue-300">USD</span></h3>
-                        
-                        <div class="w-full flex justify-between text-xs text-slate-300 mt-4 px-4 border-t border-slate-700 pt-3">
-                            <span>Total Planchas:</span>
-                            <span class="font-bold">${cantidadPlanchasTotales}</span>
-                        </div>
-
-                        ${
-                            descuento > 0
-                                ? `
-                            <div class="mt-3 bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-sm text-xs font-bold border border-emerald-500/40 flex items-center gap-1">
-                                <span>🎉</span> Descuento del 5% Aplicado (-$${descuento.toFixed(2)})
-                            </div>
-                        `
-                                : `
-                            <p class="text-[10px] text-slate-400 mt-2">Añade ${10 - cantidadPlanchasTotales} planchas más en total para un 5% de descuento.</p>
-                        `
-                        }
-                    </div>
+            if (hayErrores || cantidadUnidadesTotales === 0) {
+                panelResultado.innerHTML = `
+                    <span class="text-4xl mb-4">⚠️</span>
+                    <p class="text-red-500 text-sm font-bold">Por favor, selecciona un producto e ingresa una cantidad válida en todas las filas.</p>
                 `;
-                resultadoBox.className =
-                    "bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
+                panelResultado.className =
+                    "bg-red-50/20 border-2 border-dashed border-red-300 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
+                invalidarCotizacion();
+                return;
+            }
 
-                // 2. Armar mensaje de WhatsApp
-                let mensajeWa = `Hola MAKSER PERÚ, soy ${inputNombre.value} de la empresa ${inputEmpresa.value} (RUC: ${inputRuc.value} , Correo: ${inputCorreo.value} ).\n\n`;
-                mensajeWa += `He cotizado en su página web el siguiente requerimiento:\n\n`;
+            let descuento = 0;
+            if (subtotalGlobal >= DISCOUNT_THRESHOLD) {
+                descuento = subtotalGlobal * 0.05;
+            }
 
-                filas.forEach((fila) => {
-                    const select = fila.querySelector(
-                        ".producto-select",
-                    ) as HTMLSelectElement;
-                    const input = fila.querySelector(
-                        ".cantidad-input",
-                    ) as HTMLInputElement;
-                    const cantidad = parseInt(input.value);
+            const totalFinal = subtotalGlobal - descuento;
 
-                    if (!isNaN(cantidad) && cantidad > 0) {
-                        const nombreProducto =
-                            select.options[select.selectedIndex].text;
-                        mensajeWa += `- ${cantidad} und x ${nombreProducto}\n`;
+            // SOLO para pintar en el DOM (formato visual con comas)
+            const totalVisual = totalFinal.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+            const descuentoVisual = descuento.toFixed(2);
+            const faltanteVisual = (DISCOUNT_THRESHOLD - subtotalGlobal).toFixed(2);
+
+            // 1. Renderizar el HTML en el panel visual
+            panelResultado.innerHTML = `
+                <div class="flex flex-col items-center justify-center animate-fade-in w-full">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-blue-300 mb-2">Precio Total Estimado</span>
+                    <h3 class="text-5xl font-black text-white font-['Arial_Narrow']">$${totalVisual} <span class="text-xl text-blue-300">USD</span></h3>
+
+                    <div class="w-full flex justify-between text-xs text-slate-300 mt-4 px-4 border-t border-slate-700 pt-3">
+                        <span>Total Unidades:</span>
+                        <span class="font-bold">${cantidadUnidadesTotales}</span>
+                    </div>
+
+                    ${
+                        descuento > 0
+                            ? `
+                        <div class="mt-3 bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-sm text-xs font-bold border border-emerald-500/40 flex items-center gap-1">
+                            <span>🎉</span> Descuento del 5% Aplicado (-$${descuentoVisual})
+                        </div>
+                    `
+                            : `
+                        <p class="text-[10px] text-slate-400 mt-2">Te faltan $${faltanteVisual} USD para obtener el 5% de descuento.</p>
+                    `
                     }
-                });
+                </div>
+            `;
+            panelResultado.className =
+                "bg-blue-600/10 border-2 border-dashed border-blue-500/50 rounded-sm p-8 flex flex-col items-center justify-center text-center min-h-[280px] transition-all duration-300";
 
-                mensajeWa += `\n*TOTAL ESTIMADO: $${totalFinal.toFixed(2)} USD*\n\n`;
-                mensajeWa += `Por favor, envíenme una cotización formal y confírmenme stock.`;
+            // 2. Armar mensaje de WhatsApp (unidades por tipo de producto)
+            let mensajeWa = `Hola MASKEL PERÚ, soy ${nombreInput.value} de la empresa ${empresaInput.value} (RUC: ${rucInput.value} , Correo: ${correoInput.value} ).\n\n`;
+            mensajeWa += `He cotizado en su página web el siguiente requerimiento:\n\n`;
 
-                const btnWaSimulador = document.getElementById(
-                    "btn-whatsapp-simulador",
-                ) as HTMLAnchorElement;
-                if (btnWaSimulador) {
-                    btnWaSimulador.href = `https://wa.me/51984649227?text=${encodeURIComponent(mensajeWa)}`;
+            filas.forEach(function (fila) {
+                const select = fila.querySelector<HTMLSelectElement>(".producto-select");
+                const input = fila.querySelector<HTMLInputElement>(".cantidad-input");
+                const cantidad = leerCantidad(input);
+                const id = select ? select.value : "";
+
+                if (id && MAPA_NOMBRES[id] && cantidad > 0) {
+                    const nombreProducto = MAPA_NOMBRES[id];
+                    const unidad =
+                        id === "frp_grating" || id === "steel_grating"
+                            ? "planchas"
+                            : "unidades";
+                    mensajeWa += `- ${cantidad} ${unidad} x ${nombreProducto}\n`;
                 }
+            });
 
-                // ============================================================
-                // 🚀 ENVIAR DATA EN MATRIZ DE COLUMNAS FIJAS A GOOGLE SHEETS
-                // ============================================================
-                const datosCotizacion = {
-                    nombre: inputNombre.value,
-                    empresa: inputEmpresa.value,
-                    ruc: inputRuc.value,
-                    correo: inputCorreo.value,
-                    cant_25mm: cant25mm, // Pasa la cantidad acumulada o 0 si no se usó
-                    cant_38mm: cant38mm, // Pasa la cantidad acumulada o 0 si no se usó
-                    cant_malla: cantMalla, // Pasa la cantidad acumulada o 0 si no se usó
-                    total: totalFinal.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    }),
-                };
+            mensajeWa += `\n*TOTAL ESTIMADO: $${totalFinal.toFixed(2)} USD*\n\n`;
+            mensajeWa += `Por favor, envíenme una cotización formal y confírmenme stock.`;
 
-                const urlGoogleSheets =
-                    "https://script.google.com/macros/s/AKfycbyUc3jXffHrq6e56R8Ljoa2OLQVUca1hOOZ2O39TvOZK3JDwynAxcq4NIVD5w4c5hjNZA/exec";
+            if (btnWaSimulador) {
+                btnWaSimulador.href = `https://wa.me/51984649227?text=${encodeURIComponent(mensajeWa)}`;
+            }
+            // Tras un cálculo válido, el carrito y el contacto están OK → habilitar
+            setWaEnabled(true);
 
-                fetch(urlGoogleSheets, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(datosCotizacion),
-                })
-                    .then(() =>
-                        console.log(
-                            "Datos en columnas fijas guardados correctamente.",
-                        ),
-                    )
-                    .catch((err) =>
-                        console.error(
-                            "Error al guardar en Google Sheets:",
-                            err,
-                        ),
+            // ============================================================
+            // Payload con números puros (SIN formato ni comas)
+            // ============================================================
+            const datosCotizacion = {
+                nombre: nombreInput.value,
+                empresa: empresaInput.value,
+                ruc: rucInput.value,
+                correo: correoInput.value,
+                qty_frp_grating: qtyFrpGrating,
+                qty_steel_grating: qtySteelGrating,
+                qty_m_clips: qtyMClips,
+                qty_galv_clips: qtyGalvClips,
+                subtotal: Number(subtotalGlobal.toFixed(2)),
+                total: Number(totalFinal.toFixed(2)),
+            };
+
+            const urlGoogleSheets =
+                "https://script.google.com/macros/s/AKfycbyUc3jXffHrq6e56R8Ljoa2OLQVUca1hOOZ2O39TvOZK3JDwynAxcq4NIVD5w4c5hjNZA/exec";
+
+            fetch(urlGoogleSheets, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(datosCotizacion),
+            })
+                .then(function () {
+                    console.log(
+                        "Datos en columnas fijas guardados correctamente.",
                     );
-                // ============================================================
+                })
+                .catch(function (err) {
+                    console.error(
+                        "Error al guardar en Google Sheets:",
+                        err,
+                    );
+                });
+            // ============================================================
+        }
+
+        // Disparo del cálculo: clic, submit nativo del form y tecla Enter
+        if (btnCalcular) btnCalcular.addEventListener("click", ejecutarCalculo);
+        if (formulario) {
+            formulario.addEventListener("submit", function (e) {
+                e.preventDefault();
+                ejecutarCalculo();
+            });
+            // Accesibilidad de teclado: Enter en cualquier campo dispara el cálculo
+            // (ignorado en <select> para no interferir con la elección por teclado)
+            formulario.addEventListener("keydown", function (e) {
+                if (e.target instanceof HTMLSelectElement) return;
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    ejecutarCalculo();
+                }
             });
         }
-    });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSimulador, { once: true });
+    } else {
+        initSimulador();
+    }
 </script>
 <style>
     .animate-fade-in {
