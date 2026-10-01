@@ -342,6 +342,19 @@
         // ---------- Init: primera fila ----------
         contenedorFilas.appendChild(crearFila());
 
+        window.addEventListener("maskel:select-product", function (event) {
+            const productId = (event as CustomEvent<{ productId?: string }>).detail?.productId;
+            if (!productId) return;
+
+            const primeraFila = filasContainer.querySelector<HTMLElement>(".fila-producto");
+            const select = primeraFila?.querySelector<HTMLSelectElement>(".producto-select");
+            if (!select) return;
+
+            select.value = productId;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            document.getElementById("simulator")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
         function validarEstructuraCorreo(correo: string) {
             const patronCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return patronCorreo.test(correo);

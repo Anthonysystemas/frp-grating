@@ -109,20 +109,112 @@ const {
 
           <!-- Botón de Acción -->
           <div class="p-6 pt-0 mt-auto">
-            <a
-              href={product.link}
-              class="w-full inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded transition-all duration-200 text-sm tracking-wide border border-slate-700 hover:border-blue-500"
-            >
-              <span>{product.buttonText || "Ver detalles tecnicos"}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
-              </svg>
-            </a>
+            {product.title === "Grapa M Inoxidable" ? (
+              <button
+                type="button"
+                data-open-clip-modal
+                class="w-full inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded transition-all duration-200 text-sm tracking-wide border border-slate-700 hover:border-blue-500"
+              >
+                <span>{product.buttonText || "Ver detalles tecnicos"}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </button>
+            ) : (
+              <a
+                href={product.link}
+                class="w-full inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded transition-all duration-200 text-sm tracking-wide border border-slate-700 hover:border-blue-500"
+              >
+                <span>{product.buttonText || "Ver detalles tecnicos"}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </a>
+            )}
           </div>
 
         </article>
       ))}
     </div>
 
-  </div></section>
+  </div>
+
+  <div
+    id="clip-details-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="clip-details-title"
+  >
+    <div class="relative grid w-full max-w-3xl overflow-hidden rounded-xl border border-slate-700 bg-[#131C2E] shadow-2xl md:grid-cols-2">
+      <button
+        type="button"
+        data-close-clip-modal
+        class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/80 text-2xl text-slate-300 transition hover:text-white"
+        aria-label="Cerrar detalles de la grapa"
+      >
+        ×
+      </button>
+      <div class="flex min-h-64 items-center justify-center bg-slate-900 p-6 md:min-h-full">
+        <img src="/images/grapa.jpg" alt="Grapa M Inoxidable" class="max-h-96 w-full object-contain" />
+      </div>
+      <div class="p-7 sm:p-9">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Accesorio</span>
+        <h2 id="clip-details-title" class="mt-2 text-2xl font-black text-white sm:text-3xl">Grapa M Inoxidable</h2>
+        <div class="mt-6 border-t border-slate-700 pt-5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Especificaciones</h3>
+          <ul class="mt-4 space-y-3 text-sm leading-relaxed text-slate-200">
+            <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"></span><span>Material: Acero Inoxidable SS 304</span></li>
+            <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"></span><span>Compatible con FRP grating de 38mm de espesor</span></li>
+            <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"></span><span>Compatible con FRP grating de 25mm de espesor</span></li>
+          </ul>
+        </div>
+        <button
+          type="button"
+          data-quote-clip
+          class="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-black uppercase tracking-wider text-white transition hover:bg-blue-500"
+        >
+          Cotizar
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const clipModal = document.getElementById("clip-details-modal");
+  const clipOpenButton = document.querySelector("[data-open-clip-modal]");
+  const clipCloseButton = document.querySelector("[data-close-clip-modal]");
+  const clipQuoteButton = document.querySelector("[data-quote-clip]");
+
+  function closeClipModal() {
+    if (!clipModal) return;
+    clipModal.classList.add("hidden");
+    clipModal.classList.remove("flex");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  function openClipModal() {
+    if (!clipModal) return;
+    clipModal.classList.remove("hidden");
+    clipModal.classList.add("flex");
+    document.body.classList.add("overflow-hidden");
+    (clipCloseButton as HTMLButtonElement | null)?.focus();
+  }
+
+  clipOpenButton?.addEventListener("click", openClipModal);
+  clipCloseButton?.addEventListener("click", closeClipModal);
+  clipModal?.addEventListener("click", (event) => {
+    if (event.target === clipModal) closeClipModal();
+  });
+  clipQuoteButton?.addEventListener("click", () => {
+    closeClipModal();
+    window.dispatchEvent(new CustomEvent("maskel:select-product", { detail: { productId: "m_clips" } }));
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeClipModal();
+  });
+</script>
