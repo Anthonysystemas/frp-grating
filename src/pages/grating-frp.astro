@@ -1,29 +1,142 @@
 ---
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import Gallery from '../components/Gallery.astro';
-import Simulator from '../components/Simulator.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
-import BenefitsFRP from '../components/BenefitsFRP.astro';
 import Layout from '../layouts/Layout.astro';
+
+const medidas = [
+  { dimension: '1000 x 4000 mm', espesor: '38 mm', price: 310 },
+  { dimension: '1220 x 2440 mm', espesor: '38 mm', price: 230 },
+  { dimension: '1000 x 4000 mm', espesor: '25 mm', price: 230 },
+  { dimension: '1000 x 3000 mm', espesor: '38 mm', price: 230 },
+  { dimension: '1000 x 3000 mm', espesor: '25 mm', price: 180 },
+  { dimension: '1000 x 2000 mm', espesor: '38 mm', price: 150 },
+];
 ---
 
 <Layout
-  title="Grating FRP - Rejillas de Fibra de Vidrio | Maskel Perú"
-  description="Rejillas de fibra de vidrio FRP de alta resistencia y protección anticorrosiva para minería, industria y proyectos en Perú."
+  title="Grating FRP | Rejillas de Fibra de Vidrio | Maskel Perú"
+  description="Grating FRP anticorrosivo, dieléctrico y antideslizante en medidas de stock para minería, industria y construcción."
 >
-    
-    <Navbar />
+  <Navbar />
 
-    <main class="flex-1">
-      <Gallery />
-      <BenefitsFRP />
-      <Simulator />
-    </main>
+  <main class="bg-[#080C16] pt-20 text-white">
+    <section class="border-b border-slate-900/60 bg-[#0D1322] px-6 py-14 sm:py-18">
+      <div class="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_420px]">
+        <div>
+          <p class="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-blue-400">Stock industrial / fibra de vidrio</p>
+          <h1 class="text-3xl font-black uppercase tracking-tight sm:text-5xl">Grating <span class="text-blue-500">FRP</span></h1>
+          <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">Rejillas moldeadas de fibra de vidrio para ambientes corrosivos, áreas eléctricas y superficies que requieren alta tracción.</p>
+          <button type="button" data-open-quote class="mt-7 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-blue-500">Cotizar stock <span aria-hidden="true">→</span></button>
+        </div>
+        <figure class="overflow-hidden rounded-xl border border-slate-700 bg-[#060913] shadow-2xl">
+          <img src="/images/rejilla-frp.jpg" alt="Rejilla Grating FRP de fibra de vidrio" class="h-64 w-full object-cover sm:h-72" />
+          <figcaption class="border-t border-slate-800 px-4 py-3 text-xs text-slate-400">Superficie arenada antideslizante · Resina de alta resistencia</figcaption>
+        </figure>
+      </div>
+    </section>
 
-    <!-- WhatsApp flotante global -->
-    <WhatsAppButton />
+    <section class="px-6 py-16 sm:py-20" aria-labelledby="stock-title">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-8 max-w-2xl">
+          <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Medidas disponibles</p>
+          <h2 id="stock-title" class="text-3xl font-black uppercase tracking-tight sm:text-4xl">Tabla de stock FRP</h2>
+          <p class="mt-3 text-slate-400">Selecciona una medida en el panel de cotización para consultar disponibilidad y calcular el subtotal.</p>
+        </div>
 
-    <Footer />
+        <div class="overflow-x-auto rounded-xl border border-slate-800 bg-[#0D1220] shadow-xl">
+          <table class="w-full min-w-[620px] text-left text-sm">
+            <thead class="border-b border-slate-700 bg-[#111827] text-xs uppercase tracking-wider text-slate-300">
+              <tr><th class="px-5 py-4">Dimensión</th><th class="px-5 py-4">Espesor</th><th class="px-5 py-4">Precio unitario</th><th class="px-5 py-4 text-right">Acción</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              {medidas.map((medida, index) => (
+                <tr class="transition hover:bg-blue-500/5">
+                  <td class="px-5 py-4 font-semibold text-white">{medida.dimension}</td>
+                  <td class="px-5 py-4 text-slate-300">H {medida.espesor}</td>
+                  <td class="px-5 py-4 font-bold text-blue-300">US$ {medida.price}</td>
+                  <td class="px-5 py-4 text-right"><button type="button" data-measure-index={index} class="rounded-md border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-blue-400 hover:text-blue-300">Cotizar</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
+    <section class="border-y border-slate-900/60 bg-[#0D1322] px-6 py-16" aria-labelledby="frp-benefits-title">
+      <div class="mx-auto max-w-6xl">
+        <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Ventajas del material</p>
+        <h2 id="frp-benefits-title" class="text-3xl font-black uppercase tracking-tight sm:text-4xl">Checklist FRP</h2>
+        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {['100% anticorrosivo', 'Dieléctrico / aislante', 'Superficie antideslizante', 'Bajo peso estructural', 'Fácil instalación', 'Stock disponible'].map((beneficio) => (
+            <div class="flex items-center gap-3 rounded-lg border border-slate-800 bg-[#0A0E1A] p-4 text-sm text-slate-200"><span class="font-bold text-blue-400">✓</span>{beneficio}</div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 py-16 text-center sm:py-20">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Atención directa</p>
+      <h2 class="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl">¿Listo para cotizar?</h2>
+      <p class="mx-auto mt-3 max-w-xl text-slate-400">Elige la medida, indica la cantidad y recibe atención por WhatsApp.</p>
+      <button type="button" data-open-quote class="mt-7 rounded-lg bg-blue-600 px-7 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-blue-500">Abrir panel de cotización</button>
+    </section>
+  </main>
+
+  <div id="frp-quote-panel" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="quote-title">
+    <div class="w-full max-w-lg rounded-2xl border border-slate-700 bg-[#0D1220] p-6 shadow-2xl sm:p-8">
+      <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Cotizador FRP</p><h2 id="quote-title" class="mt-2 text-2xl font-black uppercase">Selecciona tu stock</h2></div><button type="button" data-close-quote class="text-2xl text-slate-400 hover:text-white" aria-label="Cerrar panel de cotización">×</button></div>
+      <form id="frp-quote-form" class="mt-6 space-y-5">
+        <label class="block text-sm text-slate-300">Medida<select id="frp-measure" class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white focus:border-blue-500 focus:outline-none">{medidas.map((medida, index) => <option value={index}>{medida.dimension} · H {medida.espesor} · US$ {medida.price}</option>)}</select></label>
+        <label class="block text-sm text-slate-300">Cantidad<input id="frp-quantity" type="number" min="1" value="1" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white focus:border-blue-500 focus:outline-none" /></label>
+        <div class="grid grid-cols-2 gap-3 rounded-lg border border-slate-800 bg-[#080C16] p-4 text-sm"><span class="text-slate-400">Precio unitario</span><strong id="frp-unit-price" class="text-right text-blue-300">US$ 310</strong><span class="text-slate-400">Subtotal estimado</span><strong id="frp-subtotal" class="text-right text-white">US$ 310</strong></div>
+        <label class="block text-sm text-slate-300">Nombre o empresa<input id="frp-contact" type="text" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white focus:border-blue-500 focus:outline-none" /></label>
+        <button type="submit" class="w-full rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-emerald-500">Enviar cotización por WhatsApp</button>
+      </form>
+    </div>
+  </div>
+
+  <WhatsAppButton />
+  <Footer />
 </Layout>
+
+<script define:vars={{ medidas }}>
+  const panel = document.getElementById('frp-quote-panel');
+  const measure = document.getElementById('frp-measure');
+  const quantity = document.getElementById('frp-quantity');
+  const unitPrice = document.getElementById('frp-unit-price');
+  const subtotal = document.getElementById('frp-subtotal');
+  const money = (value) => `US$ ${value.toFixed(2)}`;
+
+  function updateTotal() {
+    const selected = medidas[Number(measure?.value) || 0];
+    const amount = Math.max(1, Number(quantity?.value) || 1);
+    if (unitPrice) unitPrice.textContent = money(selected.price);
+    if (subtotal) subtotal.textContent = money(selected.price * amount);
+  }
+
+  function openPanel(index) {
+    if (measure && index !== undefined) measure.value = String(index);
+    updateTotal();
+    panel?.classList.replace('hidden', 'flex');
+  }
+
+  function closePanel() { panel?.classList.replace('flex', 'hidden'); }
+
+  document.querySelectorAll('[data-open-quote]').forEach((button) => button.addEventListener('click', () => openPanel()));
+  document.querySelectorAll('[data-measure-index]').forEach((button) => button.addEventListener('click', () => openPanel(Number(button.getAttribute('data-measure-index')))));
+  document.querySelector('[data-close-quote]')?.addEventListener('click', closePanel);
+  panel?.addEventListener('click', (event) => { if (event.target === panel) closePanel(); });
+  measure?.addEventListener('change', updateTotal);
+  quantity?.addEventListener('input', updateTotal);
+
+  document.getElementById('frp-quote-form')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const selected = medidas[Number(measure?.value) || 0];
+    const amount = Math.max(1, Number(quantity?.value) || 1);
+    const contact = document.getElementById('frp-contact').value;
+    const message = `Hola Maskel Perú, deseo cotizar ${amount} panel(es) de Grating FRP ${selected.dimension} H${selected.espesor}. Total estimado: US$ ${(selected.price * amount).toFixed(2)}. Contacto: ${contact}.`;
+    window.open(`https://wa.me/51984649227?text=${encodeURIComponent(message)}`, '_blank');
+  });
+</script>

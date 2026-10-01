@@ -7,6 +7,7 @@ import Simulator from "../components/Simulator.astro";
 import About from "../components/About.astro";
 import FrpSeccion from "../components/FrpSeccion.astro";
 import DuchaSeccion from "../components/DuchaSeccion.astro";
+import Gallery from "../components/Gallery.astro";
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import Layout from "../layouts/Layout.astro";
 
@@ -16,7 +17,7 @@ const maskelProducts = [
     description:
       "Rejillas de plástico reforzado con fibra de vidrio, alta resistencia química y a la corrosión.",
     image: "/images/rejilla-frp.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
-    link: "/rejilla-frp.jpg",
+    link: "/grating-frp",
     badge: "Resina Isoftalica",
     tag: "Producto Principal",
     specifications: [
@@ -30,7 +31,7 @@ const maskelProducts = [
     description:
       "Rejillas de ducha lineales tipo Fold Edge, ideales para desagües empotrados en pisos de baños y duchas.",
     image: "/images/rejilladucha.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
-    link: "/rejilladucha.jpg",
+    link: "/rejilla-ducha",
     badge: "Acero Inoxidable",
     tag: "Producto Principal",
     specifications: [
@@ -102,6 +103,7 @@ const maskelAccessories = [
       <FrpSeccion />
 
       <DuchaSeccion />
+
 
       <!-- Sección de Productos / Catálogo -->
       <section id="catalogo">
