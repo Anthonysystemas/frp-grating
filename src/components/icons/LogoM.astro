@@ -1,0 +1,32 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "h-10 w-10" } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 48 48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="Logo Maskel"
+>
+  <path
+    d="M24 3 44 14.5v19L24 45 4 33.5v-19L24 3Z"
+    fill="currentColor"
+    fill-opacity="0.18"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linejoin="round"
+  />
+  <path
+    d="m12.5 31V17l11.5 9 11.5-9v14M12.5 17l11.5 9 11.5-9"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

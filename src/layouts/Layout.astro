@@ -6,6 +6,7 @@ interface Props {
 }
 
 import "../styles/global.css";
+import CotizadorPanel from "../components/CotizadorPanel.astro";
 
 const {
   title,
@@ -26,5 +27,6 @@ const {
   </head>
   <body class="bg-[#0A0E1A] text-slate-100 antialiased min-h-screen flex flex-col justify-between">
     <slot />
+    <CotizadorPanel />
   </body>
 </html>
