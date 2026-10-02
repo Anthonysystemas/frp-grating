@@ -2,6 +2,8 @@
 // Panel global de cotización (paleta del sitio: fondo #0A0E1A, paneles #0D1220, acento blue-600).
 // Se abre con el evento "maskel:open-cotizador" y se cierra con la X o el overlay.
 import LogoM from "./icons/LogoM.astro";
+import CotizadorPasoDatos from "./CotizadorPasoDatos.astro";
+import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
 ---
 
 <div
@@ -61,8 +63,9 @@ import LogoM from "./icons/LogoM.astro";
     </div>
 
     <!-- Cuerpo -->
-    <div class="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+    <div data-step-body class="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-10 sm:px-6">
       <!-- 1. ELIGE TU PRODUCTO -->
+      <div data-step-panel="1">
       <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
         1. Elige tu producto
       </p>
@@ -173,6 +176,9 @@ import LogoM from "./icons/LogoM.astro";
         Continuar <span aria-hidden="true">→</span>
       </button>
     </div>
+      <CotizadorPasoDatos embedded />
+      <CotizadorPasoResumen embedded />
+    </div>
   </div>
 </div>
 
@@ -240,6 +246,10 @@ import LogoM from "./icons/LogoM.astro";
   const listTotal = root?.querySelector<HTMLElement>("[data-list-total]");
   const totalEl = root?.querySelector<HTMLElement>("[data-total]");
   const continueBtn = root?.querySelector<HTMLButtonElement>("[data-continue]");
+  const closeQuoteBtn = root?.querySelector<HTMLButtonElement>("[data-close-quote]");
+  const stepPanels = Array.from(
+    root?.querySelectorAll<HTMLElement>("[data-step-panel]") ?? [],
+  );
 
   const CLOSED = ["translate-y-full", "sm:translate-x-full"];
   const OPEN = ["translate-y-0", "sm:translate-x-0"];
@@ -248,6 +258,12 @@ import LogoM from "./icons/LogoM.astro";
   let category: CategoryKey = "frp";
   let quote: QuoteLine[] = [];
   let nextLineId = 1;
+
+  function showStep(step: number) {
+    stepPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.stepPanel !== String(step);
+    });
+  }
 
   const money = (value: number) =>
     `US$ ${value.toLocaleString("en-US", {
@@ -326,6 +342,8 @@ import LogoM from "./icons/LogoM.astro";
 
     const total = quote.reduce((sum, line) => sum + line.subtotal, 0);
     if (totalEl) totalEl.textContent = money(total);
+    sessionStorage.setItem("maskel:cotizacion", JSON.stringify(quote));
+    document.dispatchEvent(new CustomEvent("maskel:cotizador-total", { detail: { total } }));
   }
 
   function removeLine(id: number) {
@@ -347,6 +365,7 @@ import LogoM from "./icons/LogoM.astro";
     if (quantity) quantity.value = "1";
     selectCategory("frp");
     renderQuote();
+    showStep(1);
   }
 
   function openPanel() {
@@ -380,8 +399,13 @@ import LogoM from "./icons/LogoM.astro";
   }
 
   document.addEventListener("maskel:open-cotizador", openPanel);
+  document.addEventListener("maskel:cotizador-step", (event) => {
+    const step = (event as CustomEvent<{ step: number }>).detail?.step;
+    if (typeof step === "number") showStep(step);
+  });
 
   closeBtn?.addEventListener("click", closePanel);
+  closeQuoteBtn?.addEventListener("click", closePanel);
   overlay?.addEventListener("click", closePanel);
 
   document.addEventListener("keydown", (event) => {
@@ -418,6 +442,12 @@ import LogoM from "./icons/LogoM.astro";
     removeLine(Number(target.dataset.remove));
   });
 
+  continueBtn?.addEventListener("click", () => {
+    sessionStorage.setItem("maskel:cotizacion", JSON.stringify(quote));
+    document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 2 } }));
+  });
+
   selectCategory("frp");
   renderQuote();
+  showStep(1);
 </script>
