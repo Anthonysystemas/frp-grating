@@ -1,10 +1,21 @@
 ---
 // Panel global de cotización (paleta del sitio: fondo #0A0E1A, paneles #0D1220, acento blue-600).
 // Se abre con el evento "maskel:open-cotizador" y se cierra con la X o el overlay.
-import { CATALOG } from '../data/catalog';
+import { CATALOG, categorias } from '../data/catalog';
 import LogoM from "./icons/LogoM.astro";
 import CotizadorPasoDatos from "./CotizadorPasoDatos.astro";
 import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
+
+const cotizadorData = categorias.map((categoria) => ({
+  id: categoria.id,
+  label: categoria.titulo,
+  unit: categoria.id === 'frp' ? 'panel' : 'unidad',
+  options: CATALOG.filter((producto) => producto.categoria === categoria.id).map((producto) => ({
+    code: producto.id,
+    label: producto.detalle,
+    price: producto.precioUnitario,
+  })),
+}));
 ---
 
 <div
@@ -140,7 +151,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
         class="mt-6 flex items-center justify-between border-t border-slate-700/70 px-1 pt-3"
       >
         <span class="text-sm text-slate-300">Subtotal</span>
-        <strong data-subtotal class="text-2xl font-black text-white">US$ 310</strong>
+        <strong data-subtotal class="text-2xl font-black text-white">US$ 0</strong>
       </div>
 
       <!-- Agregar a la cotización -->
@@ -183,46 +194,32 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
   </div>
 </div>
 
-<script>
-  const CATALOG = {
-    frp: {
-      label: "Rejilla FRP Grating",
-      unit: "panel",
-      selectorType: "dimension",
-      options: [
-        { code: "1000x4038-H38", label: "1000×4038mm · H38mm", price: 310 },
-        { code: "1220x2440-H38", label: "1220×2440mm · H38mm", price: 230 },
-        { code: "1000x4038-H25", label: "1000×4038mm · H25mm", price: 230 },
-        { code: "1000x3000-H38", label: "1000×3000mm · H38mm", price: 230 },
-        { code: "1000x3000-H25", label: "1000×3000mm · H25mm", price: 180 },
-        { code: "1000x2000-H38", label: "1000×2000mm · H38mm", price: 150 },
-      ],
-    },
-    ducha: {
-      label: "Rejillas de ducha",
-      unit: "unidad",
-      selectorType: "model",
-      options: [
-        { code: "PT04", label: "Modelo PT04", price: 21.0 },
-        { code: "PT10", label: "Modelo PT10", price: 19.5 },
-        { code: "PT21", label: "Modelo PT21", price: 18.0 },
-        { code: "PT02", label: "Modelo PT02", price: 19.5 },
-        { code: "PT09", label: "Modelo PT09", price: 21.0 },
-        { code: "PT20", label: "Modelo PT20", price: 21.0 },
-      ],
-    },
-    clips: {
-      label: "Clips de fijación M",
-      unit: "unidad",
-      selectorType: "compat",
-      options: [
-        { code: "clip-38mm", label: "Para rejilla FRP de 38mm", price: 0.79 },
-        { code: "clip-25mm", label: "Para rejilla FRP de 25mm", price: 0.78 },
-      ],
-    },
-  } as const;
+<script type="application/json" id="catalog-data" is:inline set:html={JSON.stringify(cotizadorData)}></script>
 
-  type CategoryKey = keyof typeof CATALOG;
+<script>
+  type CotizadorOption = { code: string; label: string; price: number };
+  type CotizadorCategoria = {
+    id: string;
+    label: string;
+    unit: string;
+    options: CotizadorOption[];
+  };
+
+  let catalogEntries: CotizadorCategoria[] = [];
+  try {
+    catalogEntries = JSON.parse(
+      document.getElementById("catalog-data")?.textContent ?? "[]",
+    );
+  } catch {
+    catalogEntries = [];
+  }
+
+  const CATALOG: Record<string, CotizadorCategoria> = Object.fromEntries(
+    catalogEntries.map((entry) => [entry.id, entry]),
+  );
+
+  type CategoryKey = string;
+  const DEFAULT_CATEGORY = Object.keys(CATALOG)[0] ?? "";
   type QuoteLine = {
     id: number;
     productId: string;
@@ -257,7 +254,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
   const OPEN = ["translate-y-0", "sm:translate-x-0"];
 
   let isOpen = false;
-  let category: CategoryKey = "frp";
+  let category: CategoryKey = DEFAULT_CATEGORY;
   let quote: QuoteLine[] = [];
   let nextLineId = 1;
 
@@ -276,8 +273,8 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
   const plural = (unit: string, amount: number) =>
     unit === "panel" ? (amount === 1 ? "panel" : "panels") : amount === 1 ? unit : `${unit}es`;
 
-  function currentOption() {
-    const options = CATALOG[category].options;
+  function currentOption(): CotizadorOption | undefined {
+    const options = CATALOG[category]?.options ?? [];
     const found = options.find((option) => option.code === measure?.value);
     return found ?? options[0];
   }
@@ -288,12 +285,12 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
 
   function updateSubtotal() {
     const option = currentOption();
-    if (subtotalEl) subtotalEl.textContent = money(option.price * currentQty());
+    if (subtotalEl) subtotalEl.textContent = money((option?.price ?? 0) * currentQty());
   }
 
   function renderMeasureOptions() {
     const data = CATALOG[category];
-    if (!measure) return;
+    if (!measure || !data) return;
     measure.innerHTML = data.options
       .map(
         (option) =>
@@ -365,7 +362,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
     quote = [];
     nextLineId = 1;
     if (quantity) quantity.value = "1";
-    selectCategory("frp");
+    selectCategory(DEFAULT_CATEGORY);
     renderQuote();
     showStep(1);
   }
@@ -428,6 +425,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
     const option = currentOption();
     const qty = currentQty();
     const data = CATALOG[category];
+    if (!option || !data) return;
     quote.push({
       id: nextLineId++,
       productId: option.code,
@@ -450,7 +448,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
     document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 2 } }));
   });
 
-  selectCategory("frp");
+  selectCategory(DEFAULT_CATEGORY);
   renderQuote();
   showStep(1);
 </script>
