@@ -9,37 +9,16 @@ import DuchaSeccion from "../components/DuchaSeccion.astro";
 import Gallery from "../components/Gallery.astro";
 import ChatButton from '../components/ChatButton.astro';
 import Layout from "../layouts/Layout.astro";
-import { CATALOG } from "../data/catalog";
+import { categorias } from "../data/catalog";
 
-const categoryDetails = {
-  frp: {
-    image: "/images/rejilla-frp.jpg",
-    link: "/grating-frp",
-    badge: "Resina Isoftalica",
-    tag: "Producto Principal",
-    specifications: ["Malla 38x38mm", "Superficie arenada (Gritted)"],
-  },
-  ducha: {
-    image: "/images/rejilladucha.jpg",
-    link: "/rejilla-ducha",
-    badge: "Acero Inoxidable",
-    tag: "Producto Principal",
-    specifications: ["Tipo Fold Edge (borde plegado)", "Instalación empotrada en piso"],
-  },
-  clips: {
-    image: "/images/grapa.jpg",
-    link: "#catalogo",
-    badge: "Acero Inox SS 304",
-    tag: "Accesorio",
-    specifications: ["Fijación segura para rejillas FRP"],
-  },
-} as const;
-
-const maskelProducts = CATALOG.map((producto) => ({
-  title: producto.nombre,
-  description: producto.detalle,
-  ...categoryDetails[producto.categoria],
-  buttonText: `Cotizar ${producto.id}`,
+const maskelProducts = categorias.map((categoria) => ({
+  title: categoria.titulo,
+  description: categoria.descripcion,
+  image: categoria.imagen,
+  link: categoria.ruta,
+  badge: categoria.badge,
+  tag: categoria.etiqueta,
+  specifications: [...categoria.especificaciones],
 }));
 const maskelAccessories = [
   {

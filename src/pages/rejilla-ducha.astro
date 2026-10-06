@@ -3,15 +3,16 @@ import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import ChatButton from "../components/ChatButton.astro";
 import Layout from "../layouts/Layout.astro";
+import { categorias, productosPorCategoria } from "../data/catalog";
 
-const modelos = [
-  { code: "PT04", length: "800 mm", image: "/images/rejilladucha.jpg" },
-  { code: "PT06", length: "800 mm", image: "/images/rejilladucha.jpg" },
-  { code: "PT08", length: "800 mm", image: "/images/rejilladucha.jpg" },
-  { code: "PT10", length: "800 mm", image: "/images/rejilladucha.jpg" },
-  { code: "PT12", length: "800 mm", image: "/images/rejilladucha.jpg" },
-  { code: "PT15", length: "800 mm", image: "/images/rejilladucha.jpg" },
-];
+const categoriaDucha = categorias.find((categoria) => categoria.id === "ducha");
+const modelos = productosPorCategoria("ducha").map((producto) => ({
+  code: producto.id,
+  length: producto.medida ?? "",
+  image: categoriaDucha?.imagen ?? "",
+  price: producto.precioUnitario,
+}));
+const primerModelo = modelos[0];
 ---
 
 <Layout
@@ -87,12 +88,12 @@ const modelos = [
   <div id="technical-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="technical-title">
     <div class="relative grid max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-[#0D1220] shadow-2xl sm:grid-cols-2">
       <button type="button" data-close-modal class="absolute right-3 top-3 z-10 rounded-full bg-[#080C16]/90 px-3 py-1 text-xl text-slate-300 hover:text-white" aria-label="Cerrar ficha técnica">×</button>
-      <img id="technical-image" src="/images/rejilladucha.jpg" alt="" class="h-64 w-full object-cover sm:h-full" />
+      <img id="technical-image" src={primerModelo.image} alt="" class="h-64 w-full object-cover sm:h-full" />
       <div class="space-y-5 p-6 sm:p-8">
         <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">Ficha técnica</p>
-        <h2 id="technical-title" class="text-3xl font-black text-white">Modelo PT04</h2>
+        <h2 id="technical-title" class="text-3xl font-black text-white">Modelo {primerModelo.code}</h2>
         <div class="space-y-3 text-sm text-slate-300">
-          <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Largo</span><strong id="technical-length" class="text-white">800 mm</strong></p>
+          <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Largo</span><strong id="technical-length" class="text-white">{primerModelo.length}</strong></p>
           <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Borde</span><strong class="text-white">Fold Edge</strong></p>
           <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Material</span><strong class="text-white">Acero inoxidable</strong></p>
         </div>
@@ -108,7 +109,7 @@ const modelos = [
         <button type="button" data-close-quote class="text-2xl text-slate-400 hover:text-white" aria-label="Cerrar panel de cotización">×</button>
       </div>
       <form id="shower-quote-form" class="mt-6 space-y-4">
-        <label class="block text-sm text-slate-300">Modelo<select id="quote-model" class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white"><option>PT04</option><option>PT06</option><option>PT08</option><option>PT10</option><option>PT12</option><option>PT15</option></select></label>
+        <label class="block text-sm text-slate-300">Modelo<select id="quote-model" class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white">{modelos.map((modelo) => <option value={modelo.code}>{modelo.code} · US$ {modelo.price}</option>)}</select></label>
         <label class="block text-sm text-slate-300">Cantidad<input id="quote-quantity" type="number" min="1" value="1" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white" /></label>
         <label class="block text-sm text-slate-300">Nombre o empresa<input id="quote-contact" type="text" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white" /></label>
         <button type="submit" class="w-full rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-emerald-500">Enviar por WhatsApp</button>
@@ -127,18 +128,18 @@ const modelos = [
   const technicalTitle = document.getElementById('technical-title');
   const technicalLength = document.getElementById('technical-length');
   const technicalImage = document.getElementById('technical-image') as HTMLImageElement | null;
-  let selectedModel = 'PT04';
+  let selectedModel = quoteModel?.options[0]?.value || '';
 
   const openElement = (element: HTMLElement | null) => element?.classList.replace('hidden', 'flex');
   const closeElement = (element: HTMLElement | null) => element?.classList.replace('flex', 'hidden');
 
   document.querySelectorAll<HTMLElement>('[data-model]').forEach((button) => {
     button.addEventListener('click', () => {
-      selectedModel = button.dataset.model || 'PT04';
+      selectedModel = button.dataset.model || quoteModel?.options[0]?.value || '';
       if (technicalTitle) technicalTitle.textContent = `Modelo ${selectedModel}`;
-      if (technicalLength) technicalLength.textContent = button.dataset.length || '800 mm';
+      if (technicalLength) technicalLength.textContent = button.dataset.length || '';
       if (technicalImage) {
-        technicalImage.src = button.dataset.image || '/images/rejilladucha.jpg';
+        technicalImage.src = button.dataset.image || technicalImage.src;
         technicalImage.alt = `Rejilla de ducha ${selectedModel}`;
       }
       openElement(technicalModal);

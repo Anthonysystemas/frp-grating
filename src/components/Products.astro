@@ -210,10 +210,7 @@ const {
   clipModal?.addEventListener("click", (event) => {
     if (event.target === clipModal) closeClipModal();
   });
-  clipQuoteButton?.addEventListener("click", () => {
-    closeClipModal();
-    window.dispatchEvent(new CustomEvent("maskel:select-product", { detail: { productId: "m_clips" } }));
-  });
+  clipQuoteButton?.addEventListener("click", closeClipModal);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeClipModal();
   });
