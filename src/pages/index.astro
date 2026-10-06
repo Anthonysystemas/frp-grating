@@ -3,58 +3,44 @@ import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import Hero from "../components/Hero.astro";
 import Products from "../components/Products.astro";
-import Simulator from "../components/Simulator.astro";
 import About from "../components/About.astro";
 import FrpSeccion from "../components/FrpSeccion.astro";
 import DuchaSeccion from "../components/DuchaSeccion.astro";
 import Gallery from "../components/Gallery.astro";
 import ChatButton from '../components/ChatButton.astro';
 import Layout from "../layouts/Layout.astro";
+import { CATALOG } from "../data/catalog";
 
-const maskelProducts = [
-  {
-    title: "FRP Grating",
-    description:
-      "Rejillas de plástico reforzado con fibra de vidrio, alta resistencia química y a la corrosión.",
-    image: "/images/rejilla-frp.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
+const categoryDetails = {
+  frp: {
+    image: "/images/rejilla-frp.jpg",
     link: "/grating-frp",
     badge: "Resina Isoftalica",
     tag: "Producto Principal",
-    specifications: [
-      "Malla 38x38mm",
-      "Espesores 38mm y 25mm",
-      "Superficie arenada (Gritted)",
-    ],
+    specifications: ["Malla 38x38mm", "Superficie arenada (Gritted)"],
   },
- {
-    title: "Rejillas de Ducha",
-    description:
-      "Rejillas de ducha lineales tipo Fold Edge, ideales para desagües empotrados en pisos de baños y duchas.",
-    image: "/images/rejilladucha.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
+  ducha: {
+    image: "/images/rejilladucha.jpg",
     link: "/rejilla-ducha",
     badge: "Acero Inoxidable",
     tag: "Producto Principal",
-    specifications: [
-      "Largo 800mm",
-      "Tipo Fold Edge (borde plegado)",
-      "6 modelos disponibles",
-      "Instalación empotrada en piso",
-    ],
+    specifications: ["Tipo Fold Edge (borde plegado)", "Instalación empotrada en piso"],
   },
- {
-    title: "Grapa M Inoxidable",
-    description:
-      "Clip de fijación tipo M para anclaje seguro de rejillas FRP.",
-    image: "/images/grapa.jpg", // TODO: placeholder temporal hasta subir foto real a /public/images/
-    link: "/grapa.jpg",
+  clips: {
+    image: "/images/grapa.jpg",
+    link: "#catalogo",
     badge: "Acero Inox SS 304",
     tag: "Accesorio",
-    specifications: [
-      "Compatible con FRP grating de 38mm de espesor",
-      "Compatible con FRP grating de 25mm de espesor",
-    ],
+    specifications: ["Fijación segura para rejillas FRP"],
   },
-];
+} as const;
+
+const maskelProducts = CATALOG.map((producto) => ({
+  title: producto.nombre,
+  description: producto.detalle,
+  ...categoryDetails[producto.categoria],
+  buttonText: `Cotizar ${producto.id}`,
+}));
 const maskelAccessories = [
   {
     title: "Grapas M en Acero Inoxidable",
@@ -115,7 +101,7 @@ const maskelAccessories = [
         />
       </section>
 
-      <Simulator />
+    
 
     </main>
 
