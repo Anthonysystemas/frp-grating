@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { NodeCompiler } from '@myriaddreamin/typst-ts-node-compiler';
 import path from 'node:path';
-import { findProduct } from '../src/data/catalog';
+import { findProduct } from '../src/data/catalog.js';
 
 interface CotizacionItem {
   id: string;
