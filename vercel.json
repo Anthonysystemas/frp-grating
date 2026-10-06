@@ -1,0 +1,7 @@
+{
+    "functions": {
+        "api/cotizacion.ts": {
+            "includeFiles": "src/pdf/**/*.{typ,png,ttf,otf}"
+        }
+    }
+}

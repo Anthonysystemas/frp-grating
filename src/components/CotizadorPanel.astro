@@ -225,6 +225,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
   type CategoryKey = keyof typeof CATALOG;
   type QuoteLine = {
     id: number;
+    productId: string;
     name: string;
     detail: string;
     qty: number;
@@ -429,6 +430,7 @@ import CotizadorPasoResumen from "./CotizadorPasoResumen.astro";
     const data = CATALOG[category];
     quote.push({
       id: nextLineId++,
+      productId: option.code,
       name: data.label,
       detail: `${option.label} · ${qty} ${data.unit}(s)`,
       qty,
