@@ -99,7 +99,7 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
 </div>
 
 <script>
-  type QuoteLine = { subtotal?: number };
+  type QuoteLine = { productId?: string; qty?: number; subtotal?: number };
 
   const root = document.getElementById("cotizador-panel");
   const panel = root?.querySelector<HTMLElement>('[data-step-panel="2"]');
@@ -160,14 +160,32 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
       if (!root?.querySelector('[data-step-panel="1"]')) window.history.back();
     });
 
-    nextBtn?.addEventListener("click", () => {
+    nextBtn?.addEventListener("click", async () => {
       if (!updateNextButton()) {
         form?.reportValidity();
         return;
       }
-      document.dispatchEvent(
-        new CustomEvent("maskel:cotizador-step", { detail: { step: 3 } }),
-      );
+
+      const stored = sessionStorage.getItem("maskel:cotizacion");
+      const lines = stored ? (JSON.parse(stored) as QuoteLine[]) : [];
+      const items = lines.map((line) => ({ id: line.productId, qty: line.qty }));
+      const contacto = Object.fromEntries(new FormData(form ?? undefined));
+      nextBtn.disabled = true;
+
+      try {
+        const response = await fetch("/api/cotizacion", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contacto, items }),
+        });
+        const result = (await response.json()) as { ok?: boolean; error?: string; [key: string]: unknown };
+        if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo generar la cotización");
+        document.dispatchEvent(new CustomEvent("maskel:cotizacion-generada", { detail: result }));
+        document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 3 } }));
+      } catch (error) {
+        alert(error instanceof Error ? error.message : "No se pudo generar la cotización");
+        nextBtn.disabled = false;
+      }
     });
 
     document.addEventListener("maskel:cotizador-total", (event) => {

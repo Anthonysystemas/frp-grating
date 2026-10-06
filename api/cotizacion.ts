@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { NodeCompiler } from '@myriaddreamin/typst-ts-node-compiler';
+import path from 'node:path';
 import { findProduct } from '../src/data/catalog';
 
 interface CotizacionItem {
@@ -14,6 +16,51 @@ interface CotizacionPayload {
     correo: string;
   };
   items: CotizacionItem[];
+}
+
+function generarIdentificadores() {
+  const ahora = new Date();
+  const partes = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Lima',
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(ahora).reduce<Record<string, string>>((resultado, parte) => {
+    resultado[parte.type] = parte.value;
+    return resultado;
+  }, {});
+
+  const codigo = `MSK-${partes.year}${partes.month}${partes.day}-${partes.hour}${partes.minute}${partes.second}`;
+  const fecha = new Intl.DateTimeFormat('es-PE', {
+    timeZone: 'America/Lima',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(ahora);
+
+  return { codigo, fecha: `Lima, ${fecha}` };
+}
+
+async function generarPdf(inputs: Record<string, string>) {
+  const pdfDir = path.join(process.cwd(), 'src', 'pdf');
+  const compiler = NodeCompiler.create({
+    workspace: pdfDir,
+    fontArgs: [{ fontPaths: [path.join(pdfDir, 'fonts')] }],
+  });
+  const compilado = compiler.compile({
+    mainFilePath: path.join(pdfDir, 'plantilla.typ'),
+    inputs,
+  });
+
+  if (compilado.hasError() || !compilado.result) {
+    throw new Error(compilado.takeError()?.shortDiagnostics?.join('\n') || 'No se pudo compilar el PDF');
+  }
+
+  return compiler.pdf(compilado.result);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -84,18 +131,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       nombre: product.nombre,
       detalle: product.detalle,
       qty: item.qty,
-      precioUnitario: product.precioUnitario,
-      subtotal: subtotalCentavos // Céntimos de dólar
+      precioUnitarioCentavos: precioCentavos,
+      subtotalCentavos,
     });
+  }
+
+  const { codigo, fecha } = generarIdentificadores();
+  const total = (totalCentavos / 100).toFixed(2);
+  const pdfItems = validatedItems.map((item) => {
+    const product = findProduct(item.id)!;
+    return {
+      descripcion: product.nombre,
+      detalle: product.detalle,
+      unidad: 'unidad',
+      cantidad: item.qty,
+      precio_unitario: item.precioUnitarioCentavos / 100,
+    };
+  });
+
+  let pdfBase64: string;
+  try {
+    const pdf = await generarPdf({
+      numero: codigo,
+      fecha,
+      moneda: 'USD',
+      cliente_nombre: nombre,
+      cliente_razon_social: empresa,
+      cliente_ruc: ruc || '—',
+      cliente_correo: correo,
+      productos: JSON.stringify(pdfItems),
+      incluye_igv: 'false',
+      logo_path: 'logo.png',
+    });
+    pdfBase64 = pdf.toString('base64');
+  } catch (error) {
+    console.error('[Cotización PDF] Error de compilación', error);
+    return res.status(500).json({ ok: false, error: 'No se pudo generar el PDF de la cotización' });
   }
 
   // --- LOG LIMPIO ---
   console.log(`[Cotización Generada] Ítems: ${validatedItems.length} | Total (Centavos): ${totalCentavos}`);
 
   // --- RESPUESTA FINAL (Lista para el futuro PDF) ---
-  return res.status(200).json({ 
-    ok: true, 
-    items: validatedItems, 
-    total: totalCentavos 
+  return res.status(200).json({
+    ok: true,
+    codigo,
+    items: validatedItems,
+    totalCentavos,
+    total,
+    pdfBase64,
   });
 }

@@ -5,21 +5,6 @@ interface Props {
 
 const { embedded = false } = Astro.props;
 
-const quoteCode = "MSK-261001-211400";
-const quoteLines = [
-  {
-    name: "Rejilla FRP Grating",
-    detail: "1000×4038mm · H38mm · 1 panel",
-    subtotal: "US$ 310",
-  },
-  {
-    name: "Clips de fijación M",
-    detail: "Para rejilla FRP de 38mm · 4 unidades",
-    subtotal: "US$ 3.16",
-  },
-];
-
-const total = "US$ 313.16";
 ---
 
 <div data-step-panel="3" hidden={embedded}>
@@ -49,28 +34,18 @@ const total = "US$ 313.16";
     class="mt-6 rounded-xl border border-slate-700 bg-[#0D1220] px-4 py-5 text-center"
   >
     <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Código de cotización</p>
-    <p class="mt-3 font-mono text-2xl font-bold tracking-wide text-white">{quoteCode}</p>
+    <p data-quote-code class="mt-3 font-mono text-2xl font-bold tracking-wide text-white">—</p>
   </div>
 
   <div class="mt-6">
     <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Resumen de productos</p>
 
     <div class="mt-3">
-      {quoteLines.map((line) => (
-        <div class="flex items-start gap-3 border-b border-slate-800/70 py-3 first:border-t first:border-slate-800/70">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-baseline justify-between gap-3">
-              <span class="min-w-0 truncate text-sm font-bold text-white">{line.name}</span>
-              <strong class="shrink-0 text-sm font-bold text-white">{line.subtotal}</strong>
-            </div>
-            <p class="mt-1 text-xs leading-relaxed text-slate-400">{line.detail}</p>
-          </div>
-        </div>
-      ))}
+      <div data-quote-lines></div>
 
       <div class="mt-3 flex items-center justify-between border-t border-slate-700/70 px-1 pt-3">
         <span class="text-sm text-slate-300">Total estimado</span>
-        <strong class="text-xl font-black text-white">{total}</strong>
+        <strong data-quote-total class="text-xl font-black text-white">US$ 0.00</strong>
       </div>
     </div>
   </div>
@@ -128,3 +103,50 @@ const total = "US$ 313.16";
     Cerrar y volver al sitio
   </button>
 </div>
+
+<script>
+  type QuoteResult = {
+    codigo: string;
+    total: string;
+    pdfBase64: string;
+    items: Array<{ nombre: string; detalle: string; qty: number; subtotalCentavos: number }>;
+  };
+
+  const root = document.getElementById("cotizador-panel");
+  const panel = root?.querySelector<HTMLElement>('[data-step-panel="3"]');
+  let result: QuoteResult | null = null;
+
+  const money = (centavos: number) => `US$ ${(centavos / 100).toFixed(2)}`;
+
+  document.addEventListener("maskel:cotizacion-generada", (event) => {
+    result = (event as CustomEvent<QuoteResult>).detail;
+    const code = panel?.querySelector<HTMLElement>("[data-quote-code]");
+    const total = panel?.querySelector<HTMLElement>("[data-quote-total]");
+    const lines = panel?.querySelector<HTMLElement>("[data-quote-lines]");
+    if (code) code.textContent = result.codigo;
+    if (total) total.textContent = `US$ ${result.total}`;
+    if (lines) {
+      lines.innerHTML = result.items.map((item) => `
+        <div class="flex items-start gap-3 border-b border-slate-800/70 py-3 first:border-t first:border-slate-800/70">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate text-sm font-bold text-white">${item.nombre}</span>
+              <strong class="shrink-0 text-sm font-bold text-white">${money(item.subtotalCentavos)}</strong>
+            </div>
+            <p class="mt-1 text-xs leading-relaxed text-slate-400">${item.detalle} · ${item.qty} unidad(es)</p>
+          </div>
+        </div>`).join("");
+    }
+  });
+
+  panel?.querySelector<HTMLButtonElement>("[data-download-pdf]")?.addEventListener("click", () => {
+    if (!result) return;
+    const bytes = Uint8Array.from(atob(result.pdfBase64), (character) => character.charCodeAt(0));
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${result.codigo}.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
