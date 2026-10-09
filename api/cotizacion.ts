@@ -94,10 +94,8 @@ async function enviarCotizacion(params: {
   pdf: Buffer;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  const copia = process.env.COPIA_EMAIL;
 
   if (!apiKey) throw new EnvioError('Falta configurar RESEND_API_KEY', 500);
-  if (!copia) throw new EnvioError('Falta configurar COPIA_EMAIL', 500);
 
   const { codigo, nombre, empresa, correo, total, pdf } = params;
   const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
@@ -121,8 +119,7 @@ async function enviarCotizacion(params: {
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
     from,
-    to: correo,
-    bcc: copia,
+    to: 'ventas@maskelperu.com',
     replyTo: "ventas@maskelperu.com",
     subject: `Cotización ${codigo} – Maskel Perú`,
     html,
