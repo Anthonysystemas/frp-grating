@@ -30,7 +30,7 @@
 
 // ---------- Datos fijos de la empresa (no cambian por cotización) ----------
 #let EMPRESA = (
-  nombre: "MAKSEL PERU S.A.C.",
+  nombre: "MASKEL PERÚ S.A.C.",
   ruc: "20548480303",
   direccion: "Av. Huarangal Parcela 42, Lote 25, Carabayllo, Lima",
   telefono: "(+51) 984 649 227",
