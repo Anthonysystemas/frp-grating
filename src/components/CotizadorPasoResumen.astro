@@ -149,4 +149,24 @@ const { embedded = false } = Astro.props;
     link.click();
     URL.revokeObjectURL(url);
   });
+
+  panel?.querySelector<HTMLButtonElement>("[data-send-whatsapp]")?.addEventListener("click", () => {
+    if (!result) return;
+    const items = result.items
+      .map((item) => `- ${item.nombre} (${item.detalle}) x${item.qty}`)
+      .join("\n");
+    const mensaje = [
+      "Hola, acabo de generar una cotización con Maskel.",
+      "",
+      `Código: ${result.codigo}`,
+      "",
+      "Productos:",
+      items,
+      "",
+      `Total: US$ ${result.total}`,
+      "",
+      "El detalle completo ya fue enviado a su equipo por correo.",
+    ].join("\n");
+    window.location.href = "https://wa.me/51984649227?text=" + encodeURIComponent(mensaje);
+  });
 </script>

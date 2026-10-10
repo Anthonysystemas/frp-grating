@@ -160,17 +160,69 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
       if (!root?.querySelector('[data-step-panel="1"]')) window.history.back();
     });
 
+    const leerCotizacionGuardada = (): { huella?: string; resultado?: unknown } | null => {
+      try {
+        const stored = sessionStorage.getItem("maskel:cotizacion-enviada");
+        return stored ? (JSON.parse(stored) as { huella?: string; resultado?: unknown }) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const guardarCotizacionEnviada = (huella: string, resultado: unknown) => {
+      try {
+        sessionStorage.setItem("maskel:cotizacion-enviada", JSON.stringify({ huella, resultado }));
+      } catch {
+        /* sessionStorage no disponible (modo privado) */
+      }
+    };
+
+    const construirHuella = (
+      contacto: Record<string, unknown>,
+      items: Array<{ id?: string; qty?: number }>,
+    ) => {
+      const lineas = items
+        .map((item) => `${item.id ?? ""}:${item.qty ?? ""}`)
+        .sort()
+        .join("|");
+      return [
+        lineas,
+        String(contacto.nombre ?? ""),
+        String(contacto.empresa ?? ""),
+        String(contacto.ruc ?? ""),
+        String(contacto.correo ?? ""),
+      ].join("::");
+    };
+
     nextBtn?.addEventListener("click", async () => {
       if (!updateNextButton()) {
         form?.reportValidity();
         return;
       }
 
-      const stored = sessionStorage.getItem("maskel:cotizacion");
-      const lines = stored ? (JSON.parse(stored) as QuoteLine[]) : [];
+      let lines: QuoteLine[] = [];
+      try {
+        const stored = sessionStorage.getItem("maskel:cotizacion");
+        lines = stored ? (JSON.parse(stored) as QuoteLine[]) : [];
+      } catch {
+        lines = [];
+      }
       const items = lines.map((line) => ({ id: line.productId, qty: line.qty }));
       const contacto = Object.fromEntries(new FormData(form ?? undefined));
+      const huella = construirHuella(contacto, items);
+
+      const guardada = leerCotizacionGuardada();
+      if (guardada && guardada.huella === huella && guardada.resultado) {
+        document.dispatchEvent(
+          new CustomEvent("maskel:cotizacion-generada", { detail: guardada.resultado }),
+        );
+        document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 3 } }));
+        return;
+      }
+
+      const etiquetaOriginal = nextBtn.textContent;
       nextBtn.disabled = true;
+      nextBtn.textContent = "Enviando…";
 
       try {
         const response = await fetch("/api/cotizacion", {
@@ -179,11 +231,14 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
           body: JSON.stringify({ contacto, items }),
         });
         const result = (await response.json()) as { ok?: boolean; error?: string; [key: string]: unknown };
-        if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo generar la cotización");
+        if (!response.ok || !result.ok) throw new Error("Solicitud rechazada");
+        guardarCotizacionEnviada(huella, result);
         document.dispatchEvent(new CustomEvent("maskel:cotizacion-generada", { detail: result }));
         document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 3 } }));
-      } catch (error) {
-        alert(error instanceof Error ? error.message : "No se pudo generar la cotización");
+      } catch {
+        alert("No pudimos generar la cotización. Intenta de nuevo.");
+      } finally {
+        nextBtn.textContent = etiquetaOriginal;
         nextBtn.disabled = false;
       }
     });

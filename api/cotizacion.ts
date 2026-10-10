@@ -4,8 +4,6 @@ import { Resend } from 'resend';
 import path from 'node:path';
 import { findProduct } from '../src/data/catalog.js';
 
-const VALIDEZ_DIAS = 15;
-
 class EnvioError extends Error {
   status: number;
 
@@ -87,9 +85,7 @@ async function generarPdf(inputs: Record<string, string>) {
 
 async function enviarCotizacion(params: {
   codigo: string;
-  nombre: string;
   empresa: string;
-  correo: string;
   total: string;
   pdf: Buffer;
 }) {
@@ -97,31 +93,24 @@ async function enviarCotizacion(params: {
 
   if (!apiKey) throw new EnvioError('Falta configurar RESEND_API_KEY', 500);
 
-  const { codigo, nombre, empresa, correo, total, pdf } = params;
+  const { codigo, empresa, total, pdf } = params;
   const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
+  const empresaSinSaltos = empresa.replace(/[\r\n]+/g, ' ').trim();
+  const empresaSegura = escaparHtml(empresaSinSaltos);
 
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.6;font-size:14px;max-width:560px">
-      <p>Hola ${escaparHtml(nombre)},</p>
-      <p>Gracias por tu interés en Maskel Perú. Adjuntamos la cotización
-        <strong>${escaparHtml(codigo)}</strong> para <strong>${escaparHtml(empresa)}</strong>.</p>
-      <p style="margin:16px 0">Total: <strong>US$ ${escaparHtml(total)}</strong><br />
-        Validez: ${VALIDEZ_DIAS} días.</p>
-      <p>Para cualquier consulta, contáctanos:</p>
-      <ul style="padding-left:18px;margin:8px 0">
-        <li>Teléfono: (+51) 984 649 227</li>
-        <li>Correo: <a href="mailto:ventas@maskelperu.com">ventas@maskelperu.com</a></li>
-        <li>Web: <a href="https://www.maskelperu.com">www.maskelperu.com</a></li>
-      </ul>
-      <p style="color:#64748b;font-size:12px">Maskel Perú</p>
+      <p><strong>Nueva cotización generada</strong></p>
+      <p>Código: <strong>${escaparHtml(codigo)}</strong><br />
+        Empresa: ${empresaSegura}<br />
+        Total: <strong>US$ ${escaparHtml(total)}</strong></p>
     </div>`;
 
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
     from,
     to: 'ventas@maskelperu.com',
-    replyTo: "ventas@maskelperu.com",
-    subject: `Cotización ${codigo} – Maskel Perú`,
+    subject: `Cotización ${codigo} – ${empresaSinSaltos}`,
     html,
     attachments: [{ filename: `${codigo}.pdf`, content: pdf.toString('base64') }],
   });
@@ -238,7 +227,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // --- ENVÍO POR CORREO (await: Vercel corta la ejecución al responder) ---
   try {
-    await enviarCotizacion({ codigo, nombre, empresa, correo, total, pdf });
+    await enviarCotizacion({ codigo, empresa, total, pdf });
   } catch (error) {
     const status = error instanceof EnvioError ? error.status : 502;
     const message = error instanceof Error ? error.message : 'No se pudo enviar la cotización por correo';
