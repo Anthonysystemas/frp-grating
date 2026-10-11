@@ -79,6 +79,23 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
         class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
       />
     </label>
+
+    <label class="mt-4 block">
+      <span class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">
+        Celular
+      </span>
+      <input
+        type="tel"
+        name="celular"
+        required
+        inputmode="numeric"
+        autocomplete="tel"
+        pattern="9[0-9]{8}"
+        maxlength="9"
+        placeholder="987654321"
+        class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+      />
+    </label>
   </form>
 
   <div
@@ -137,10 +154,9 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
     };
 
     const updateNextButton = () => {
-      const isValid = requiredFields.every((field) => {
-        if (!field.value.trim()) return false;
-        return field.type !== "email" || field.validity.valid;
-      });
+      const isValid = requiredFields.every(
+        (field) => field.value.trim().length > 0 && field.checkValidity(),
+      );
       if (nextBtn) nextBtn.disabled = !isValid;
       return isValid;
     };
@@ -191,6 +207,7 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
         String(contacto.empresa ?? ""),
         String(contacto.ruc ?? ""),
         String(contacto.correo ?? ""),
+        String(contacto.celular ?? ""),
       ].join("::");
     };
 

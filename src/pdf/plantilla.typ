@@ -53,6 +53,7 @@
 #let cliente_ruc = sys.inputs.at("cliente_ruc", default: "—")
 #let cliente_nombre = sys.inputs.at("cliente_nombre", default: "—")
 #let cliente_correo = sys.inputs.at("cliente_correo", default: "—")
+#let cliente_celular = sys.inputs.at("cliente_celular", default: "—")
 
 #let forma_pago = sys.inputs.at("forma_pago", default: "50% adelanto, 50% contra entrega")
 #let tiempo_entrega = sys.inputs.at("tiempo_entrega", default: "A coordinar según disponibilidad de stock")
@@ -145,6 +146,7 @@
     [#text(size: 9.2pt)[#text(weight: "bold")[Empresa:] #cliente_razon_social]],
     [#text(size: 9.2pt)[#text(weight: "bold")[RUC:] #cliente_ruc]],
     [#text(size: 9.2pt)[#text(weight: "bold")[Correo:] #cliente_correo]],
+    [#text(size: 9.2pt)[#text(weight: "bold")[Celular:] #cliente_celular]],
   )
 ]
 

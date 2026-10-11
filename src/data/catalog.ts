@@ -7,6 +7,7 @@ export interface Product {
   detalle: string;
   precioUnitario: number; // En dólares (US$)
   medida?: string;
+  imagen?: string;
 }
 
 export interface Categoria {
@@ -29,13 +30,13 @@ export const CATALOG: Product[] = [
   { id: '1000x3000-H25', categoria: 'frp', nombre: 'Rejilla FRP Moldeada', detalle: '1000x3000mm · Espesor: 25mm', precioUnitario: 180 },
   { id: '1000x2000-H38', categoria: 'frp', nombre: 'Rejilla FRP Moldeada', detalle: '1000x2000mm · Espesor: 38mm', precioUnitario: 150 },
 
-  // --- DUCHAS Y LAVAOJOS ---
-  { id: 'PT04', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT04', precioUnitario: 21, medida: '800 mm' },
-  { id: 'PT10', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT10', precioUnitario: 19.5, medida: '800 mm' },
-  { id: 'PT21', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT21', precioUnitario: 18, medida: '800 mm' },
-  { id: 'PT02', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT02', precioUnitario: 19.5, medida: '800 mm' },
-  { id: 'PT09', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT09', precioUnitario: 21, medida: '800 mm' },
-  { id: 'PT20', categoria: 'ducha', nombre: 'Ducha Lavaojos de Emergencia', detalle: 'Modelo PT20', precioUnitario: 21, medida: '800 mm' },
+  // --- REJILLAS DE DUCHA LINEALES ---
+  { id: 'rejilla-ducha-pt02', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT02', detalle: '800mm, acabado lineal', precioUnitario: 52.75, imagen: '/productos/rejilla-ducha/PT02.jpg' },
+  { id: 'rejilla-ducha-pt04', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT04', detalle: '800mm, acabado lineal', precioUnitario: 56.50, imagen: '/productos/rejilla-ducha/PT04.jpg' },
+  { id: 'rejilla-ducha-pt09', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT09', detalle: '800mm, acabado lineal', precioUnitario: 56.50, imagen: '/productos/rejilla-ducha/PT09.jpg' },
+  { id: 'rejilla-ducha-pt10', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT10', detalle: '800mm, acabado lineal', precioUnitario: 52.75, imagen: '/productos/rejilla-ducha/PT10.jpg' },
+  { id: 'rejilla-ducha-pt20', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT20', detalle: '800mm, acabado lineal', precioUnitario: 56.50, imagen: '/productos/rejilla-ducha/PT20.jpg' },
+  { id: 'rejilla-ducha-pt21', categoria: 'ducha', nombre: 'Rejilla de Ducha Lineal PT21', detalle: '800mm, acabado lineal', precioUnitario: 49.00, imagen: '/productos/rejilla-ducha/PT21.png' },
 
   // --- CLIPS DE FIJACIÓN ---
   { id: 'clip-38mm', categoria: 'clips', nombre: 'M Clips SS304', detalle: 'Compatible con FRP espesor 38mm', precioUnitario: 0.79 },

@@ -34,6 +34,7 @@ interface CotizacionPayload {
     empresa: string;
     ruc?: string;
     correo: string;
+    celular: string;
   };
   items: CotizacionItem[];
 }
@@ -86,6 +87,7 @@ async function generarPdf(inputs: Record<string, string>) {
 async function enviarCotizacion(params: {
   codigo: string;
   empresa: string;
+  celular: string;
   total: string;
   pdf: Buffer;
 }) {
@@ -93,7 +95,7 @@ async function enviarCotizacion(params: {
 
   if (!apiKey) throw new EnvioError('Falta configurar RESEND_API_KEY', 500);
 
-  const { codigo, empresa, total, pdf } = params;
+  const { codigo, empresa, celular, total, pdf } = params;
   const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
   const empresaSinSaltos = empresa.replace(/[\r\n]+/g, ' ').trim();
   const empresaSegura = escaparHtml(empresaSinSaltos);
@@ -103,6 +105,7 @@ async function enviarCotizacion(params: {
       <p><strong>Nueva cotización generada</strong></p>
       <p>Código: <strong>${escaparHtml(codigo)}</strong><br />
         Empresa: ${empresaSegura}<br />
+        Celular: ${escaparHtml(celular)}<br />
         Total: <strong>US$ ${escaparHtml(total)}</strong></p>
     </div>`;
 
@@ -136,6 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const empresa = (contacto.empresa || '').trim();
   const ruc = (contacto.ruc || '').trim();
   const correo = (contacto.correo || '').trim();
+  const celular = (contacto.celular || '').trim();
 
   if (!nombre) return res.status(400).json({ ok: false, error: 'El nombre es obligatorio' });
   if (nombre.length > 100) return res.status(400).json({ ok: false, error: 'Nombre excede los 100 caracteres' });
@@ -146,6 +150,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!correo || !emailRegex.test(correo) || correo.length > 120) {
     return res.status(400).json({ ok: false, error: 'El correo electrónico no es válido' });
+  }
+
+  const celularRegex = /^9\d{8}$/;
+  if (!celular || !celularRegex.test(celular)) {
+    return res.status(400).json({ ok: false, error: 'El celular no es válido. Debe tener 9 dígitos y empezar con 9' });
   }
 
   if (ruc) {
@@ -216,6 +225,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       cliente_razon_social: empresa,
       cliente_ruc: ruc || '—',
       cliente_correo: correo,
+      cliente_celular: celular,
       productos: JSON.stringify(pdfItems),
       incluye_igv: 'false',
       logo_path: 'logo.png',
@@ -227,7 +237,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // --- ENVÍO POR CORREO (await: Vercel corta la ejecución al responder) ---
   try {
-    await enviarCotizacion({ codigo, empresa, total, pdf });
+    await enviarCotizacion({ codigo, empresa, celular, total, pdf });
   } catch (error) {
     const status = error instanceof EnvioError ? error.status : 502;
     const message = error instanceof Error ? error.message : 'No se pudo enviar la cotización por correo';
