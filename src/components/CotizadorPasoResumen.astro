@@ -123,8 +123,16 @@ const { embedded = false } = Astro.props;
     igvCentavos: number;
     totalCentavos: number;
     pdfBase64: string;
-    items: Array<{ nombre: string; detalle: string; qty: number; subtotalCentavos: number }>;
+    items: Array<{ id: string; nombre: string; detalle: string; qty: number; subtotalCentavos: number }>;
   };
+
+  type CotizacionGuardada = {
+    huella?: string;
+    resultado?: QuoteResult;
+    emailEnviado?: boolean;
+  };
+
+  const CLAVE_COTIZACION_ENVIADA = "maskel:cotizacion-enviada";
 
   const root = document.getElementById("cotizador-panel");
   const panel = root?.querySelector<HTMLElement>('[data-step-panel="3"]');
@@ -168,23 +176,114 @@ const { embedded = false } = Astro.props;
     URL.revokeObjectURL(url);
   });
 
-  panel?.querySelector<HTMLButtonElement>("[data-send-whatsapp]")?.addEventListener("click", () => {
-    if (!result) return;
-    const items = result.items
+  const leerCotizacionGuardada = (): CotizacionGuardada | null => {
+    try {
+      const stored = sessionStorage.getItem(CLAVE_COTIZACION_ENVIADA);
+      return stored ? (JSON.parse(stored) as CotizacionGuardada) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const correoYaEnviado = (codigo: string) => {
+    const guardada = leerCotizacionGuardada();
+    return Boolean(guardada?.emailEnviado && guardada.resultado?.codigo === codigo);
+  };
+
+  const marcarCorreoEnviado = (codigo: string) => {
+    const guardada = leerCotizacionGuardada();
+    if (!guardada || guardada.resultado?.codigo !== codigo) return;
+    try {
+      sessionStorage.setItem(
+        CLAVE_COTIZACION_ENVIADA,
+        JSON.stringify({ ...guardada, emailEnviado: true }),
+      );
+    } catch {
+      /* sessionStorage no disponible (modo privado) */
+    }
+  };
+
+  const leerCliente = () => {
+    const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+    if (!form) return null;
+    const datos = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    return {
+      nombre: (datos.nombre ?? "").trim(),
+      empresa: (datos.empresa ?? "").trim(),
+      ruc: (datos.ruc ?? "").trim(),
+      correo: (datos.correo ?? "").trim(),
+      celular: (datos.celular ?? "").trim(),
+    };
+  };
+
+  const abrirWhatsApp = (quote: QuoteResult) => {
+    const items = quote.items
       .map((item) => `- ${item.nombre} (${item.detalle}) x${item.qty}`)
       .join("\n");
     const mensaje = [
       "Hola, acabo de generar una cotización con Maskel.",
       "",
-      `Código: ${result.codigo}`,
+      `Código: ${quote.codigo}`,
       "",
       "Productos:",
       items,
       "",
-      `Total (incluye IGV): ${money(result.totalCentavos)}`,
+      `Total (incluye IGV): ${money(quote.totalCentavos)}`,
       "",
       "El detalle completo ya fue enviado a su equipo por correo.",
     ].join("\n");
     window.location.href = "https://wa.me/51984649227?text=" + encodeURIComponent(mensaje);
+  };
+
+  const whatsappBtn = panel?.querySelector<HTMLButtonElement>("[data-send-whatsapp]");
+
+  whatsappBtn?.addEventListener("click", async () => {
+    const boton = whatsappBtn;
+    if (!result || !boton) return;
+
+    // El correo ya salió para esta cotización: abre WhatsApp directo.
+    if (correoYaEnviado(result.codigo)) {
+      abrirWhatsApp(result);
+      return;
+    }
+
+    const etiquetaOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.textContent = "Enviando…";
+
+    try {
+      const cliente = leerCliente();
+      if (!cliente) throw new Error("No encontramos tus datos de contacto. Vuelve al paso anterior.");
+
+      const response = await fetch("/api/enviar-correo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          codigo: result.codigo,
+          cliente,
+          items: result.items.map((item) => ({ id: item.id, qty: item.qty })),
+          subtotalCentavos: result.subtotalCentavos,
+          igvCentavos: result.igvCentavos,
+          totalCentavos: result.totalCentavos,
+          pdfBase64: result.pdfBase64,
+        }),
+      });
+      const data = (await response.json()) as { ok?: boolean; error?: string };
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "No pudimos enviar el correo a ventas.");
+      }
+
+      marcarCorreoEnviado(result.codigo);
+      abrirWhatsApp(result);
+    } catch (error) {
+      const mensaje =
+        error instanceof Error && error.message
+          ? error.message
+          : "No pudimos enviar el correo a ventas. Intenta de nuevo.";
+      alert(mensaje);
+    } finally {
+      boton.innerHTML = etiquetaOriginal;
+      boton.disabled = false;
+    }
   });
 </script>

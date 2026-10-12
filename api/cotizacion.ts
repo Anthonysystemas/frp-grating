@@ -1,27 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { NodeCompiler } from '@myriaddreamin/typst-ts-node-compiler';
-import { Resend } from 'resend';
 import path from 'node:path';
 import { findProduct } from '../src/data/catalog.js';
-
-class EnvioError extends Error {
-  status: number;
-
-  constructor(message: string, status: number) {
-    super(message);
-    this.name = 'EnvioError';
-    this.status = status;
-  }
-}
-
-function escaparHtml(valor: string) {
-  return valor
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+import { validarCliente } from '../src/lib/cotizacion.js';
 
 interface CotizacionItem {
   id: string;
@@ -84,49 +65,6 @@ async function generarPdf(inputs: Record<string, string>) {
   return compiler.pdf(compilado.result);
 }
 
-async function enviarCotizacion(params: {
-  codigo: string;
-  empresa: string;
-  celular: string;
-  subtotal: string;
-  igv: string;
-  total: string;
-  pdf: Buffer;
-}) {
-  const apiKey = process.env.RESEND_API_KEY;
-
-  if (!apiKey) throw new EnvioError('Falta configurar RESEND_API_KEY', 500);
-
-  const { codigo, empresa, celular, subtotal, igv, total, pdf } = params;
-  const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
-  const empresaSinSaltos = empresa.replace(/[\r\n]+/g, ' ').trim();
-  const empresaSegura = escaparHtml(empresaSinSaltos);
-
-  const html = `
-    <div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.6;font-size:14px;max-width:560px">
-      <p><strong>Nueva cotización generada</strong></p>
-      <p>Código: <strong>${escaparHtml(codigo)}</strong><br />
-        Empresa: ${empresaSegura}<br />
-        Celular: ${escaparHtml(celular)}<br />
-        Subtotal: <strong>US$ ${escaparHtml(subtotal)}</strong><br />
-        IGV (18%): <strong>US$ ${escaparHtml(igv)}</strong><br />
-        Total: <strong>US$ ${escaparHtml(total)}</strong></p>
-    </div>`;
-
-  const resend = new Resend(apiKey);
-  const { error } = await resend.emails.send({
-    from,
-    to: 'ventas@maskelperu.com',
-    subject: `Cotización ${codigo} – ${empresaSinSaltos}`,
-    html,
-    attachments: [{ filename: `${codigo}.pdf`, content: pdf.toString('base64') }],
-  });
-
-  if (error) {
-    throw new EnvioError(error.message || 'Resend rechazó el envío', 502);
-  }
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' });
@@ -134,39 +72,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { contacto, items } = (req.body || {}) as CotizacionPayload;
 
-  if (!contacto || typeof contacto !== 'object') {
-    return res.status(400).json({ ok: false, error: 'Datos de contacto inválidos' });
+  // --- VALIDACIONES DE CONTACTO (compartidas con /api/enviar-correo) ---
+  const validacion = validarCliente(contacto);
+  if (!validacion.ok) {
+    return res.status(400).json({ ok: false, error: validacion.error });
   }
-
-  // --- VALIDACIONES DE TEXTO Y LONGITUD ---
-  const nombre = (contacto.nombre || '').trim();
-  const empresa = (contacto.empresa || '').trim();
-  const ruc = (contacto.ruc || '').trim();
-  const correo = (contacto.correo || '').trim();
-  const celular = (contacto.celular || '').trim();
-
-  if (!nombre) return res.status(400).json({ ok: false, error: 'El nombre es obligatorio' });
-  if (nombre.length > 100) return res.status(400).json({ ok: false, error: 'Nombre excede los 100 caracteres' });
-
-  if (!empresa) return res.status(400).json({ ok: false, error: 'La empresa es obligatoria' });
-  if (empresa.length > 120) return res.status(400).json({ ok: false, error: 'Empresa excede los 120 caracteres' });
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!correo || !emailRegex.test(correo) || correo.length > 120) {
-    return res.status(400).json({ ok: false, error: 'El correo electrónico no es válido' });
-  }
-
-  const celularRegex = /^9\d{8}$/;
-  if (!celular || !celularRegex.test(celular)) {
-    return res.status(400).json({ ok: false, error: 'El celular no es válido. Debe tener 9 dígitos y empezar con 9' });
-  }
-
-  if (ruc) {
-    const rucRegex = /^(10|15|17|20)\d{9}$/;
-    if (!rucRegex.test(ruc)) {
-      return res.status(400).json({ ok: false, error: 'RUC inválido. Debe tener 11 dígitos y empezar con 10, 15, 17 o 20' });
-    }
-  }
+  const { nombre, empresa, ruc, correo, celular } = validacion.cliente;
 
   // --- VALIDACIONES DE ÍTEMS Y CÁLCULO ESTRICTO ---
   if (!Array.isArray(items) || items.length === 0) {
@@ -243,24 +154,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('[Cotización PDF] Error de compilación', error);
     return res.status(500).json({ ok: false, error: 'No se pudo generar el PDF de la cotización' });
-  }
-
-  // --- ENVÍO POR CORREO (await: Vercel corta la ejecución al responder) ---
-  try {
-    await enviarCotizacion({
-      codigo,
-      empresa,
-      celular,
-      subtotal: (subtotalCentavos / 100).toFixed(2),
-      igv: (igvCentavos / 100).toFixed(2),
-      total,
-      pdf,
-    });
-  } catch (error) {
-    const status = error instanceof EnvioError ? error.status : 502;
-    const message = error instanceof Error ? error.message : 'No se pudo enviar la cotización por correo';
-    console.error('[Cotización Email] Error al enviar', message);
-    return res.status(status).json({ ok: false, error: message });
   }
 
   // --- LOG LIMPIO ---
