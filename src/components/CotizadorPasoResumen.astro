@@ -43,10 +43,21 @@ const { embedded = false } = Astro.props;
     <div class="mt-3">
       <div data-quote-lines></div>
 
-      <div class="mt-3 flex items-center justify-between border-t border-slate-700/70 px-1 pt-3">
-        <span class="text-sm text-slate-300">Total estimado</span>
-        <strong data-quote-total class="text-xl font-black text-white">US$ 0.00</strong>
+      <div class="mt-3 space-y-1 border-t border-slate-700/70 px-1 pt-3 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-300">Subtotal</span>
+          <span data-quote-subtotal class="text-slate-200">US$ 0.00</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-300">IGV (18%)</span>
+          <span data-quote-igv class="text-slate-200">US$ 0.00</span>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="font-semibold text-slate-200">Total</span>
+          <strong data-quote-total class="text-xl font-black text-white">US$ 0.00</strong>
+        </div>
       </div>
+      <p class="mt-3 text-xs italic text-slate-400">Precio estimado, sujeto a negociación.</p>
     </div>
   </div>
 
@@ -108,6 +119,9 @@ const { embedded = false } = Astro.props;
   type QuoteResult = {
     codigo: string;
     total: string;
+    subtotalCentavos: number;
+    igvCentavos: number;
+    totalCentavos: number;
     pdfBase64: string;
     items: Array<{ nombre: string; detalle: string; qty: number; subtotalCentavos: number }>;
   };
@@ -121,10 +135,14 @@ const { embedded = false } = Astro.props;
   document.addEventListener("maskel:cotizacion-generada", (event) => {
     result = (event as CustomEvent<QuoteResult>).detail;
     const code = panel?.querySelector<HTMLElement>("[data-quote-code]");
+    const subtotal = panel?.querySelector<HTMLElement>("[data-quote-subtotal]");
+    const igv = panel?.querySelector<HTMLElement>("[data-quote-igv]");
     const total = panel?.querySelector<HTMLElement>("[data-quote-total]");
     const lines = panel?.querySelector<HTMLElement>("[data-quote-lines]");
     if (code) code.textContent = result.codigo;
-    if (total) total.textContent = `US$ ${result.total}`;
+    if (subtotal) subtotal.textContent = money(result.subtotalCentavos);
+    if (igv) igv.textContent = money(result.igvCentavos);
+    if (total) total.textContent = money(result.totalCentavos);
     if (lines) {
       lines.innerHTML = result.items.map((item) => `
         <div class="flex items-start gap-3 border-b border-slate-800/70 py-3 first:border-t first:border-slate-800/70">
@@ -163,7 +181,7 @@ const { embedded = false } = Astro.props;
       "Productos:",
       items,
       "",
-      `Total: US$ ${result.total}`,
+      `Total (incluye IGV): ${money(result.totalCentavos)}`,
       "",
       "El detalle completo ya fue enviado a su equipo por correo.",
     ].join("\n");

@@ -88,6 +88,8 @@ async function enviarCotizacion(params: {
   codigo: string;
   empresa: string;
   celular: string;
+  subtotal: string;
+  igv: string;
   total: string;
   pdf: Buffer;
 }) {
@@ -95,7 +97,7 @@ async function enviarCotizacion(params: {
 
   if (!apiKey) throw new EnvioError('Falta configurar RESEND_API_KEY', 500);
 
-  const { codigo, empresa, celular, total, pdf } = params;
+  const { codigo, empresa, celular, subtotal, igv, total, pdf } = params;
   const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
   const empresaSinSaltos = empresa.replace(/[\r\n]+/g, ' ').trim();
   const empresaSegura = escaparHtml(empresaSinSaltos);
@@ -106,6 +108,8 @@ async function enviarCotizacion(params: {
       <p>Código: <strong>${escaparHtml(codigo)}</strong><br />
         Empresa: ${empresaSegura}<br />
         Celular: ${escaparHtml(celular)}<br />
+        Subtotal: <strong>US$ ${escaparHtml(subtotal)}</strong><br />
+        IGV (18%): <strong>US$ ${escaparHtml(igv)}</strong><br />
         Total: <strong>US$ ${escaparHtml(total)}</strong></p>
     </div>`;
 
@@ -174,7 +178,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const validatedItems = [];
-  let totalCentavos = 0;
+  let subtotalCentavos = 0;
 
   for (const item of items) {
     // Buscar id seguro en nuestro catálogo
@@ -189,8 +193,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Cálculo seguro en centavos (evita errores de JavaScript como 0.1 + 0.2 = 0.30000000000000004)
     const precioCentavos = Math.round(product.precioUnitario * 100);
-    const subtotalCentavos = precioCentavos * item.qty;
-    totalCentavos += subtotalCentavos;
+    const subtotalItemCentavos = precioCentavos * item.qty;
+    subtotalCentavos += subtotalItemCentavos;
 
     validatedItems.push({
       id: product.id,
@@ -198,9 +202,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       detalle: product.detalle,
       qty: item.qty,
       precioUnitarioCentavos: precioCentavos,
-      subtotalCentavos,
+      subtotalCentavos: subtotalItemCentavos,
     });
   }
+
+  const igvCentavos = Math.round(subtotalCentavos * 0.18);
+  const totalCentavos = subtotalCentavos + igvCentavos;
 
   const { codigo, fecha } = generarIdentificadores();
   const total = (totalCentavos / 100).toFixed(2);
@@ -227,7 +234,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       cliente_correo: correo,
       cliente_celular: celular,
       productos: JSON.stringify(pdfItems),
-      incluye_igv: 'false',
+      subtotal_usd: (subtotalCentavos / 100).toFixed(2),
+      igv_usd: (igvCentavos / 100).toFixed(2),
+      total_usd: (totalCentavos / 100).toFixed(2),
+      incluye_igv: 'true',
       logo_path: 'logo.png',
     });
   } catch (error) {
@@ -237,7 +247,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // --- ENVÍO POR CORREO (await: Vercel corta la ejecución al responder) ---
   try {
-    await enviarCotizacion({ codigo, empresa, celular, total, pdf });
+    await enviarCotizacion({
+      codigo,
+      empresa,
+      celular,
+      subtotal: (subtotalCentavos / 100).toFixed(2),
+      igv: (igvCentavos / 100).toFixed(2),
+      total,
+      pdf,
+    });
   } catch (error) {
     const status = error instanceof EnvioError ? error.status : 502;
     const message = error instanceof Error ? error.message : 'No se pudo enviar la cotización por correo';
@@ -254,6 +272,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     code: codigo,
     codigo,
     items: validatedItems,
+    subtotalCentavos,
+    igvCentavos,
     totalCentavos,
     total,
     pdfBase64: pdf.toString('base64'),

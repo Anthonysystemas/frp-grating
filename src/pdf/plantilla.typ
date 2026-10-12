@@ -227,9 +227,13 @@
 // ============================================================
 // TOTALES
 // ============================================================
-#let subtotal = productos.map(p => p.at("cantidad", default: 0) * p.at("precio_unitario", default: 0)).sum(default: 0)
-#let igv = if incluye_igv { subtotal * 0.18 } else { 0 }
-#let total = subtotal + igv
+#let subtotal_input = sys.inputs.at("subtotal_usd", default: "")
+#let igv_input = sys.inputs.at("igv_usd", default: "")
+#let total_input = sys.inputs.at("total_usd", default: "")
+#let subtotal = if subtotal_input != "" { float(subtotal_input) } else { productos.map(p => p.at("cantidad", default: 0) * p.at("precio_unitario", default: 0)).sum(default: 0) }
+#let igv_calculado = if igv_input != "" { float(igv_input) } else { subtotal * 0.18 }
+#let igv = if incluye_igv { igv_calculado } else { 0 }
+#let total = if total_input != "" { float(total_input) } else { subtotal + igv }
 
 #v(8pt)
 #align(right)[
@@ -275,7 +279,7 @@
 #v(10pt)
 
 #text(size: 8pt, fill: GRIS, style: "italic")[
-  Los precios no incluyen instalación salvo indicación expresa. Cotización sujeta a disponibilidad de stock al momento de la confirmación del pedido.
+  Precio estimado, sujeto a negociación. Los precios no incluyen instalación salvo indicación expresa. Cotización sujeta a disponibilidad de stock al momento de la confirmación del pedido.
 ]
 
 #v(22pt)
