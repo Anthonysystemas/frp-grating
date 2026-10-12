@@ -279,7 +279,7 @@
 #v(10pt)
 
 #text(size: 8pt, fill: GRIS, style: "italic")[
-  Precio estimado, sujeto a negociación. Los precios no incluyen instalación salvo indicación expresa. Cotización sujeta a disponibilidad de stock al momento de la confirmación del pedido.
+  Precio estimado, sujeto a negociación. Los precios no incluyen instalación. Cotización sujeta a disponibilidad de stock al momento de la confirmación del pedido.
 ]
 
 #v(22pt)
