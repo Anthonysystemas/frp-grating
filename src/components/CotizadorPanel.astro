@@ -368,6 +368,13 @@ const cotizadorData = categorias.map((categoria) => ({
         </button>`;
       })
       .join("");
+
+    duchaGrid.querySelectorAll<HTMLImageElement>("img").forEach((image) => {
+      image.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openImageModal(image.currentSrc || image.src, image.alt);
+      });
+    });
   }
 
   function renderQuote() {
@@ -549,12 +556,6 @@ const cotizadorData = categorias.map((categoria) => ({
     const target = (event.target as Element).closest<HTMLElement>("[data-model-card]");
     if (!target) return;
     selectModelCard(target);
-  });
-
-  duchaGrid?.addEventListener("dblclick", (event) => {
-    if (!(event.target instanceof HTMLImageElement)) return;
-    const src = event.target.getAttribute("src");
-    if (src) openImageModal(src, event.target.getAttribute("alt") ?? "");
   });
 
   listItems?.addEventListener("click", (event) => {
