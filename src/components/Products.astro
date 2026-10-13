@@ -50,15 +50,19 @@ const {
           <div>
             {product.image && (
             <div class="relative h-52 overflow-hidden bg-slate-900">
-              {product.tag && (
-                <span class={`absolute top-3 left-3 z-10 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md ${product.tag === "Producto Principal" ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-700"}`}>
-                  {product.tag}
-                </span>
-              )}
-              {product.badge && (
-                <span class="absolute top-3 right-3 z-10 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-                  {product.badge}
-                </span>
+              {(product.tag || product.badge) && (
+                <div class="absolute inset-x-3 top-3 z-10 flex items-start justify-between gap-2">
+                  {product.tag && (
+                    <span title={product.tag} class={`min-w-0 truncate text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md ${product.tag === "Principal" ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-700"}`}>
+                      {product.tag}
+                    </span>
+                  )}
+                  {product.badge && (
+                    <span title={product.badge} class="min-w-0 truncate bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                      {product.badge}
+                    </span>
+                  )}
+                </div>
               )}
               <img
                 src={product.image}
@@ -72,7 +76,7 @@ const {
             <!-- Contenido de la tarjeta -->
             <div class="p-6">
               {product.tag && !product.image && (
-                <span class={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3 ${product.tag === "Producto Principal" ? "bg-blue-600/15 text-blue-400 border border-blue-500/30" : "bg-slate-200/10 text-slate-300 border border-slate-500/30"}`}>
+                <span class={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3 ${product.tag === "Principal" ? "bg-blue-600/15 text-blue-400 border border-blue-500/30" : "bg-slate-200/10 text-slate-300 border border-slate-500/30"}`}>
                   {product.tag}
                 </span>
               )}

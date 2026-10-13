@@ -18,6 +18,10 @@ const {
   secondaryCtaText = "Simular cotización",
   secondaryCtaLink = "#simulator"
 } = Astro.props;
+
+// "#simulator" ya no es una sección válida: se interpreta como disparador
+// del panel de cotización (mismo mecanismo que ChatButton.astro).
+const abrirCotizador = secondaryCtaLink === "#simulator";
 ---
 
 <section
@@ -64,14 +68,16 @@ const {
       class="flex flex-row items-center justify-center gap-4 w-full sm:w-auto"
     >
       <a
-        href={ctaLink}
+        href="#"
+        data-open-cotizador
         class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-sm transition-all duration-200 flex items-center gap-3 text-sm tracking-wide cursor-pointer shadow-md shadow-blue-600/10"
       >
         {ctaText} <span class="text-base">&rarr;</span>
       </a>
 
       <a
-        href={secondaryCtaLink}
+        href={abrirCotizador ? "#" : secondaryCtaLink}
+        data-open-cotizador={abrirCotizador ? "" : undefined}
         class="bg-transparent hover:bg-blue-600/20 text-blue-400 font-semibold px-6 py-3.5 rounded-sm border border-blue-500 hover:border-blue-400 transition-all duration-200 text-sm tracking-wide cursor-pointer shadow-md shadow-blue-500/10"
       >
         {secondaryCtaText}
