@@ -10,7 +10,6 @@ const medidas = productosPorCategoria('frp').map((producto) => {
   return {
     dimension: dimensionCruda.replace('x', ' x ').replace('mm', ' mm'),
     espesor: espesorCrudo.replace('Espesor:', '').trim().replace('mm', ' mm'),
-    price: producto.precioUnitario,
   };
 });
 ---
@@ -42,25 +41,52 @@ const medidas = productosPorCategoria('frp').map((producto) => {
         <div class="mb-8 max-w-2xl">
           <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Medidas disponibles</p>
           <h2 id="stock-title" class="text-3xl font-black uppercase tracking-tight sm:text-4xl">Tabla de stock FRP</h2>
-          <p class="mt-3 text-slate-400">Selecciona una medida en el panel de cotización para consultar disponibilidad y calcular el subtotal.</p>
+          <p class="mt-3 text-slate-400">Estas son las medidas de grating FRP que manejamos. Elige la tuya en el panel de cotización para recibir tu PDF personalizado.</p>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-slate-800 bg-[#0D1220] shadow-xl">
-          <table class="w-full min-w-[620px] text-left text-sm">
+          <table class="w-full min-w-[480px] text-left text-sm">
             <thead class="border-b border-slate-700 bg-[#111827] text-xs uppercase tracking-wider text-slate-300">
-              <tr><th class="px-5 py-4">Dimensión</th><th class="px-5 py-4">Espesor</th><th class="px-5 py-4">Precio unitario</th><th class="px-5 py-4 text-right">Acción</th></tr>
+              <tr><th class="px-5 py-4">Dimensión</th><th class="px-5 py-4">Espesor</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-800">
               {medidas.map((medida) => (
                 <tr class="transition hover:bg-blue-500/5">
                   <td class="px-5 py-4 font-semibold text-white">{medida.dimension}</td>
                   <td class="px-5 py-4 text-slate-300">H {medida.espesor}</td>
-                  <td class="px-5 py-4 font-bold text-blue-300">US$ {medida.price}</td>
-                  <td class="px-5 py-4 text-right"><button type="button" data-open-cotizador class="rounded-md border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-blue-400 hover:text-blue-300">Cotizar</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="px-6 pb-16 sm:pb-20" aria-labelledby="specs-title">
+      <div class="mx-auto max-w-6xl">
+        <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Ficha del material</p>
+        <h2 id="specs-title" class="text-3xl font-black uppercase tracking-tight sm:text-4xl">Especificaciones técnicas</h2>
+        <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-xl border border-slate-800 bg-[#0D1220] p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-400">Resina</p>
+            <p class="mt-2 text-sm text-slate-200">Resina isoftálica de alta resistencia química</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-[#0D1220] p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-400">Resistencia a la carga</p>
+            <p class="mt-2 text-sm text-slate-200">Alta resistencia estructural para tránsito peatonal y vehicular liviano</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-[#0D1220] p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-400">Área abierta</p>
+            <p class="mt-2 text-sm text-slate-200">Amplio porcentaje de área abierta para buen drenaje y ventilación</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-[#0D1220] p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-400">Color</p>
+            <p class="mt-2 text-sm text-slate-200">Amarillo de seguridad</p>
+          </div>
+          <div class="rounded-xl border border-slate-800 bg-[#0D1220] p-5">
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-400">Superficie</p>
+            <p class="mt-2 text-sm text-slate-200">Arenada antideslizante</p>
+          </div>
         </div>
       </div>
     </section>
@@ -75,13 +101,6 @@ const medidas = productosPorCategoria('frp').map((producto) => {
           ))}
         </div>
       </div>
-    </section>
-
-    <section class="px-6 py-16 text-center sm:py-20">
-      <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Atención directa</p>
-      <h2 class="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl">¿Listo para cotizar?</h2>
-      <p class="mx-auto mt-3 max-w-xl text-slate-400">Elige la medida, indica la cantidad y recibe atención por WhatsApp.</p>
-      <button type="button" data-open-cotizador class="mt-7 rounded-lg bg-blue-600 px-7 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-blue-500">Abrir panel de cotización</button>
     </section>
   </main>
 

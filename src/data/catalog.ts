@@ -56,7 +56,7 @@ export const categorias: Categoria[] = [
   },
   {
     id: 'ducha',
-    titulo: 'Ducha Lavaojos de Emergencia',
+    titulo: 'Rejillas de Ducha',
     descripcion: 'Seis modelos lineales de 800 mm para una evacuación limpia, resistente y de instalación empotrada.',
     imagen: '/images/rejilladucha.jpg',
     badge: 'Inoxidable',
