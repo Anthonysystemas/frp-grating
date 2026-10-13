@@ -6,12 +6,15 @@ import Layout from "../layouts/Layout.astro";
 import { categorias, productosPorCategoria } from "../data/catalog";
 
 const categoriaDucha = categorias.find((categoria) => categoria.id === "ducha");
-const modelos = productosPorCategoria("ducha").map((producto) => ({
-  code: producto.id,
-  length: producto.medida ?? "",
-  image: categoriaDucha?.imagen ?? "",
-  price: producto.precioUnitario,
-}));
+const modelos = productosPorCategoria("ducha").map((producto) => {
+  const [medida] = producto.detalle.split(",");
+  return {
+    code: producto.id.replace("rejilla-ducha-", "").toUpperCase(),
+    name: producto.nombre,
+    measure: medida.trim(),
+    image: producto.imagen ?? categoriaDucha?.imagen ?? "",
+  };
+});
 const primerModelo = modelos[0];
 ---
 
@@ -29,7 +32,7 @@ const primerModelo = modelos[0];
           <h1 class="text-3xl font-black uppercase tracking-tight sm:text-5xl">Rejillas de Ducha <span class="text-cyan-400">— Fold Edge</span></h1>
           <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">Seis modelos lineales de 800 mm para una evacuación limpia, resistente y de instalación empotrada.</p>
         </div>
-        <button type="button" data-open-quote class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-500">Cotizar <span aria-hidden="true">→</span></button>
+        <button type="button" data-open-cotizador class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-blue-500">Cotizar <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
@@ -52,10 +55,10 @@ const primerModelo = modelos[0];
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <h3 class="text-lg font-bold text-white">Modelo {modelo.code}</h3>
-                    <p class="mt-1 text-xs text-slate-400">Largo: {modelo.length} · Acero inoxidable</p>
+                    <p class="mt-1 text-xs text-slate-400">Largo: {modelo.measure} · Acero inoxidable</p>
                   </div>
                 </div>
-                <button type="button" data-model={modelo.code} data-length={modelo.length} data-image={modelo.image} class="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300">Ver ficha técnica</button>
+                <button type="button" data-name={modelo.name} data-measure={modelo.measure} data-image={modelo.image} class="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300">Ver ficha técnica</button>
               </div>
             </article>
           ))}
@@ -74,46 +77,22 @@ const primerModelo = modelos[0];
         </div>
       </div>
     </section>
-
-    <section class="px-6 py-16 text-center sm:py-20">
-      <div class="mx-auto max-w-2xl">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">Atención directa</p>
-        <h2 class="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl">¿Listo para cotizar?</h2>
-        <p class="mt-3 text-slate-400">Indica el modelo y la cantidad que necesitas. Te responderemos por WhatsApp.</p>
-        <button type="button" data-open-quote class="mt-7 rounded-lg bg-blue-600 px-7 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-blue-500">Abrir panel de cotización</button>
-      </div>
-    </section>
   </main>
 
   <div id="technical-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="technical-title">
     <div class="relative grid max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-700 bg-[#0D1220] shadow-2xl sm:grid-cols-2">
       <button type="button" data-close-modal class="absolute right-3 top-3 z-10 rounded-full bg-[#080C16]/90 px-3 py-1 text-xl text-slate-300 hover:text-white" aria-label="Cerrar ficha técnica">×</button>
-      <img id="technical-image" src={primerModelo.image} alt="" class="h-64 w-full object-cover sm:h-full" />
+      <img id="technical-image" src={primerModelo.image} alt={primerModelo.name} class="h-64 w-full bg-[#060913] object-contain sm:h-full" />
       <div class="space-y-5 p-6 sm:p-8">
         <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">Ficha técnica</p>
-        <h2 id="technical-title" class="text-3xl font-black text-white">Modelo {primerModelo.code}</h2>
+        <h2 id="technical-title" class="text-3xl font-black text-white">{primerModelo.name}</h2>
         <div class="space-y-3 text-sm text-slate-300">
-          <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Largo</span><strong id="technical-length" class="text-white">{primerModelo.length}</strong></p>
+          <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Largo</span><strong id="technical-length" class="text-white">{primerModelo.measure}</strong></p>
           <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Borde</span><strong class="text-white">Fold Edge</strong></p>
           <p class="flex justify-between gap-4 border-b border-slate-800 pb-3"><span>Material</span><strong class="text-white">Acero inoxidable</strong></p>
         </div>
-        <button type="button" data-quote-selected class="w-full rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-emerald-500">Cotizar este modelo</button>
+        <button type="button" data-open-cotizador class="w-full rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-emerald-500">Cotizar este modelo</button>
       </div>
-    </div>
-  </div>
-
-  <div id="quote-panel" class="fixed inset-0 z-[70] hidden bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="quote-title">
-    <div class="mx-auto mt-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-700 bg-[#0D1220] p-6 shadow-2xl sm:p-8">
-      <div class="flex items-start justify-between gap-4">
-        <div><p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">Respuesta rápida</p><h2 id="quote-title" class="mt-2 text-2xl font-black uppercase">Cotizar rejilla</h2></div>
-        <button type="button" data-close-quote class="text-2xl text-slate-400 hover:text-white" aria-label="Cerrar panel de cotización">×</button>
-      </div>
-      <form id="shower-quote-form" class="mt-6 space-y-4">
-        <label class="block text-sm text-slate-300">Modelo<select id="quote-model" class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white">{modelos.map((modelo) => <option value={modelo.code}>{modelo.code} · US$ {modelo.price}</option>)}</select></label>
-        <label class="block text-sm text-slate-300">Cantidad<input id="quote-quantity" type="number" min="1" value="1" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white" /></label>
-        <label class="block text-sm text-slate-300">Nombre o empresa<input id="quote-contact" type="text" required class="mt-2 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-white" /></label>
-        <button type="submit" class="w-full rounded-lg bg-emerald-600 px-5 py-3 text-xs font-black uppercase tracking-wider transition hover:bg-emerald-500">Enviar por WhatsApp</button>
-      </form>
     </div>
   </div>
 
@@ -123,48 +102,40 @@ const primerModelo = modelos[0];
 
 <script>
   const technicalModal = document.getElementById('technical-modal');
-  const quotePanel = document.getElementById('quote-panel');
-  const quoteModel = document.getElementById('quote-model') as HTMLSelectElement | null;
   const technicalTitle = document.getElementById('technical-title');
   const technicalLength = document.getElementById('technical-length');
   const technicalImage = document.getElementById('technical-image') as HTMLImageElement | null;
-  let selectedModel = quoteModel?.options[0]?.value || '';
 
   const openElement = (element: HTMLElement | null) => element?.classList.replace('hidden', 'flex');
   const closeElement = (element: HTMLElement | null) => element?.classList.replace('flex', 'hidden');
 
-  document.querySelectorAll<HTMLElement>('[data-model]').forEach((button) => {
+  document.querySelectorAll<HTMLElement>('[data-name]').forEach((button) => {
     button.addEventListener('click', () => {
-      selectedModel = button.dataset.model || quoteModel?.options[0]?.value || '';
-      if (technicalTitle) technicalTitle.textContent = `Modelo ${selectedModel}`;
-      if (technicalLength) technicalLength.textContent = button.dataset.length || '';
+      const name = button.dataset.name || '';
+      if (technicalTitle) technicalTitle.textContent = name;
+      if (technicalLength) technicalLength.textContent = button.dataset.measure || '';
       if (technicalImage) {
         technicalImage.src = button.dataset.image || technicalImage.src;
-        technicalImage.alt = `Rejilla de ducha ${selectedModel}`;
+        technicalImage.alt = name;
       }
       openElement(technicalModal);
     });
   });
 
-  document.querySelectorAll<HTMLElement>('[data-open-quote]').forEach((button) => button.addEventListener('click', () => openElement(quotePanel)));
   document.querySelectorAll<HTMLElement>('[data-close-modal]').forEach((button) => button.addEventListener('click', () => closeElement(technicalModal)));
-  document.querySelectorAll<HTMLElement>('[data-close-quote]').forEach((button) => button.addEventListener('click', () => closeElement(quotePanel)));
-  document.querySelector('[data-quote-selected]')?.addEventListener('click', () => {
-    if (quoteModel) quoteModel.value = selectedModel;
-    closeElement(technicalModal);
-    openElement(quotePanel);
+
+  // "Cotizar este modelo" abre el panel global (evento maskel:open-cotizador vía Navbar);
+  // aquí solo cerramos la ficha técnica al pulsarlo.
+  technicalModal?.querySelectorAll<HTMLElement>('[data-open-cotizador]').forEach((button) => {
+    button.addEventListener('click', () => closeElement(technicalModal));
   });
 
-  [technicalModal, quotePanel].forEach((element) => element?.addEventListener('click', (event) => {
-    if (event.target === element) closeElement(element);
-  }));
+  technicalModal?.addEventListener('click', (event) => {
+    if (event.target === technicalModal) closeElement(technicalModal);
+  });
 
-  document.getElementById('shower-quote-form')?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const model = (document.getElementById('quote-model') as HTMLSelectElement).value;
-    const quantity = (document.getElementById('quote-quantity') as HTMLInputElement).value;
-    const contact = (document.getElementById('quote-contact') as HTMLInputElement).value;
-    const message = `Hola Maskel Perú, deseo cotizar ${quantity} unidad(es) de la rejilla de ducha ${model}. Contacto: ${contact}.`;
-    window.open(`https://wa.me/51984649227?text=${encodeURIComponent(message)}`, '_blank');
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (technicalModal && !technicalModal.classList.contains('hidden')) closeElement(technicalModal);
   });
 </script>

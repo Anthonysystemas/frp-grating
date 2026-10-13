@@ -4,7 +4,6 @@ interface Props {
   title?: string;
   subtitle?: string;
   ctaText?: string;
-  ctaLink?: string;
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
 }
@@ -12,9 +11,8 @@ interface Props {
 // 2. Extraer Props con valores por defecto
 const {
   title = "Rejillas de Fibra de Vidrio FRP",
-  subtitle = "Importación y distribución directa de Grating Metálico, Grating FRP y accesorios de fijación industrial. Stock estandarizado para entrega inmediata.",
+  subtitle = "Importación y distribución directa de Grating FRP y accesorios de fijación industrial. Stock estandarizado para entrega inmediata.",
   ctaText = "Ver Productos",
-  ctaLink = "#productos",
   secondaryCtaText = "Simular cotización",
   secondaryCtaLink = "#simulator"
 } = Astro.props;

@@ -1,7 +1,7 @@
 // ============================================================
 // PLANTILLA DE COTIZACIÓN — MASKEL PERÚ S.A.C.
 // ============================================================
-// Se compila pasando datos por sys.inputs (ver pdf_service.py):
+// Se compila pasando datos por sys.inputs (ver api/cotizacion.ts):
 //   typst.compile("plantilla.typ", sys_inputs = {
 //       "numero": "COT-2026-0045",
 //       "fecha": "Lima, 21 de setiembre de 2026",
@@ -14,7 +14,7 @@
 //       "productos": "[{...}, {...}]"   <- JSON string, ver estructura abajo
 //       "forma_pago": "...",
 //       "tiempo_entrega": "...",
-//       "logo_path": "logo_maskel.png"  <- opcional
+//       "logo_path": "logo.png"         <- opcional
 //   })
 //
 // Estructura esperada de cada producto en el JSON de "productos":
@@ -31,7 +31,7 @@
 // ---------- Datos fijos de la empresa (no cambian por cotización) ----------
 #let EMPRESA = (
   nombre: "MASKEL PERÚ S.A.C.",
-  ruc: "20548480303",
+  ruc: "20616213246",
   direccion: "Av. Huarangal Parcela 42, Lote 25, Carabayllo, Lima",
   telefono: "(+51) 984 649 227",
   correo: "ventas@maskelperu.com",
@@ -92,7 +92,7 @@
 //  - se dimensiona por ANCHO (no por alto), para no deformarlo ni dejarlo diminuto.
 //  - NO se repite el nombre de la empresa en texto al lado, para evitar
 //    redundancia visual (el logo ya lo dice).
-//  - usa la versión con fondo transparente (logo_maskel_transparente.png);
+//  - usa la versión con fondo transparente (logo.png);
 //    el archivo original tiene un rectángulo azul marino de fondo que,
 //    puesto sobre el header blanco, se vería como una caja oscura pegada.
 #grid(

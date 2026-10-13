@@ -19,35 +19,11 @@ const maskelProducts = categorias.map((categoria) => ({
   tag: categoria.etiqueta,
   specifications: [...categoria.especificaciones],
 }));
-const maskelAccessories = [
-  {
-    title: "Grapas M en Acero Inoxidable",
-    description: "Grapas tipo M para fijación de FRP grating.",
-    link: "#catalogo",
-    badge: "SS 304",
-    specifications: [
-      "Material: Acero Inoxidable SS 304",
-      "Uso: Fijación de FRP grating",
-    ],
-    buttonText: "Consultar accesorio",
-  },
-  {
-    title: "Grapas de Acero Galvanizado",
-    description: "Grapas para sujeción de grating metálico dentado.",
-    link: "#catalogo",
-    badge: "Galvanizado",
-    specifications: [
-      'Perno de 1/4" x 2"',
-      "Uso: Sujeción de grating metálico dentado",
-    ],
-    buttonText: "Consultar accesorio",
-  },
-];
 ---
 
 <Layout
-  title="Maskel Perú | Soluciones Industriales en Grating, Drenaje y Peldaños FRP"
-  description="Fabricación e Importación y distribución directa de Grating Metálico y FRP de alta resistencia anticorrosiva para minería e industria."
+  title="Maskel Perú | Soluciones Industriales en Grating FRP y Rejillas de Ducha"
+  description="Fabricación e Importación y distribución directa de Grating FRP y rejillas de ducha de alta resistencia anticorrosiva para minería e industria."
 >
     <!-- Navbar Global -->
     <Navbar />
@@ -58,7 +34,6 @@ const maskelAccessories = [
         title="GRATING FRP Y REJILLAS DE DUCHA PARA APLICACIONES INDUSTRIALES"
         subtitle="Importación y distribución directa de Grating FRP, rejillas de ducha y clips de fijación. Stock estandarizado para entrega inmediata."
         ctaText="Simular Cotización"
-        ctaLink="https://wa.me/51984649227?text=Hola%20Maskel%20Per%C3%BA%2C%20deseo%20una%20cotizaci%C3%B3n%20de%20productos"
         secondaryCtaText="Ver Productos"
         secondaryCtaLink="#productos"
       />
@@ -75,7 +50,6 @@ const maskelAccessories = [
           title="NUESTRO CATÁLOGO DE PRODUCTOS"
           subtitle="Selecciona el producto que necesitas para ver sus especificaciones detalladas y consultar disponibilidad."
           products={maskelProducts}
-          accessories={maskelAccessories}
         />
       </section>
 

@@ -127,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return {
       descripcion: product.nombre,
       detalle: product.detalle,
-      unidad: 'unidad',
+      unidad: product.categoria === 'frp' ? 'panel' : 'unidad',
       cantidad: item.qty,
       precio_unitario: item.precioUnitarioCentavos / 100,
     };
@@ -162,7 +162,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // --- RESPUESTA FINAL ---
   return res.status(200).json({
     ok: true,
-    code: codigo,
     codigo,
     items: validatedItems,
     subtotalCentavos,
