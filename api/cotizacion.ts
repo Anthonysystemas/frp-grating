@@ -47,12 +47,27 @@ function generarIdentificadores() {
   return { codigo, fecha: `Lima, ${fecha}` };
 }
 
+// Compilador de Typst reutilizado entre invocaciones de la misma instancia
+// serverless ("warm"). Crearlo recarga las fuentes desde disco (~500ms en frío),
+// así que se crea una sola vez de forma perezosa y se reutiliza.
+let compiladorPdf: NodeCompiler | null = null;
+
+function obtenerCompiladorPdf(): NodeCompiler {
+  if (!compiladorPdf) {
+    const pdfDir = path.join(process.cwd(), 'src', 'pdf');
+    compiladorPdf = NodeCompiler.create({
+      workspace: pdfDir,
+      fontArgs: [{ fontPaths: [path.join(pdfDir, 'fonts')] }],
+    });
+  }
+  return compiladorPdf;
+}
+
 async function generarPdf(inputs: Record<string, string>) {
   const pdfDir = path.join(process.cwd(), 'src', 'pdf');
-  const compiler = NodeCompiler.create({
-    workspace: pdfDir,
-    fontArgs: [{ fontPaths: [path.join(pdfDir, 'fonts')] }],
-  });
+  // Cada compilación pasa sus propios `inputs` (sys.inputs); la instancia
+  // compartida no conserva datos de la cotización anterior.
+  const compiler = obtenerCompiladorPdf();
   const compilado = compiler.compile({
     mainFilePath: path.join(pdfDir, 'plantilla.typ'),
     inputs,
