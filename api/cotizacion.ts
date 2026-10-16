@@ -87,6 +87,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { contacto, items } = (req.body || {}) as CotizacionPayload;
 
+  // --- HONEYPOT ANTI-SPAM ---
+  // Un humano nunca ve el campo `website` (oculto por CSS). Si llega con
+  // contenido, es un bot: se rechaza antes de validar o compilar el PDF.
+  const honeypot = ((contacto as any)?.website || '').toString().trim();
+  if (honeypot) {
+    return res.status(400).json({ ok: false, error: 'Solicitud rechazada' });
+  }
+
   // --- VALIDACIONES DE CONTACTO (compartidas con /api/enviar-correo) ---
   const validacion = validarCliente(contacto);
   if (!validacion.ok) {

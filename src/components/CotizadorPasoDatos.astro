@@ -25,6 +25,15 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
   </p>
 
   <form data-contact-form class="mt-3" novalidate>
+    <!-- Honeypot anti-spam: oculto por CSS para humanos, visible para bots -->
+    <div
+      aria-hidden="true"
+      style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;"
+    >
+      <label for="website">No rellenar</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+
     <label class="block">
       <span class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">
         Nombre completo

@@ -32,6 +32,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { codigo, cliente, items, subtotalCentavos, igvCentavos, totalCentavos, pdfBase64 } =
     (req.body || {}) as EnviarCorreoPayload;
 
+  // --- HONEYPOT ANTI-SPAM ---
+  // Mismo criterio que /api/cotizacion: si el campo oculto `website` llega con
+  // contenido, la petición es de un bot (o un POST directo) y se rechaza.
+  const honeypot = ((cliente as any)?.website || '').toString().trim();
+  if (honeypot) {
+    return res.status(400).json({ ok: false, error: 'Solicitud rechazada' });
+  }
+
   // --- VALIDACIÓN DE CÓDIGO ---
   const codigoLimpio = (codigo || '').trim();
   if (!codigoLimpio || !CODIGO_REGEX.test(codigoLimpio)) {
