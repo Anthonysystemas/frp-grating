@@ -229,11 +229,13 @@
 // ============================================================
 #let subtotal_input = sys.inputs.at("subtotal_usd", default: "")
 #let igv_input = sys.inputs.at("igv_usd", default: "")
+#let flete_input = sys.inputs.at("flete_usd", default: "")
 #let total_input = sys.inputs.at("total_usd", default: "")
 #let subtotal = if subtotal_input != "" { float(subtotal_input) } else { productos.map(p => p.at("cantidad", default: 0) * p.at("precio_unitario", default: 0)).sum(default: 0) }
 #let igv_calculado = if igv_input != "" { float(igv_input) } else { subtotal * 0.18 }
 #let igv = if incluye_igv { igv_calculado } else { 0 }
-#let total = if total_input != "" { float(total_input) } else { subtotal + igv }
+#let flete = if flete_input != "" { float(flete_input) } else { 0 }
+#let total = if total_input != "" { float(total_input) } else { subtotal + igv + flete }
 
 #v(8pt)
 #align(right)[
@@ -246,6 +248,7 @@
 
       [Subtotal], [#fmt_moneda(subtotal)],
       ..if incluye_igv { ([IGV (18%)], [#fmt_moneda(igv)]) } else { () },
+      ..if flete > 0 { ([Flete], [#fmt_moneda(flete)]) } else { () },
       table.hline(stroke: 1pt + AZUL),
       [#text(weight: "bold")[TOTAL]], [#text(weight: "bold", size: 11pt, fill: AZUL)[#fmt_moneda(total)]],
     )
