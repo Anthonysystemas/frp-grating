@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { NodeCompiler } from '@myriaddreamin/typst-ts-node-compiler';
-import path from 'node:path';
 import { findProduct } from '../src/data/catalog.js';
 import { validarCliente } from '../src/lib/cotizacion.js';
+import { generarPdfCotizacion } from '../src/lib/pdf.js';
+import { supabase } from '../src/lib/supabase.js';
 
 interface CotizacionItem {
   id: string;
@@ -45,39 +45,6 @@ function generarIdentificadores() {
   }).format(ahora);
 
   return { codigo, fecha: `Lima, ${fecha}` };
-}
-
-// Compilador de Typst reutilizado entre invocaciones de la misma instancia
-// serverless ("warm"). Crearlo recarga las fuentes desde disco (~500ms en frío),
-// así que se crea una sola vez de forma perezosa y se reutiliza.
-let compiladorPdf: NodeCompiler | null = null;
-
-function obtenerCompiladorPdf(): NodeCompiler {
-  if (!compiladorPdf) {
-    const pdfDir = path.join(process.cwd(), 'src', 'pdf');
-    compiladorPdf = NodeCompiler.create({
-      workspace: pdfDir,
-      fontArgs: [{ fontPaths: [path.join(pdfDir, 'fonts')] }],
-    });
-  }
-  return compiladorPdf;
-}
-
-async function generarPdf(inputs: Record<string, string>) {
-  const pdfDir = path.join(process.cwd(), 'src', 'pdf');
-  // Cada compilación pasa sus propios `inputs` (sys.inputs); la instancia
-  // compartida no conserva datos de la cotización anterior.
-  const compiler = obtenerCompiladorPdf();
-  const compilado = compiler.compile({
-    mainFilePath: path.join(pdfDir, 'plantilla.typ'),
-    inputs,
-  });
-
-  if (compilado.hasError() || !compilado.result) {
-    throw new Error(compilado.takeError()?.shortDiagnostics?.join('\n') || 'No se pudo compilar el PDF');
-  }
-
-  return compiler.pdf(compilado.result);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -144,6 +111,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const totalCentavos = subtotalCentavos + igvCentavos;
 
   const { codigo, fecha } = generarIdentificadores();
+
+  // --- PERSISTENCIA EN SUPABASE (FASE 1) ---
+  // Se registra la cotización y su primera versión antes de compilar el PDF:
+  // así la solicitud no se pierde si falla la generación del documento.
+  const { data: cotizacionGuardada, error: errorCotizacion } = await supabase
+    .from('cotizaciones')
+    .insert({
+      codigo,
+      cliente_nombre: nombre,
+      cliente_ruc_dni: ruc || null,
+      cliente_correo: correo,
+      cliente_celular: celular,
+      estado: 'pendiente_revision',
+    })
+    .select('id, codigo')
+    .single();
+
+  if (errorCotizacion || !cotizacionGuardada) {
+    console.error('[Cotización] Error al guardar la cotización', errorCotizacion);
+    return res.status(500).json({ ok: false, error: 'No se pudo guardar la cotización' });
+  }
+
+  const versionItems = validatedItems.map((item) => ({
+    id: item.id,
+    nombre: item.nombre,
+    detalle: item.detalle,
+    cantidad: item.qty,
+    precio_unitario: item.precioUnitarioCentavos / 100,
+    subtotal: item.subtotalCentavos / 100,
+  }));
+
+  const { error: errorVersion } = await supabase
+    .from('cotizacion_versiones')
+    .insert({
+      cotizacion_id: cotizacionGuardada.id,
+      version_numero: 1,
+      es_oficial: false,
+      items: versionItems,
+      subtotal: Number((subtotalCentavos / 100).toFixed(2)),
+      igv: Number((igvCentavos / 100).toFixed(2)),
+      total: Number((totalCentavos / 100).toFixed(2)),
+    });
+
+  if (errorVersion) {
+    console.error('[Cotización] Error al guardar la primera versión', errorVersion);
+    // Evita dejar una cotización huérfana si falla la inserción de su versión.
+    const { error: errorLimpieza } = await supabase
+      .from('cotizaciones')
+      .delete()
+      .eq('id', cotizacionGuardada.id);
+    if (errorLimpieza) {
+      console.error('[Cotización] No se pudo revertir la cotización huérfana', errorLimpieza);
+    }
+    return res.status(500).json({ ok: false, error: 'No se pudo guardar la cotización' });
+  }
+
   const total = (totalCentavos / 100).toFixed(2);
   const pdfItems = validatedItems.map((item) => {
     const product = findProduct(item.id)!;
@@ -158,21 +181,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let pdf: Buffer;
   try {
-    pdf = await generarPdf({
+    pdf = await generarPdfCotizacion({
       numero: codigo,
       fecha,
       moneda: 'USD',
-      cliente_nombre: nombre,
-      cliente_razon_social: empresa,
-      cliente_ruc: ruc || '—',
-      cliente_correo: correo,
-      cliente_celular: celular,
-      productos: JSON.stringify(pdfItems),
-      subtotal_usd: (subtotalCentavos / 100).toFixed(2),
-      igv_usd: (igvCentavos / 100).toFixed(2),
-      total_usd: (totalCentavos / 100).toFixed(2),
-      incluye_igv: 'true',
-      logo_path: 'logo.png',
+      clienteNombre: nombre,
+      clienteRazonSocial: empresa,
+      clienteRuc: ruc,
+      clienteCorreo: correo,
+      clienteCelular: celular,
+      items: pdfItems,
+      subtotal: subtotalCentavos / 100,
+      igv: igvCentavos / 100,
+      total: totalCentavos / 100,
     });
   } catch (error) {
     console.error('[Cotización PDF] Error de compilación', error);
@@ -185,6 +206,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // --- RESPUESTA FINAL ---
   return res.status(200).json({
     ok: true,
+    id: cotizacionGuardada.id,
     codigo,
     items: validatedItems,
     subtotalCentavos,

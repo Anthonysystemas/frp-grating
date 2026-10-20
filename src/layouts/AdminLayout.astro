@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Panel de cotizaciones | Maskel Perú" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#070B14" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>{title}</title>
+  </head>
+
+  <body class="min-h-screen bg-[#070B14] text-slate-100 antialiased selection:bg-blue-600/40">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.16),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.08),transparent_35%)]"
+    >
+    </div>
+
+    <slot />
+  </body>
+</html>

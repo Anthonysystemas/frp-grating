@@ -2,6 +2,9 @@
     "functions": {
         "api/cotizacion.ts": {
             "includeFiles": "src/pdf/**/*.{typ,png,ttf,otf}"
+        },
+        "api/admin/aprobar.ts": {
+            "includeFiles": "src/pdf/**/*.{typ,png,ttf,otf}"
         }
     }
 }
