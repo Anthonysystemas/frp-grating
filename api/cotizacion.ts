@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // --- VALIDACIONES DE CONTACTO (compartidas con /api/enviar-correo) ---
   const validacion = validarCliente(contacto);
-  if (!validacion.ok) {
+  if (validacion.ok === false) {
     return res.status(400).json({ ok: false, error: validacion.error });
   }
   const { nombre, empresa, ruc, correo, celular } = validacion.cliente;

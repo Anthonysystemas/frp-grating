@@ -241,7 +241,7 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
 
   for (let index = 0; index < itemsEntrada.length; index += 1) {
     const resultado = normalizarItem(itemsEntrada[index], index, existentes);
-    if (!resultado.ok) {
+    if (resultado.ok === false) {
       throw new AprobarError(resultado.error, 400);
     }
 
