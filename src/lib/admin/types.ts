@@ -27,6 +27,13 @@ export interface Cotizacion {
   id: string;
   codigo: string;
   cliente_nombre?: string;
+  nombre?: string;
+  cliente_empresa?: string;
+  empresa?: string;
+  cliente?: {
+    nombre?: string;
+    empresa?: string;
+  };
   cliente_ruc_dni?: string;
   cliente_correo?: string;
   cliente_celular?: string;

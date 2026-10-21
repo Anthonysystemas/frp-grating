@@ -58,23 +58,21 @@ export function validarCliente(cliente: ClienteCotizacion | undefined | null): R
   if (nombre.length > 100) return { ok: false, error: 'Nombre excede los 100 caracteres' };
 
   if (!empresa) return { ok: false, error: 'La empresa es obligatoria' };
-  if (empresa.length > 120) return { ok: false, error: 'Empresa excede los 120 caracteres' };
+  if (empresa.length > 200) return { ok: false, error: 'Empresa excede los 200 caracteres' };
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!correo || !emailRegex.test(correo) || correo.length > 120) {
-    return { ok: false, error: 'El correo electrónico no es válido' };
+  // Solo se exige la presencia de "@"; no se restringe el dominio.
+  if (!correo || !correo.includes('@')) {
+    return { ok: false, error: 'No es correo válido.' };
   }
 
   const celularRegex = /^9\d{8}$/;
   if (!celular || !celularRegex.test(celular)) {
-    return { ok: false, error: 'El celular no es válido. Debe tener 9 dígitos y empezar con 9' };
+    return { ok: false, error: 'No es un número válido.' };
   }
 
-  if (ruc) {
-    const rucRegex = /^(10|15|17|20)\d{9}$/;
-    if (!rucRegex.test(ruc)) {
-      return { ok: false, error: 'RUC inválido. Debe tener 11 dígitos y empezar con 10, 15, 17 o 20' };
-    }
+  // RUC obligatorio: exactamente 11 dígitos con prefijo válido.
+  if (!/^(10|15|17|20)\d{9}$/.test(ruc)) {
+    return { ok: false, error: 'No es RUC válido. Ingrese RUC válido.' };
   }
 
   return { ok: true, cliente: { nombre, empresa, ruc, correo, celular } };

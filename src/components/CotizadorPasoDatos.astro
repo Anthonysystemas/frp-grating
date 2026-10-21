@@ -57,36 +57,57 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
         name="empresa"
         required
         autocomplete="organization"
-        placeholder="Ej. Constructora Andina SAC"
+        placeholder="Ej. Enel, Entel, Persona Natural"
         class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
       />
     </label>
 
     <label class="mt-4 block">
       <span class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">
-        RUC
+        RUC de la empresa
       </span>
       <input
         type="text"
         name="ruc"
         inputmode="numeric"
-        placeholder="20XXXXXXXXX"
+        maxlength="11"
+        required
+        placeholder="Ej. 20601234567"
+        aria-describedby="ruc-error"
         class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
       />
+      <p
+        id="ruc-error"
+        data-ruc-error
+        class="mt-1.5 hidden text-xs font-medium text-red-400"
+        role="alert"
+      >
+        No es RUC válido. Ingrese RUC válido.
+      </p>
     </label>
 
     <label class="mt-4 block">
       <span class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">
-        Correo corporativo
+        Correo electrónico
       </span>
       <input
-        type="email"
+        type="text"
         name="correo"
+        inputmode="email"
         required
         autocomplete="email"
-        placeholder="nombre@empresa.com"
+        placeholder="usuario@dominio.com"
+        aria-describedby="correo-error"
         class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
       />
+      <p
+        id="correo-error"
+        data-correo-error
+        class="mt-1.5 hidden text-xs font-medium text-red-400"
+        role="alert"
+      >
+        No es correo válido.
+      </p>
     </label>
 
     <label class="mt-4 block">
@@ -99,11 +120,19 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
         required
         inputmode="numeric"
         autocomplete="tel"
-        pattern="9[0-9]{8}"
         maxlength="9"
         placeholder="987654321"
+        aria-describedby="celular-error"
         class="mt-3 w-full rounded-lg border border-slate-700 bg-[#060913] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
       />
+      <p
+        id="celular-error"
+        data-celular-error
+        class="mt-1.5 hidden text-xs font-medium text-red-400"
+        role="alert"
+      >
+        No es un número válido.
+      </p>
     </label>
   </form>
 
@@ -117,12 +146,64 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
   <button
     type="button"
     data-step-next
-    disabled
     class="mt-4 w-full rounded bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
   >
     Generar cotización
   </button>
+
+  <dialog
+    data-cotizador-alert
+    aria-labelledby="cotizador-alert-title"
+    class="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border border-amber-500/30 bg-slate-900 p-0 text-slate-100 shadow-2xl shadow-black/60 backdrop:bg-black/40"
+  >
+    <div class="relative p-6 text-center">
+      <button
+        type="button"
+        data-alert-close
+        aria-label="Cerrar aviso"
+        class="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path>
+        </svg>
+      </div>
+
+      <h3 id="cotizador-alert-title" class="mt-4 text-base font-bold text-white">Atención</h3>
+      <p data-alert-message class="mt-2 text-sm leading-relaxed text-slate-300"></p>
+
+      <button
+        type="button"
+        data-alert-close
+        class="mt-5 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+      >
+        Entendido
+      </button>
+    </div>
+  </dialog>
 </div>
+
+<style>
+  @keyframes cotizador-alert-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  dialog[data-cotizador-alert][open] {
+    animation: cotizador-alert-in 180ms ease-out;
+  }
+</style>
 
 <script>
   type QuoteLine = { productId?: string; qty?: number; subtotal?: number };
@@ -131,13 +212,117 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
   const panel = root?.querySelector<HTMLElement>('[data-step-panel="2"]');
 
   if (panel) {
+    type CampoValidacion = {
+      input: HTMLInputElement | null;
+      validar: (value: string) => boolean;
+      mensajeFalta: string;
+      mensajeInvalido: string;
+      errorEl?: HTMLElement | null;
+    };
+
     const backBtn = panel.querySelector<HTMLButtonElement>("[data-step-back]");
     const nextBtn = panel.querySelector<HTMLButtonElement>("[data-step-next]");
     const form = panel.querySelector<HTMLFormElement>("[data-contact-form]");
-    const requiredFields = Array.from(
-      form?.querySelectorAll<HTMLInputElement>("[required]") ?? [],
-    );
     const totalEl = panel.querySelector<HTMLElement>("[data-contact-total]");
+    const alertModal = panel.querySelector<HTMLDialogElement>("[data-cotizador-alert]");
+    const alertMessage = panel.querySelector<HTMLElement>("[data-alert-message]");
+    const alertCloseButtons = panel.querySelectorAll<HTMLButtonElement>("[data-alert-close]");
+
+    const campos: CampoValidacion[] = [
+      {
+        input: form?.querySelector<HTMLInputElement>('input[name="nombre"]') ?? null,
+        validar: (value) => value.length > 0,
+        mensajeFalta: "Te faltó ingresar tu nombre",
+        mensajeInvalido: "El nombre ingresado no es válido",
+      },
+      {
+        input: form?.querySelector<HTMLInputElement>('input[name="empresa"]') ?? null,
+        validar: (value) => value.length > 0,
+        mensajeFalta: "Te faltó agregar la empresa",
+        mensajeInvalido: "La empresa ingresada no es válida",
+      },
+      {
+        input: form?.querySelector<HTMLInputElement>('input[name="ruc"]') ?? null,
+        validar: (value) => /^(10|15|17|20)\d{9}$/.test(value),
+        mensajeFalta: "Te faltó ingresar el RUC",
+        mensajeInvalido: "El RUC ingresado no es válido",
+        errorEl: panel.querySelector<HTMLElement>("[data-ruc-error]"),
+      },
+      {
+        input: form?.querySelector<HTMLInputElement>('input[name="correo"]') ?? null,
+        validar: (value) => value.includes("@"),
+        mensajeFalta: "Te faltó colocar tu correo electrónico",
+        mensajeInvalido: "El correo debe contener '@'",
+        errorEl: panel.querySelector<HTMLElement>("[data-correo-error]"),
+      },
+      {
+        input: form?.querySelector<HTMLInputElement>('input[name="celular"]') ?? null,
+        validar: (value) => /^9\d{8}$/.test(value),
+        mensajeFalta: "Te faltó ingresar tu número de celular",
+        mensajeInvalido: "El número de celular ingresado no es válido",
+        errorEl: panel.querySelector<HTMLElement>("[data-celular-error]"),
+      },
+    ];
+
+    const mostrarError = (elemento: HTMLElement | null | undefined, mostrar: boolean): void => {
+      elemento?.classList.toggle("hidden", !mostrar);
+    };
+
+    const marcarInvalido = (input: HTMLInputElement | null, invalido: boolean): void => {
+      input?.setAttribute("aria-invalid", invalido ? "true" : "false");
+    };
+
+    const limpiarError = (campo: CampoValidacion): void => {
+      mostrarError(campo.errorEl, false);
+      marcarInvalido(campo.input, false);
+    };
+
+    // Los campos vacíos nunca muestran error rojo.
+    const validarEnBlur = (campo: CampoValidacion): void => {
+      if (!campo.errorEl) return;
+      const valor = (campo.input?.value ?? "").trim();
+      if (!valor) {
+        limpiarError(campo);
+        return;
+      }
+      const valido = campo.validar(valor);
+      mostrarError(campo.errorEl, !valido);
+      marcarInvalido(campo.input, !valido);
+    };
+
+    const mostrarAlerta = (mensaje: string): void => {
+      if (!alertModal || !alertMessage) return;
+      alertMessage.textContent = mensaje;
+      if (!alertModal.open) alertModal.showModal();
+    };
+
+    const validarFormulario = (): boolean => {
+      for (const campo of campos) {
+        const valor = (campo.input?.value ?? "").trim();
+        if (!valor) {
+          limpiarError(campo);
+          marcarInvalido(campo.input, true);
+          mostrarAlerta(campo.mensajeFalta);
+          campo.input?.focus();
+          return false;
+        }
+      }
+
+      for (const campo of campos) {
+        const valor = (campo.input?.value ?? "").trim();
+        const valido = campo.validar(valor);
+        mostrarError(campo.errorEl, !valido);
+        marcarInvalido(campo.input, !valido);
+        if (!valido) {
+          mostrarAlerta(campo.mensajeInvalido);
+          campo.input?.focus();
+          return false;
+        }
+      }
+
+      campos.forEach(limpiarError);
+      return true;
+    };
 
     const formatMoney = (value: number) =>
       `US$ ${value.toLocaleString("en-US", {
@@ -162,20 +347,20 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
       if (totalEl) totalEl.textContent = formatMoney(value);
     };
 
-    const updateNextButton = () => {
-      const isValid = requiredFields.every(
-        (field) => field.value.trim().length > 0 && field.checkValidity(),
-      );
-      if (nextBtn) nextBtn.disabled = !isValid;
-      return isValid;
-    };
-
     updateTotal();
-    updateNextButton();
 
-    requiredFields.forEach((field) => {
-      field.addEventListener("input", updateNextButton);
-      field.addEventListener("change", updateNextButton);
+    campos.forEach((campo) => {
+      // Mientras se escribe no se muestra ningún error rojo.
+      campo.input?.addEventListener("input", () => limpiarError(campo));
+      campo.input?.addEventListener("blur", () => validarEnBlur(campo));
+    });
+
+    alertCloseButtons.forEach((boton) => {
+      boton.addEventListener("click", () => alertModal?.close());
+    });
+
+    alertModal?.addEventListener("click", (event) => {
+      if (event.target === alertModal) alertModal.close();
     });
 
     backBtn?.addEventListener("click", () => {
@@ -221,8 +406,7 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
     };
 
     nextBtn?.addEventListener("click", async () => {
-      if (!updateNextButton()) {
-        form?.reportValidity();
+      if (!validarFormulario()) {
         return;
       }
 
@@ -256,13 +440,27 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ contacto, items }),
         });
-        const result = (await response.json()) as { ok?: boolean; error?: string; [key: string]: unknown };
-        if (!response.ok || !result.ok) throw new Error("Solicitud rechazada");
+        const result = (await response.json().catch(() => ({}))) as {
+          ok?: boolean;
+          error?: string;
+          [key: string]: unknown;
+        };
+        if (!response.ok || result.ok !== true) {
+          throw new Error(
+            typeof result.error === "string" && result.error.trim()
+              ? result.error
+              : `No pudimos generar la cotización (HTTP ${response.status}). Intenta de nuevo.`,
+          );
+        }
         guardarCotizacionEnviada(huella, result);
         document.dispatchEvent(new CustomEvent("maskel:cotizacion-generada", { detail: result }));
         document.dispatchEvent(new CustomEvent("maskel:cotizador-step", { detail: { step: 3 } }));
-      } catch {
-        alert("No pudimos generar la cotización. Intenta de nuevo.");
+      } catch (error) {
+        const mensaje =
+          error instanceof Error && error.message
+            ? error.message
+            : "No pudimos generar la cotización. Intenta de nuevo.";
+        mostrarAlerta(mensaje);
       } finally {
         nextBtn.textContent = etiquetaOriginal;
         nextBtn.disabled = false;

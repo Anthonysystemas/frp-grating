@@ -21,8 +21,19 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
   const totales = totalesDeVersion(version);
   const celularDigitos = String(cotizacion.cliente_celular ?? "").replace(/\D/g, "");
   const celular = cotizacion.cliente_celular ? `Cel. ${cotizacion.cliente_celular}` : "";
-  const documento = cotizacion.cliente_ruc_dni ? `RUC/DNI ${cotizacion.cliente_ruc_dni}` : "";
+  const documento = cotizacion.cliente_ruc_dni ? `RUC ${cotizacion.cliente_ruc_dni}` : "";
   const contacto = [celular, documento].filter(Boolean).join(" · ") || "Sin contacto";
+  const nombre =
+    cotizacion.cliente_nombre?.trim() ||
+    cotizacion.cliente?.nombre?.trim() ||
+    cotizacion.nombre?.trim() ||
+    "—";
+  const empresa =
+    cotizacion.cliente_empresa?.trim() ||
+    cotizacion.empresa?.trim() ||
+    cotizacion.cliente?.empresa?.trim() ||
+    "";
+  const nombreCompleto = empresa ? `${nombre} — ${empresa}` : nombre;
   const total = version ? money(totales.total) : "—";
 
   return `
@@ -37,7 +48,9 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
       <div class="border-t border-dashed border-slate-800 my-2"></div>
 
       <div class="min-w-0">
-        <p class="truncate text-sm font-medium text-slate-100">${escapeHtml(cotizacion.cliente_nombre || "—")}</p>
+        <p class="truncate text-sm font-medium text-slate-100" title="${escapeHtml(nombreCompleto)}">
+          ${escapeHtml(nombre)}${empresa ? `<span class="text-slate-300"> — ${escapeHtml(empresa)}</span>` : ""}
+        </p>
         ${
           cotizacion.cliente_celular
             ? `<a class="mt-0.5 block truncate text-xs text-slate-400 hover:text-slate-300 hover:underline" href="tel:${escapeHtml(celularDigitos)}">${escapeHtml(contacto)}</a>`
