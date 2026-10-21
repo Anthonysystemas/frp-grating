@@ -1,7 +1,7 @@
 import { CATALOG, categorias } from "../../data/catalog";
 import { money } from "./format";
 import { lineasDeVersion } from "./quote";
-import { aprobarCotizacion, fetchCotizaciones } from "./api";
+import { aprobarCotizacion, fetchCotizaciones, mensajeError } from "./api";
 import { filaModal, opcionesCategoria, opcionesProducto, tarjeta } from "./render";
 import type {
   CatalogoCategoria,
@@ -153,7 +153,8 @@ export function initAdmin(): void {
       errorState.classList.add("hidden");
       render();
     } catch (error) {
-      const mensaje = error instanceof Error ? error.message : "No se pudieron cargar las cotizaciones";
+      console.error("[Admin] Error al cargar cotizaciones:", error);
+      const mensaje = mensajeError(error, "No se pudieron cargar las cotizaciones");
       errorMessage.textContent = mensaje;
       errorState.classList.remove("hidden");
       list.classList.add("hidden");
@@ -456,7 +457,8 @@ export function initAdmin(): void {
       modalSuccess.scrollIntoView({ behavior: "smooth", block: "start" });
       mostrarToast("Cotización aprobada correctamente.", "ok");
     } catch (error) {
-      const mensaje = error instanceof Error ? error.message : "No se pudo aprobar la cotización";
+      console.error("[Admin] Error al aprobar cotización:", error);
+      const mensaje = mensajeError(error, "No se pudo aprobar la cotización");
       modalError.textContent = mensaje;
       modalError.classList.remove("hidden");
       modalSubmit.textContent = "Aprobar cotización";
