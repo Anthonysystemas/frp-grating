@@ -120,6 +120,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .insert({
       codigo,
       cliente_nombre: nombre,
+      cliente_empresa: empresa,
       cliente_ruc_dni: ruc || null,
       cliente_correo: correo,
       cliente_celular: celular,

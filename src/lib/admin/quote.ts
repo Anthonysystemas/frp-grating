@@ -49,6 +49,9 @@ export const totalesDeVersion = (version?: VersionCotizacion | null) => {
   return { subtotal, igv, flete, total };
 };
 
+export const normalizarRuc = (ruc?: string | null): string =>
+  String(ruc ?? "").replace(/\D/g, "").trim();
+
 export const numeroWhatsApp = (cotizacion: Cotizacion): string => {
   const digitos = String(cotizacion.cliente_celular ?? "").replace(/\D/g, "");
   if (digitos.length === 9 && digitos.startsWith("9")) return `51${digitos}`;

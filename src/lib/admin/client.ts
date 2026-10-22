@@ -1,8 +1,20 @@
 import { CATALOG, categorias } from "../../data/catalog";
-import { money } from "./format";
-import { lineasDeVersion } from "./quote";
-import { aprobarCotizacion, fetchCotizaciones, mensajeError } from "./api";
-import { filaModal, opcionesCategoria, opcionesProducto, tarjeta } from "./render";
+import { fechaCorta, money } from "./format";
+import { lineasDeVersion, normalizarRuc, totalesDeVersion } from "./quote";
+import {
+  aprobarCotizacion,
+  cambiarEstadoCotizacion,
+  fetchCotizaciones,
+  mensajeError,
+} from "./api";
+import {
+  badgeEstado,
+  filaModal,
+  opcionesCategoria,
+  opcionesProducto,
+  tarjeta,
+} from "./render";
+import { obtenerEstado } from "./states";
 import type {
   CatalogoCategoria,
   CatalogoOpcion,
@@ -35,14 +47,16 @@ export function initAdmin(): void {
   const retryBtn = document.getElementById("retry") as HTMLButtonElement;
   const searchInput = document.getElementById("search") as HTMLInputElement;
   const filters = document.getElementById("filters") as HTMLElement;
-  const statTotal = document.getElementById("stat-total") as HTMLElement;
-  const statPendientes = document.getElementById("stat-pendientes") as HTMLElement;
-  const statAprobadas = document.getElementById("stat-aprobadas") as HTMLElement;
-  const stats = [statTotal, statPendientes, statAprobadas];
 
   const modal = document.getElementById("approve-modal") as HTMLDialogElement;
   const modalTitle = document.getElementById("approve-title") as HTMLElement;
   const modalClient = document.getElementById("modal-client") as HTMLElement;
+  const modalStatus = document.getElementById("modal-status") as HTMLElement;
+  const modalDate = document.getElementById("modal-date") as HTMLElement;
+  const modalTotalSummary = document.getElementById("modal-total-summary") as HTMLElement;
+  const modalItemsHint = document.getElementById("modal-items-hint") as HTMLElement;
+  const modalFleteWrapper = document.getElementById("modal-flete-wrapper") as HTMLElement;
+  const modalAdminBlock = document.getElementById("modal-admin-block") as HTMLElement;
   const modalItems = document.getElementById("modal-items") as HTMLElement;
   const modalItemsEmpty = document.getElementById("modal-items-empty") as HTMLElement;
   const toggleCatalogBtn = document.getElementById("toggle-catalog") as HTMLButtonElement;
@@ -72,7 +86,7 @@ export function initAdmin(): void {
   const toast = document.getElementById("toast") as HTMLElement;
 
   let cotizaciones: Cotizacion[] = [];
-  let filtro: "todas" | "pendiente_revision" | "aprobada" = "todas";
+  let filtro: "todas" | "pendiente_revision" | "aprobada" | "historial" | "eliminada" = "pendiente_revision";
   let busqueda = "";
   let cotizacionModal: Cotizacion | null = null;
   let pdfObjectUrl: string | null = null;
@@ -98,28 +112,64 @@ export function initAdmin(): void {
   // Render del listado
   // ---------------------------------------------------------------------
   const render = (): void => {
-    const total = cotizaciones.length;
-    const pendientes = cotizaciones.filter((cotizacion) => cotizacion.estado === "pendiente_revision").length;
-    const aprobadas = cotizaciones.filter((cotizacion) => cotizacion.estado === "aprobada").length;
+    const activas = cotizaciones.filter((cotizacion) => cotizacion.estado !== "eliminada");
+    const total = activas.length;
+    const pendientes = activas.filter((cotizacion) => cotizacion.estado === "pendiente_revision").length;
+    const aprobadas = activas.filter((cotizacion) => cotizacion.estado === "aprobada").length;
+    const pagadas = activas.filter((cotizacion) => cotizacion.estado === "pagada").length;
+    const eliminadas = cotizaciones.filter((cotizacion) => cotizacion.estado === "eliminada").length;
 
-    stats.forEach((element) => element.classList.remove("animate-pulse"));
-    statTotal.textContent = String(total);
-    statPendientes.textContent = String(pendientes);
-    statAprobadas.textContent = String(aprobadas);
+    const conteos = {
+      pendiente_revision: pendientes,
+      aprobada: aprobadas,
+      historial: pagadas,
+      eliminada: eliminadas,
+      todas: total,
+    };
+
+    filters.querySelectorAll<HTMLElement>("[data-count]").forEach((elemento) => {
+      const clave = elemento.dataset.count as keyof typeof conteos | undefined;
+      if (clave && clave in conteos) {
+        elemento.textContent = `(${conteos[clave]})`;
+      }
+    });
 
     const termino = busqueda.trim().toLowerCase();
+    const terminoRuc = termino.replace(/\D/g, "");
+
     const visibles = cotizaciones.filter((cotizacion) => {
-      if (filtro !== "todas" && cotizacion.estado !== filtro) return false;
+      if (filtro === "eliminada") {
+        if (cotizacion.estado !== "eliminada") return false;
+      } else {
+        if (cotizacion.estado === "eliminada") return false;
+        if (filtro === "historial") {
+          if (cotizacion.estado !== "pagada") return false;
+        } else if (filtro !== "todas" && cotizacion.estado !== filtro) {
+          return false;
+        }
+      }
+
       if (!termino) return true;
-      return [
+
+      const coincideTexto = [
         cotizacion.codigo,
         cotizacion.cliente_nombre,
-        cotizacion.cliente_ruc_dni,
+        cotizacion.nombre,
+        cotizacion.cliente_empresa,
+        cotizacion.empresa,
+        cotizacion.cliente?.nombre,
+        cotizacion.cliente?.empresa,
         cotizacion.cliente_correo,
         cotizacion.cliente_celular,
       ]
         .filter(Boolean)
         .some((valor) => String(valor).toLowerCase().includes(termino));
+
+      const coincideRuc =
+        terminoRuc.length > 0 &&
+        normalizarRuc(cotizacion.cliente_ruc_dni).includes(terminoRuc);
+
+      return coincideTexto || coincideRuc;
     });
 
     list.innerHTML = visibles.map(tarjeta).join("");
@@ -127,9 +177,15 @@ export function initAdmin(): void {
     emptyState.classList.toggle("hidden", visibles.length > 0);
     if (visibles.length === 0) {
       emptyDetail.textContent =
-        total === 0
-          ? "Cuando se genere una cotización desde la web aparecerá aquí."
-          : "No hay cotizaciones que coincidan con el filtro o la búsqueda.";
+        filtro === "eliminada"
+          ? "No hay cotizaciones eliminadas."
+          : filtro === "historial"
+            ? "No hay cotizaciones en el historial."
+            : filtro === "pendiente_revision"
+              ? "No hay cotizaciones pendientes."
+              : total === 0
+                ? "Cuando se genere una cotización desde la web aparecerá aquí."
+                : "No hay cotizaciones que coincidan con el filtro o la búsqueda.";
     }
   };
 
@@ -149,7 +205,11 @@ export function initAdmin(): void {
   const cargar = async (): Promise<void> => {
     setCargando(true);
     try {
-      cotizaciones = await fetchCotizaciones();
+      const [activas, eliminadas] = await Promise.all([
+        fetchCotizaciones(),
+        fetchCotizaciones("eliminada"),
+      ]);
+      cotizaciones = [...activas, ...eliminadas];
       errorState.classList.add("hidden");
       render();
     } catch (error) {
@@ -177,8 +237,13 @@ export function initAdmin(): void {
 
   const actualizarEstadoModal = (): void => {
     const hayItems = modalItems.querySelectorAll("[data-modal-item]").length > 0;
+    const editable = cotizacionModal?.estado === "pendiente_revision";
+
+    modalItemsEmpty.textContent = editable
+      ? "No hay ítems en esta cotización. Agrega al menos uno para poder aprobarla."
+      : "Esta cotización no tiene ítems registrados.";
     modalItemsEmpty.classList.toggle("hidden", hayItems);
-    modalSubmit.disabled = !hayItems;
+    modalSubmit.disabled = editable ? !hayItems : false;
   };
 
   const categoriaCatalogoActual = (): CatalogoCategoria | null =>
@@ -279,7 +344,11 @@ export function initAdmin(): void {
     modalError.textContent = "";
     modalFormView.classList.remove("hidden");
     modalSuccess.classList.add("hidden");
+    modalSubmit.classList.remove("hidden");
     modalSubmit.textContent = "Aprobar cotización";
+    modalStatus.innerHTML = "";
+    modalDate.textContent = "";
+    modalTotalSummary.textContent = "";
     modalItems.innerHTML = "";
     modalFlete.value = "0";
     catalogPanel.classList.add("hidden");
@@ -302,19 +371,58 @@ export function initAdmin(): void {
     }
 
     const lineas = lineasDeVersion(version);
+    const editable = cotizacion.estado === "pendiente_revision";
+    const configEstado = obtenerEstado(cotizacion.estado);
+    const totales = totalesDeVersion(version);
+    const nombre =
+      cotizacion.cliente_nombre?.trim() ||
+      cotizacion.cliente?.nombre?.trim() ||
+      cotizacion.nombre?.trim() ||
+      "—";
+    const empresa =
+      cotizacion.cliente_empresa?.trim() ||
+      cotizacion.empresa?.trim() ||
+      cotizacion.cliente?.empresa?.trim() ||
+      "";
 
     cotizacionModal = cotizacion;
     resetModal();
 
-    modalTitle.textContent = cotizacion.codigo;
-    modalClient.textContent = [cotizacion.cliente_nombre, cotizacion.cliente_ruc_dni]
+    modalTitle.textContent = "Gestionar cotización";
+    modalClient.textContent = [
+      cotizacion.codigo,
+      empresa ? `${nombre} — ${empresa}` : nombre,
+      cotizacion.cliente_ruc_dni ? `RUC ${cotizacion.cliente_ruc_dni}` : "",
+    ]
       .filter(Boolean)
       .join(" · ");
+    modalStatus.innerHTML = badgeEstado(cotizacion.estado);
+    modalDate.textContent = fechaCorta(cotizacion.created_at);
+    modalTotalSummary.textContent = money(totales.total);
+    modalItemsHint.textContent = editable ? "Edita precios o elimina" : "Solo lectura";
     modalFlete.value = String(Number(version.flete ?? 0));
 
-    modalItems.innerHTML = lineas.map(filaModal).join("");
+    toggleCatalogBtn.classList.toggle("hidden", !editable);
+    modalFleteWrapper.classList.toggle("hidden", !editable);
+    modalAdminBlock.classList.toggle("hidden", !editable);
+    catalogPanel.classList.add("hidden");
+
+    modalItems.innerHTML = lineas.map((linea) => filaModal(linea, editable)).join("");
     actualizarEstadoModal();
-    recalcular();
+
+    if (editable) {
+      recalcular();
+    } else {
+      modalSubtotal.textContent = money(totales.subtotal);
+      modalIgv.textContent = money(totales.igv);
+      modalFleteLabel.textContent = money(totales.flete);
+      modalTotal.textContent = money(totales.total);
+    }
+
+    modalSubmit.textContent = configEstado.accionPrincipal;
+    modalSubmit.className = `rounded-lg px-5 py-2.5 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-wait disabled:opacity-60 ${configEstado.btnBg}`;
+    modalSubmit.classList.toggle("hidden", cotizacion.estado === "pagada");
+
     if (!modal.open) modal.showModal();
   };
 
@@ -367,10 +475,54 @@ export function initAdmin(): void {
     render();
   };
 
+  const cambiarEstadoDesdeModal = async (
+    cotizacion: Cotizacion,
+    estadoDestino: "pagada" | "pendiente_revision",
+  ): Promise<void> => {
+    modalError.classList.add("hidden");
+    modalError.textContent = "";
+
+    const configEstado = obtenerEstado(cotizacion.estado);
+    modalSubmit.disabled = true;
+    modalSubmit.textContent = estadoDestino === "pagada" ? "Marcando…" : "Restaurando…";
+
+    try {
+      await cambiarEstadoCotizacion(cotizacion.id, estadoDestino);
+      cotizacion.estado = estadoDestino;
+      filtro = estadoDestino === "pagada" ? "historial" : "todas";
+      filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
+      });
+      render();
+      modal.close();
+      mostrarToast(
+        estadoDestino === "pagada"
+          ? "Cotización marcada como pagada."
+          : "Cotización restaurada correctamente.",
+        "ok",
+      );
+    } catch (error) {
+      console.error("[Admin] Error al cambiar el estado:", error);
+      modalError.textContent = mensajeError(error, "No se pudo actualizar la cotización");
+      modalError.classList.remove("hidden");
+      modalSubmit.disabled = false;
+      modalSubmit.textContent = configEstado.accionPrincipal;
+    }
+  };
+
   modalForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const cotizacionActual = cotizacionModal;
     if (!cotizacionActual) return;
+
+    if (cotizacionActual.estado !== "pendiente_revision") {
+      if (cotizacionActual.estado === "aprobada") {
+        await cambiarEstadoDesdeModal(cotizacionActual, "pagada");
+      } else if (cotizacionActual.estado === "eliminada") {
+        await cambiarEstadoDesdeModal(cotizacionActual, "pendiente_revision");
+      }
+      return;
+    }
 
     modalError.classList.add("hidden");
     modalError.textContent = "";
@@ -467,8 +619,75 @@ export function initAdmin(): void {
   });
 
   // ---------------------------------------------------------------------
+  // Eliminación de cotizaciones
+  // ---------------------------------------------------------------------
+  const eliminarCotizacionDesdeLista = async (id: string): Promise<void> => {
+    const cotizacion = cotizaciones.find((item) => item.id === id);
+    if (!cotizacion) return;
+
+    if (!window.confirm(`¿Deseas eliminar esta cotización?\n\n${cotizacion.codigo}`)) {
+      return;
+    }
+
+    try {
+      await cambiarEstadoCotizacion(cotizacion.id, "eliminada");
+      cotizacion.estado = "eliminada";
+      render();
+      mostrarToast("Cotización eliminada correctamente.", "ok");
+    } catch (error) {
+      console.error("[Admin] Error al eliminar cotización:", error);
+      mostrarToast(mensajeError(error, "No se pudo eliminar la cotización"), "error");
+    }
+  };
+
+  const restaurarCotizacionDesdeLista = async (id: string): Promise<void> => {
+    const cotizacion = cotizaciones.find((item) => item.id === id);
+    if (!cotizacion) return;
+
+    try {
+      await cambiarEstadoCotizacion(id, "pendiente_revision");
+      cotizacion.estado = "pendiente_revision";
+      filtro = "todas";
+      filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item.dataset.filter === "todas"));
+      });
+      render();
+      mostrarToast("Cotización restaurada correctamente.", "ok");
+    } catch (error) {
+      console.error("[Admin] Error al restaurar cotización:", error);
+      mostrarToast(mensajeError(error, "No se pudo restaurar la cotización"), "error");
+    }
+  };
+
+  const marcarComoPagada = async (id: string): Promise<void> => {
+    const cotizacion = cotizaciones.find((item) => item.id === id);
+    if (!cotizacion) return;
+
+    try {
+      await cambiarEstadoCotizacion(id, "pagada");
+      cotizacion.estado = "pagada";
+      filtro = "historial";
+      filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item.dataset.filter === "historial"));
+      });
+      render();
+      mostrarToast("Cotización marcada como pagada.", "ok");
+    } catch (error) {
+      console.error("[Admin] Error al marcar como pagada:", error);
+      mostrarToast(mensajeError(error, "No se pudo marcar la cotización como pagada"), "error");
+    }
+  };
+
+  // ---------------------------------------------------------------------
   // Eventos
   // ---------------------------------------------------------------------
+  document.addEventListener("click", (event) => {
+    if ((event.target as Element).closest("[data-card-menu]")) return;
+    list.querySelectorAll<HTMLDetailsElement>("details[data-card-menu][open]").forEach((menu) => {
+      menu.open = false;
+    });
+  });
+
   refreshBtn.addEventListener("click", () => void cargar());
   retryBtn.addEventListener("click", () => void cargar());
 
@@ -481,7 +700,15 @@ export function initAdmin(): void {
     const boton = (event.target as Element).closest<HTMLButtonElement>("[data-filter]");
     if (!boton) return;
     const valor = boton.dataset.filter;
-    if (valor !== "todas" && valor !== "pendiente_revision" && valor !== "aprobada") return;
+    if (
+      valor !== "todas" &&
+      valor !== "pendiente_revision" &&
+      valor !== "aprobada" &&
+      valor !== "historial" &&
+      valor !== "eliminada"
+    ) {
+      return;
+    }
     filtro = valor;
     filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
       item.setAttribute("aria-pressed", String(item === boton));
@@ -490,10 +717,39 @@ export function initAdmin(): void {
   });
 
   list.addEventListener("click", (event) => {
-    const boton = (event.target as Element).closest<HTMLButtonElement>("[data-approve]");
-    if (!boton) return;
-    const id = boton.dataset.approve;
-    if (id) abrirModal(id);
+    const objetivo = event.target as Element;
+    if (!objetivo.closest("summary")) {
+      list.querySelectorAll<HTMLDetailsElement>("details[data-card-menu][open]").forEach((menu) => {
+        menu.open = false;
+      });
+    }
+
+    const botonAprobar = objetivo.closest<HTMLButtonElement>("[data-approve]");
+    if (botonAprobar) {
+      const id = botonAprobar.dataset.approve;
+      if (id) abrirModal(id);
+      return;
+    }
+
+    const botonEliminar = (event.target as Element).closest<HTMLButtonElement>("[data-delete]");
+    if (botonEliminar) {
+      const id = botonEliminar.getAttribute("data-delete");
+      if (id) void eliminarCotizacionDesdeLista(id);
+      return;
+    }
+
+    const botonRestaurar = (event.target as Element).closest<HTMLButtonElement>("[data-restore]");
+    if (botonRestaurar) {
+      const id = botonRestaurar.getAttribute("data-restore");
+      if (id) void restaurarCotizacionDesdeLista(id);
+      return;
+    }
+
+    const botonPagar = (event.target as Element).closest<HTMLButtonElement>("[data-mark-paid]");
+    if (botonPagar) {
+      const id = botonPagar.getAttribute("data-mark-paid");
+      if (id) void marcarComoPagada(id);
+    }
   });
 
   modalItems.addEventListener("input", recalcular);

@@ -2,19 +2,11 @@
   <div id="filters" class="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filtrar por estado">
     <button
       type="button"
-      data-filter="todas"
+      data-filter="pendiente_revision"
       aria-pressed="true"
       class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
     >
-      Todas
-    </button>
-    <button
-      type="button"
-      data-filter="pendiente_revision"
-      aria-pressed="false"
-      class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
-    >
-      Pendientes
+      Pendientes <span data-count="pendiente_revision" class="text-slate-500">(0)</span>
     </button>
     <button
       type="button"
@@ -22,7 +14,31 @@
       aria-pressed="false"
       class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
     >
-      Aprobadas
+      Aprobadas <span data-count="aprobada" class="text-slate-500">(0)</span>
+    </button>
+    <button
+      type="button"
+      data-filter="historial"
+      aria-pressed="false"
+      class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
+    >
+      Historial <span data-count="historial" class="text-slate-500">(0)</span>
+    </button>
+    <button
+      type="button"
+      data-filter="eliminada"
+      aria-pressed="false"
+      class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
+    >
+      Eliminadas <span data-count="eliminada" class="text-slate-500">(0)</span>
+    </button>
+    <button
+      type="button"
+      data-filter="todas"
+      aria-pressed="false"
+      class="shrink-0 rounded-lg border border-slate-700 bg-[#0B1120] px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white aria-pressed:border-blue-500 aria-pressed:bg-blue-600 aria-pressed:text-white sm:text-sm"
+    >
+      Todas <span data-count="todas" class="text-slate-500">(0)</span>
     </button>
   </div>
 
@@ -43,7 +59,7 @@
       id="search"
       type="search"
       autocomplete="off"
-      placeholder="Buscar código, cliente, RUC o correo…"
+      placeholder="Buscar código, cliente, empresa, RUC o correo…"
       class="w-full rounded-lg border border-slate-700 bg-[#0B1120] py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
     />
   </label>
