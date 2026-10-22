@@ -32,6 +32,7 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
   const total = version ? money(totales.total) : "—";
   const configEstado = obtenerEstado(cotizacion.estado);
   const esEliminada = cotizacion.estado === "eliminada";
+  const enviada = cotizacion.estado === "aprobada" && Boolean(cotizacion.ultimo_envio_at);
   const accionAttr = esEliminada
     ? `data-restore="${escapeHtml(cotizacion.id)}"`
     : cotizacion.estado === "aprobada"
@@ -39,10 +40,21 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
       : `data-approve="${escapeHtml(cotizacion.id)}"`;
 
   return `
-    <article class="flex h-full flex-col rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-sm shadow-black/20 transition hover:border-slate-700">
+    <article
+      data-card-open="${escapeHtml(cotizacion.id)}"
+      tabindex="0"
+      class="flex h-full cursor-pointer flex-col rounded-xl border border-slate-800 bg-slate-900 p-3 shadow-sm shadow-black/20 transition hover:border-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+    >
       <div class="flex items-center justify-between gap-2">
         <h2 class="min-w-0 truncate font-mono text-xs font-semibold text-slate-200">${escapeHtml(cotizacion.codigo)}</h2>
-        ${badgeEstado(cotizacion.estado)}
+        <div class="flex shrink-0 items-center gap-1">
+          ${badgeEstado(cotizacion.estado)}
+          ${
+            enviada
+              ? `<span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-300">✉ Enviada</span>`
+              : ""
+          }
+        </div>
       </div>
 
       <p class="mt-2 truncate text-sm font-semibold text-white" title="${escapeHtml(nombreCompleto)}">
@@ -80,6 +92,17 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
             >
               Ver detalle
             </button>
+            ${
+              cotizacion.estado === "aprobada" || cotizacion.estado === "pagada"
+                ? `<button
+              type="button"
+              data-enviar-cliente="${escapeHtml(cotizacion.id)}"
+              class="block w-full px-3 py-2 text-left text-xs font-medium text-blue-300 transition hover:bg-blue-500/10"
+            >
+              Enviar al cliente
+            </button>`
+                : ""
+            }
             <a
               href="${escapeHtml(enlaceWhatsApp(cotizacion))}"
               target="_blank"

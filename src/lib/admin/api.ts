@@ -160,6 +160,73 @@ export async function cambiarEstadoCotizacion(
   }
 }
 
+export interface EnviarCotizacionResponse {
+  ok: boolean;
+  mensaje?: string;
+  correo?: string;
+  enviado_at?: string;
+  registro_actualizado?: boolean;
+  advertencia?: string;
+}
+
+export async function actualizarCorreoCliente(
+  id: string,
+  clienteCorreo: string,
+): Promise<Cotizacion | null> {
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetch(API_LISTA, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ id, cliente_correo: clienteCorreo }),
+    });
+  } catch (error) {
+    throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
+  }
+
+  const data = await leerJson(respuesta);
+  const dataCorreo = data as { ok?: boolean; error?: string; cotizacion?: Cotizacion };
+
+  if (!respuesta.ok || dataCorreo?.ok !== true) {
+    throw new Error(
+      mensajeDesdeRespuesta(data) ||
+        `No se pudo actualizar el correo (HTTP ${respuesta.status})`,
+    );
+  }
+
+  return dataCorreo.cotizacion ?? null;
+}
+
+export async function enviarCotizacionCliente(
+  id: string,
+  correo: string,
+): Promise<EnviarCotizacionResponse> {
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetch(`${API_LISTA}/enviar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ cotizacion_id: id, correo }),
+    });
+  } catch (error) {
+    throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
+  }
+
+  const data = await leerJson(respuesta);
+  const dataEnvio = data as Partial<EnviarCotizacionResponse> & { error?: string };
+
+  if (!respuesta.ok || dataEnvio?.ok !== true) {
+    throw new Error(
+      mensajeDesdeRespuesta(data) ||
+        `No se pudo enviar la cotización al cliente (HTTP ${respuesta.status})`,
+    );
+  }
+
+  return dataEnvio as EnviarCotizacionResponse;
+}
+
 export async function aprobarCotizacion(payload: AprobarPayload): Promise<AprobarResponse> {
   let respuesta: Response;
 

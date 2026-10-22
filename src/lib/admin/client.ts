@@ -1,9 +1,11 @@
 import { CATALOG, categorias } from "../../data/catalog";
-import { fechaCorta, money } from "./format";
+import { fechaCorta, fechaLegible, money } from "./format";
 import { lineasDeVersion, normalizarRuc, totalesDeVersion } from "./quote";
 import {
+  actualizarCorreoCliente,
   aprobarCotizacion,
   cambiarEstadoCotizacion,
+  enviarCotizacionCliente,
   fetchCotizaciones,
   mensajeError,
 } from "./api";
@@ -57,6 +59,13 @@ export function initAdmin(): void {
   const modalItemsHint = document.getElementById("modal-items-hint") as HTMLElement;
   const modalFleteWrapper = document.getElementById("modal-flete-wrapper") as HTMLElement;
   const modalAdminBlock = document.getElementById("modal-admin-block") as HTMLElement;
+  const modalClienteCorreo = document.getElementById("modal-cliente-correo") as HTMLInputElement;
+  const modalGuardarCorreo = document.getElementById("modal-guardar-correo") as HTMLButtonElement;
+  const modalCorreoError = document.getElementById("modal-correo-error") as HTMLElement;
+  const modalEnvioStatus = document.getElementById("modal-envio-status") as HTMLElement;
+  const modalEnviarCliente = document.getElementById("modal-enviar-cliente") as HTMLButtonElement;
+  const modalEnviarSpinner = document.getElementById("modal-enviar-spinner") as HTMLElement;
+  const modalEnviarLabel = document.getElementById("modal-enviar-label") as HTMLElement;
   const modalItems = document.getElementById("modal-items") as HTMLElement;
   const modalItemsEmpty = document.getElementById("modal-items-empty") as HTMLElement;
   const toggleCatalogBtn = document.getElementById("toggle-catalog") as HTMLButtonElement;
@@ -73,8 +82,10 @@ export function initAdmin(): void {
   const modalTotal = document.getElementById("modal-total") as HTMLElement;
   const modalError = document.getElementById("modal-error") as HTMLElement;
   const modalSubmit = document.getElementById("modal-submit") as HTMLButtonElement;
+  const modalSubmitOnly = document.getElementById("modal-submit-only") as HTMLButtonElement;
   const modalForm = document.getElementById("approve-form") as HTMLFormElement;
   const modalFormView = document.getElementById("modal-form-view") as HTMLElement;
+  const modalFormActions = document.getElementById("modal-form-actions") as HTMLElement;
   const modalSuccess = document.getElementById("modal-success") as HTMLElement;
   const modalSuccessDetail = document.getElementById("modal-success-detail") as HTMLElement;
   const downloadPdf = document.getElementById("download-pdf") as HTMLAnchorElement;
@@ -86,7 +97,7 @@ export function initAdmin(): void {
   const toast = document.getElementById("toast") as HTMLElement;
 
   let cotizaciones: Cotizacion[] = [];
-  let filtro: "todas" | "pendiente_revision" | "aprobada" | "historial" | "eliminada" = "pendiente_revision";
+  let filtro: "pendiente_revision" | "aprobada" | "historial" | "eliminada" = "pendiente_revision";
   let busqueda = "";
   let cotizacionModal: Cotizacion | null = null;
   let pdfObjectUrl: string | null = null;
@@ -113,7 +124,6 @@ export function initAdmin(): void {
   // ---------------------------------------------------------------------
   const render = (): void => {
     const activas = cotizaciones.filter((cotizacion) => cotizacion.estado !== "eliminada");
-    const total = activas.length;
     const pendientes = activas.filter((cotizacion) => cotizacion.estado === "pendiente_revision").length;
     const aprobadas = activas.filter((cotizacion) => cotizacion.estado === "aprobada").length;
     const pagadas = activas.filter((cotizacion) => cotizacion.estado === "pagada").length;
@@ -124,7 +134,6 @@ export function initAdmin(): void {
       aprobada: aprobadas,
       historial: pagadas,
       eliminada: eliminadas,
-      todas: total,
     };
 
     filters.querySelectorAll<HTMLElement>("[data-count]").forEach((elemento) => {
@@ -144,7 +153,7 @@ export function initAdmin(): void {
         if (cotizacion.estado === "eliminada") return false;
         if (filtro === "historial") {
           if (cotizacion.estado !== "pagada") return false;
-        } else if (filtro !== "todas" && cotizacion.estado !== filtro) {
+        } else if (cotizacion.estado !== filtro) {
           return false;
         }
       }
@@ -176,16 +185,13 @@ export function initAdmin(): void {
     list.classList.toggle("hidden", visibles.length === 0);
     emptyState.classList.toggle("hidden", visibles.length > 0);
     if (visibles.length === 0) {
-      emptyDetail.textContent =
-        filtro === "eliminada"
-          ? "No hay cotizaciones eliminadas."
-          : filtro === "historial"
-            ? "No hay cotizaciones en el historial."
-            : filtro === "pendiente_revision"
-              ? "No hay cotizaciones pendientes."
-              : total === 0
-                ? "Cuando se genere una cotización desde la web aparecerá aquí."
-                : "No hay cotizaciones que coincidan con el filtro o la búsqueda.";
+      const mensajes: Record<typeof filtro, string> = {
+        pendiente_revision: "No hay cotizaciones pendientes.",
+        aprobada: "No hay cotizaciones aprobadas.",
+        historial: "No hay cotizaciones en el historial.",
+        eliminada: "No hay cotizaciones en la papelera.",
+      };
+      emptyDetail.textContent = mensajes[filtro];
     }
   };
 
@@ -343,14 +349,30 @@ export function initAdmin(): void {
     modalError.classList.add("hidden");
     modalError.textContent = "";
     modalFormView.classList.remove("hidden");
+    modalFormActions.classList.remove("hidden");
     modalSuccess.classList.add("hidden");
     modalSubmit.classList.remove("hidden");
-    modalSubmit.textContent = "Aprobar cotización";
+    modalSubmit.disabled = false;
+    modalSubmit.textContent = "Aprobar y Enviar al Cliente";
+    modalSubmitOnly.classList.add("hidden");
+    modalSubmitOnly.disabled = false;
+    modalSubmitOnly.textContent = "Solo Aprobar";
     modalStatus.innerHTML = "";
     modalDate.textContent = "";
     modalTotalSummary.textContent = "";
     modalItems.innerHTML = "";
     modalFlete.value = "0";
+    modalClienteCorreo.value = "";
+    modalCorreoError.classList.add("hidden");
+    modalCorreoError.textContent = "";
+    modalEnvioStatus.textContent = "";
+    modalEnviarCliente.classList.add("hidden");
+    modalEnviarCliente.classList.remove("inline-flex");
+    modalEnviarCliente.disabled = false;
+    modalEnviarSpinner.classList.add("hidden");
+    modalEnviarLabel.textContent = "Enviar cotización final al cliente";
+    modalGuardarCorreo.disabled = false;
+    modalGuardarCorreo.textContent = "Guardar";
     catalogPanel.classList.add("hidden");
     toggleCatalogBtn.setAttribute("aria-expanded", "false");
     catalogQty.value = "1";
@@ -402,6 +424,23 @@ export function initAdmin(): void {
     modalItemsHint.textContent = editable ? "Edita precios o elimina" : "Solo lectura";
     modalFlete.value = String(Number(version.flete ?? 0));
 
+    modalClienteCorreo.value = cotizacion.cliente_correo ?? "";
+    modalCorreoError.classList.add("hidden");
+    modalCorreoError.textContent = "";
+    modalEnvioStatus.textContent =
+      cotizacion.ultimo_envio_at && cotizacion.ultimo_envio_correo
+        ? `Enviado el ${fechaLegible(cotizacion.ultimo_envio_at)} a ${cotizacion.ultimo_envio_correo}`
+        : "";
+    modalEnviarCliente.classList.toggle(
+      "hidden",
+      cotizacion.estado !== "aprobada" && cotizacion.estado !== "pagada",
+    );
+    modalEnviarCliente.classList.toggle(
+      "inline-flex",
+      cotizacion.estado === "aprobada" || cotizacion.estado === "pagada",
+    );
+
+    modalGuardarCorreo.classList.toggle("hidden", editable);
     toggleCatalogBtn.classList.toggle("hidden", !editable);
     modalFleteWrapper.classList.toggle("hidden", !editable);
     modalAdminBlock.classList.toggle("hidden", !editable);
@@ -419,9 +458,13 @@ export function initAdmin(): void {
       modalTotal.textContent = money(totales.total);
     }
 
-    modalSubmit.textContent = configEstado.accionPrincipal;
+    modalSubmit.textContent = editable ? "Aprobar y Enviar al Cliente" : configEstado.accionPrincipal;
     modalSubmit.className = `rounded-lg px-5 py-2.5 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-wait disabled:opacity-60 ${configEstado.btnBg}`;
     modalSubmit.classList.toggle("hidden", cotizacion.estado === "pagada");
+
+    modalSubmitOnly.classList.toggle("hidden", !editable);
+    modalSubmitOnly.disabled = false;
+    modalSubmitOnly.textContent = "Solo Aprobar";
 
     if (!modal.open) modal.showModal();
   };
@@ -466,13 +509,110 @@ export function initAdmin(): void {
     ];
     cotizacion.version_actual = version;
 
-    // Si el filtro activo era "Pendientes", volvemos a "Todas" para que la
-    // tarjeta siga visible mostrando de inmediato su nuevo estado.
-    filtro = "todas";
+    // Mostramos la cotización recién aprobada en su nueva pestaña.
+    filtro = "aprobada";
     filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
-      item.setAttribute("aria-pressed", String(item.dataset.filter === "todas"));
+      item.setAttribute("aria-pressed", String(item.dataset.filter === "aprobada"));
     });
     render();
+  };
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const guardarCorreoCliente = async (): Promise<void> => {
+    const cotizacion = cotizacionModal;
+    if (!cotizacion) return;
+
+    const correo = modalClienteCorreo.value.trim();
+    modalCorreoError.classList.add("hidden");
+    modalCorreoError.textContent = "";
+
+    if (!correo || !EMAIL_REGEX.test(correo)) {
+      modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
+      modalCorreoError.classList.remove("hidden");
+      modalClienteCorreo.focus();
+      return;
+    }
+
+    const etiquetaOriginal = modalGuardarCorreo.textContent;
+    modalGuardarCorreo.disabled = true;
+    modalGuardarCorreo.textContent = "Guardando…";
+
+    try {
+      const actualizada = await actualizarCorreoCliente(cotizacion.id, correo);
+      cotizacion.cliente_correo = actualizada?.cliente_correo ?? correo;
+      modalClienteCorreo.value = cotizacion.cliente_correo;
+      mostrarToast("Correo actualizado correctamente.", "ok");
+    } catch (error) {
+      console.error("[Admin] Error al actualizar el correo:", error);
+      modalCorreoError.textContent = mensajeError(error, "No se pudo actualizar el correo");
+      modalCorreoError.classList.remove("hidden");
+    } finally {
+      modalGuardarCorreo.disabled = false;
+      modalGuardarCorreo.textContent = etiquetaOriginal || "Guardar";
+    }
+  };
+
+  const enviarCotizacionFinal = async (): Promise<void> => {
+    const cotizacion = cotizacionModal;
+    if (!cotizacion) return;
+
+    if (cotizacion.estado !== "aprobada" && cotizacion.estado !== "pagada") {
+      modalCorreoError.textContent = "La cotización debe estar aprobada o pagada para enviarse.";
+      modalCorreoError.classList.remove("hidden");
+      return;
+    }
+
+    const correo = modalClienteCorreo.value.trim();
+    modalCorreoError.classList.add("hidden");
+    modalCorreoError.textContent = "";
+
+    if (!correo || !EMAIL_REGEX.test(correo)) {
+      modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
+      modalCorreoError.classList.remove("hidden");
+      modalClienteCorreo.focus();
+      return;
+    }
+
+    modalEnviarCliente.disabled = true;
+    modalGuardarCorreo.disabled = true;
+    modalEnviarSpinner.classList.remove("hidden");
+    modalEnviarLabel.textContent = "Enviando…";
+
+    try {
+      if (correo !== cotizacion.cliente_correo) {
+        const actualizada = await actualizarCorreoCliente(cotizacion.id, correo);
+        cotizacion.cliente_correo = actualizada?.cliente_correo ?? correo;
+      }
+
+      const resultado = await enviarCotizacionCliente(cotizacion.id, correo);
+      const enviadoAt = resultado.enviado_at ?? new Date().toISOString();
+      const correoEnviado = resultado.correo ?? correo;
+
+      cotizacion.ultimo_envio_at = enviadoAt;
+      cotizacion.ultimo_envio_correo = correoEnviado;
+      modalEnvioStatus.textContent = `Enviado el ${fechaLegible(enviadoAt)} a ${correoEnviado}`;
+      render();
+
+      mostrarToast(
+        resultado.advertencia
+          ? "Cotización enviada. No se pudo registrar el envío."
+          : "Cotización enviada al cliente.",
+        resultado.advertencia ? "error" : "ok",
+      );
+    } catch (error) {
+      console.error("[Admin] Error al enviar la cotización:", error);
+      modalCorreoError.textContent = mensajeError(
+        error,
+        "No se pudo enviar la cotización al cliente",
+      );
+      modalCorreoError.classList.remove("hidden");
+    } finally {
+      modalEnviarCliente.disabled = false;
+      modalGuardarCorreo.disabled = false;
+      modalEnviarSpinner.classList.add("hidden");
+      modalEnviarLabel.textContent = "Enviar cotización final al cliente";
+    }
   };
 
   const cambiarEstadoDesdeModal = async (
@@ -489,7 +629,7 @@ export function initAdmin(): void {
     try {
       await cambiarEstadoCotizacion(cotizacion.id, estadoDestino);
       cotizacion.estado = estadoDestino;
-      filtro = estadoDestino === "pagada" ? "historial" : "todas";
+      filtro = estadoDestino === "pagada" ? "historial" : "pendiente_revision";
       filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
         item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
       });
@@ -510,22 +650,22 @@ export function initAdmin(): void {
     }
   };
 
-  modalForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+﻿  const ejecutarAprobacion = async (enviarAlCliente: boolean): Promise<void> => {
     const cotizacionActual = cotizacionModal;
-    if (!cotizacionActual) return;
-
-    if (cotizacionActual.estado !== "pendiente_revision") {
-      if (cotizacionActual.estado === "aprobada") {
-        await cambiarEstadoDesdeModal(cotizacionActual, "pagada");
-      } else if (cotizacionActual.estado === "eliminada") {
-        await cambiarEstadoDesdeModal(cotizacionActual, "pendiente_revision");
-      }
-      return;
-    }
+    if (!cotizacionActual || cotizacionActual.estado !== "pendiente_revision") return;
 
     modalError.classList.add("hidden");
     modalError.textContent = "";
+    modalCorreoError.classList.add("hidden");
+    modalCorreoError.textContent = "";
+
+    const correo = modalClienteCorreo.value.trim();
+    if (enviarAlCliente && (!correo || !EMAIL_REGEX.test(correo))) {
+      modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
+      modalCorreoError.classList.remove("hidden");
+      modalClienteCorreo.focus();
+      return;
+    }
 
     const filas = Array.from(modalItems.querySelectorAll<HTMLElement>("[data-modal-item]"));
     const items = filas.map((fila) => {
@@ -572,9 +712,16 @@ export function initAdmin(): void {
     if (adminEmail.value.trim()) administrador.correo = adminEmail.value.trim();
 
     modalSubmit.disabled = true;
-    modalSubmit.textContent = "Aprobando…";
+    modalSubmitOnly.disabled = true;
+    modalSubmit.textContent = enviarAlCliente ? "Aprobando y enviando…" : "Aprobando…";
+    modalSubmitOnly.textContent = "Aprobando…";
 
     try {
+      if (enviarAlCliente && correo !== cotizacionActual.cliente_correo) {
+        const actualizada = await actualizarCorreoCliente(cotizacionActual.id, correo);
+        cotizacionActual.cliente_correo = actualizada?.cliente_correo ?? correo;
+      }
+
       const data = await aprobarCotizacion({
         cotizacion_id: cotizacionActual.id,
         items,
@@ -603,24 +750,72 @@ export function initAdmin(): void {
         downloadPdf.classList.add("hidden");
       }
 
-      modalSuccessDetail.textContent = `${cotizacionActual.codigo} · Versión ${version.version_numero} · ${money(version.total)}`;
+      const detalleVersion = `${cotizacionActual.codigo} · Versión ${version.version_numero} · ${money(version.total)}`;
+      modalSuccessDetail.textContent = detalleVersion;
       modalFormView.classList.add("hidden");
+      modalFormActions.classList.add("hidden");
       modalSuccess.classList.remove("hidden");
       modalSuccess.scrollIntoView({ behavior: "smooth", block: "start" });
-      mostrarToast("Cotización aprobada correctamente.", "ok");
+
+      if (enviarAlCliente) {
+        try {
+          modalSubmit.textContent = "Enviando correo…";
+          const envio = await enviarCotizacionCliente(cotizacionActual.id, correo);
+          const enviadoAt = envio.enviado_at ?? new Date().toISOString();
+          const correoEnviado = envio.correo ?? correo;
+
+          cotizacionActual.ultimo_envio_at = enviadoAt;
+          cotizacionActual.ultimo_envio_correo = correoEnviado;
+          modalSuccessDetail.textContent = `${detalleVersion} · Enviada a ${correoEnviado}`;
+          render();
+          mostrarToast("Cotización aprobada y enviada al cliente.", "ok");
+        } catch (error) {
+          console.error("[Admin] Error al enviar la cotización aprobada:", error);
+          modalSuccessDetail.textContent = `${detalleVersion} · Aprobada, pero no se pudo enviar el correo.`;
+          mostrarToast(
+            mensajeError(error, "Cotización aprobada, pero no se pudo enviar el correo"),
+            "error",
+          );
+        }
+      } else {
+        mostrarToast("Cotización aprobada correctamente.", "ok");
+      }
     } catch (error) {
       console.error("[Admin] Error al aprobar cotización:", error);
-      const mensaje = mensajeError(error, "No se pudo aprobar la cotización");
-      modalError.textContent = mensaje;
+      modalError.textContent = mensajeError(error, "No se pudo aprobar la cotización");
       modalError.classList.remove("hidden");
-      modalSubmit.textContent = "Aprobar cotización";
+      modalFormActions.classList.remove("hidden");
+      modalSubmit.disabled = false;
+      modalSubmitOnly.disabled = false;
+      modalSubmit.textContent = "Aprobar y Enviar al Cliente";
+      modalSubmitOnly.textContent = "Solo Aprobar";
       actualizarEstadoModal();
+    }
+  };
+
+  modalSubmit.addEventListener("click", () => {
+    const cotizacion = cotizacionModal;
+    if (!cotizacion) return;
+
+    if (cotizacion.estado === "pendiente_revision") {
+      void ejecutarAprobacion(true);
+    } else if (cotizacion.estado === "aprobada") {
+      void cambiarEstadoDesdeModal(cotizacion, "pagada");
+    } else if (cotizacion.estado === "eliminada") {
+      void cambiarEstadoDesdeModal(cotizacion, "pendiente_revision");
     }
   });
 
-  // ---------------------------------------------------------------------
-  // Eliminación de cotizaciones
-  // ---------------------------------------------------------------------
+  modalSubmitOnly.addEventListener("click", () => {
+    if (cotizacionModal?.estado === "pendiente_revision") {
+      void ejecutarAprobacion(false);
+    }
+  });
+
+  modalForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+  });
+
   const eliminarCotizacionDesdeLista = async (id: string): Promise<void> => {
     const cotizacion = cotizaciones.find((item) => item.id === id);
     if (!cotizacion) return;
@@ -647,9 +842,9 @@ export function initAdmin(): void {
     try {
       await cambiarEstadoCotizacion(id, "pendiente_revision");
       cotizacion.estado = "pendiente_revision";
-      filtro = "todas";
+      filtro = "pendiente_revision";
       filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
-        item.setAttribute("aria-pressed", String(item.dataset.filter === "todas"));
+        item.setAttribute("aria-pressed", String(item.dataset.filter === "pendiente_revision"));
       });
       render();
       mostrarToast("Cotización restaurada correctamente.", "ok");
@@ -701,7 +896,6 @@ export function initAdmin(): void {
     if (!boton) return;
     const valor = boton.dataset.filter;
     if (
-      valor !== "todas" &&
       valor !== "pendiente_revision" &&
       valor !== "aprobada" &&
       valor !== "historial" &&
@@ -724,10 +918,30 @@ export function initAdmin(): void {
       });
     }
 
+    const tarjeta = objetivo.closest<HTMLElement>("[data-card-open]");
+    const elementoInteractivo = objetivo.closest(
+      "button, a, summary, input, select, textarea, details",
+    );
+    if (tarjeta && !elementoInteractivo) {
+      const id = tarjeta.getAttribute("data-card-open");
+      if (id) abrirModal(id);
+      return;
+    }
+
     const botonAprobar = objetivo.closest<HTMLButtonElement>("[data-approve]");
     if (botonAprobar) {
       const id = botonAprobar.dataset.approve;
       if (id) abrirModal(id);
+      return;
+    }
+
+    const botonEnviarCliente = objetivo.closest<HTMLButtonElement>("[data-enviar-cliente]");
+    if (botonEnviarCliente) {
+      const id = botonEnviarCliente.getAttribute("data-enviar-cliente");
+      if (id) {
+        abrirModal(id);
+        modalEnviarCliente.focus();
+      }
       return;
     }
 
@@ -752,6 +966,20 @@ export function initAdmin(): void {
     }
   });
 
+  list.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    const objetivo = event.target as Element;
+    if (objetivo.closest("button, a, summary, input, select, textarea, details")) return;
+
+    const tarjeta = objetivo.closest<HTMLElement>("[data-card-open]");
+    if (!tarjeta) return;
+
+    event.preventDefault();
+    const id = tarjeta.getAttribute("data-card-open");
+    if (id) abrirModal(id);
+  });
+
   modalItems.addEventListener("input", recalcular);
   modalFlete.addEventListener("input", recalcular);
   toggleCatalogBtn.addEventListener("click", toggleCatalogo);
@@ -771,6 +999,9 @@ export function initAdmin(): void {
     actualizarEstadoModal();
     recalcular();
   });
+
+  modalGuardarCorreo.addEventListener("click", () => void guardarCorreoCliente());
+  modalEnviarCliente.addEventListener("click", () => void enviarCotizacionFinal());
 
   modalClose.addEventListener("click", () => modal.close());
   modalCancel.addEventListener("click", () => modal.close());
