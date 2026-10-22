@@ -1,3 +1,4 @@
+import type { EstadoCotizacion } from "./states";
 import type { Cotizacion, VersionCotizacion } from "./types";
 
 const API_LISTA = "/api/admin/cotizaciones";
@@ -108,11 +109,13 @@ async function leerJson(respuesta: Response): Promise<unknown> {
   }
 }
 
-export async function fetchCotizaciones(): Promise<Cotizacion[]> {
+export async function fetchCotizaciones(estado?: "eliminada"): Promise<Cotizacion[]> {
   let respuesta: Response;
 
+  const url = estado ? `${API_LISTA}?estado=${encodeURIComponent(estado)}` : API_LISTA;
+
   try {
-    respuesta = await fetch(API_LISTA, { headers: { Accept: "application/json" } });
+    respuesta = await fetch(url, { headers: { Accept: "application/json" } });
   } catch (error) {
     throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
   }
@@ -128,6 +131,33 @@ export async function fetchCotizaciones(): Promise<Cotizacion[]> {
   }
 
   return Array.isArray(dataLista.cotizaciones) ? dataLista.cotizaciones : [];
+}
+
+export async function cambiarEstadoCotizacion(
+  id: string,
+  estado: EstadoCotizacion,
+): Promise<void> {
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetch(API_LISTA, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ id, estado }),
+    });
+  } catch (error) {
+    throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
+  }
+
+  const data = await leerJson(respuesta);
+  const dataEstado = data as { ok?: boolean; error?: string };
+
+  if (!respuesta.ok || dataEstado?.ok !== true) {
+    throw new Error(
+      mensajeDesdeRespuesta(data) ||
+        `No se pudo actualizar el estado de la cotización (HTTP ${respuesta.status})`,
+    );
+  }
 }
 
 export async function aprobarCotizacion(payload: AprobarPayload): Promise<AprobarResponse> {
