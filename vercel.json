@@ -5,6 +5,9 @@
         },
         "api/admin/aprobar.ts": {
             "includeFiles": "src/pdf/**/*.{typ,png,ttf,otf}"
+        },
+        "api/admin/cotizaciones/enviar.ts": {
+            "includeFiles": "src/pdf/**/*.{typ,png,ttf,otf}"
         }
     }
 }

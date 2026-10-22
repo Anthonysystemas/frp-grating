@@ -1,0 +1,130 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Acceso administrativo | Maskel Perú">
+  <main class="flex min-h-screen items-center justify-center px-4 py-10">
+    <div class="w-full max-w-sm">
+      <div class="mb-6 flex flex-col items-center text-center">
+        <img src="/logo.png" alt="Maskel Perú" class="h-12 w-auto object-contain" />
+        <h1 class="mt-4 text-xl font-bold text-white">Acceso administrativo</h1>
+        <p class="mt-1 text-sm text-slate-400">Ingresa con tu cuenta de administrador.</p>
+      </div>
+
+      <form
+        id="login-form"
+        class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-black/30 sm:p-7"
+        novalidate
+      >
+        <label class="block">
+          <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Correo</span>
+          <input
+            id="login-email"
+            type="email"
+            required
+            autocomplete="username"
+            placeholder="admin@maskelperu.com"
+            class="mt-2 w-full rounded-lg border border-slate-700 bg-[#070B14] px-3 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+        </label>
+
+        <label class="mt-4 block">
+          <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Contraseña</span>
+          <input
+            id="login-password"
+            type="password"
+            required
+            autocomplete="current-password"
+            placeholder="••••••••"
+            class="mt-2 w-full rounded-lg border border-slate-700 bg-[#070B14] px-3 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          />
+        </label>
+
+        <p
+          id="login-error"
+          class="mt-4 hidden break-words rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300"
+          role="alert"
+        ></p>
+
+        <button
+          id="login-submit"
+          type="submit"
+          class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-wait disabled:opacity-60"
+        >
+          <svg
+            id="login-spinner"
+            class="hidden h-4 w-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"></path>
+          </svg>
+          <span id="login-submit-label">Ingresar</span>
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-xs text-slate-600">
+        Acceso restringido. Solo personal autorizado.
+      </p>
+    </div>
+  </main>
+</AdminLayout>
+
+<script>
+  const form = document.getElementById("login-form") as HTMLFormElement;
+  const emailInput = document.getElementById("login-email") as HTMLInputElement;
+  const passwordInput = document.getElementById("login-password") as HTMLInputElement;
+  const submitBtn = document.getElementById("login-submit") as HTMLButtonElement;
+  const submitLabel = document.getElementById("login-submit-label") as HTMLElement;
+  const spinner = document.getElementById("login-spinner") as HTMLElement;
+  const errorBox = document.getElementById("login-error") as HTMLElement;
+
+  const mostrarError = (mensaje: string) => {
+    errorBox.textContent = mensaje;
+    errorBox.classList.remove("hidden");
+  };
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorBox.classList.add("hidden");
+    errorBox.textContent = "";
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      mostrarError("Ingresa tu correo y contraseña.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = "Ingresando…";
+    spinner.classList.remove("hidden");
+
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+
+      if (!response.ok || data.ok !== true) {
+        throw new Error(data.error || "No se pudo iniciar sesión");
+      }
+
+      window.location.replace("/admin");
+    } catch (error) {
+      mostrarError(error instanceof Error ? error.message : "No se pudo iniciar sesión");
+      submitBtn.disabled = false;
+      submitLabel.textContent = "Ingresar";
+      spinner.classList.add("hidden");
+    }
+  });
+</script>

@@ -39,6 +39,8 @@ export interface Cotizacion {
   cliente_celular?: string;
   estado?: string;
   created_at?: string;
+  ultimo_envio_at?: string | null;
+  ultimo_envio_correo?: string | null;
   versiones?: VersionCotizacion[];
   version_actual?: VersionCotizacion | null;
 }

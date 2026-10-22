@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ESTADOS, esEstadoValido } from '../../src/lib/admin/states.js';
-import { supabaseAdmin as supabase } from '../../src/lib/supabase.js';
+import { ESTADOS, esEstadoValido } from '../../../src/lib/admin/states.js';
+import { supabaseAdmin as supabase } from '../../../src/lib/supabase.js';
 
 interface VersionCotizacion {
   id: string;
@@ -16,11 +16,16 @@ interface VersionCotizacion {
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // --- CAMBIO CENTRALIZADO DE ESTADO ---
+  // --- ACTUALIZACIÓN DE ESTADO Y/O CORREO ---
   if (req.method === 'PATCH') {
-    const body = (req.body || {}) as { id?: unknown; estado?: unknown };
+    const body = (req.body || {}) as {
+      id?: unknown;
+      estado?: unknown;
+      cliente_correo?: unknown;
+    };
     const idRaw = typeof body.id === 'string' ? body.id : req.query.id;
     const id = (Array.isArray(idRaw) ? idRaw[0] : idRaw)?.trim() ?? '';
 
@@ -28,20 +33,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ ok: false, error: 'El id de la cotización no es válido' });
     }
 
-    const { estado } = body;
-    if (!esEstadoValido(estado)) {
-      return res.status(400).json({ ok: false, error: 'El estado solicitado no es válido' });
+    const cambios: { estado?: string; cliente_correo?: string } = {};
+
+    if (body.estado !== undefined) {
+      if (!esEstadoValido(body.estado)) {
+        return res.status(400).json({ ok: false, error: 'El estado solicitado no es válido' });
+      }
+      cambios.estado = body.estado;
+    }
+
+    if (body.cliente_correo !== undefined) {
+      const correo = typeof body.cliente_correo === 'string' ? body.cliente_correo.trim() : '';
+      if (!correo || !EMAIL_REGEX.test(correo)) {
+        return res.status(400).json({ ok: false, error: 'El correo electrónico no es válido' });
+      }
+      cambios.cliente_correo = correo;
+    }
+
+    if (Object.keys(cambios).length === 0) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Debe enviar estado o cliente_correo para actualizar',
+      });
     }
 
     const { data: cotizacionActualizada, error: errorActualizar } = await supabase
       .from('cotizaciones')
-      .update({ estado })
+      .update(cambios)
       .eq('id', id)
-      .select('id, codigo, estado')
+      .select('id, codigo, estado, cliente_correo')
       .maybeSingle();
 
     if (errorActualizar) {
-      console.error('[Admin cotizaciones] Error al actualizar el estado', errorActualizar);
+      console.error('[Admin cotizaciones] Error al actualizar la cotización', errorActualizar);
       return res.status(500).json({ ok: false, error: 'No se pudo actualizar la cotización' });
     }
 
@@ -49,9 +73,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ ok: false, error: 'La cotización no existe' });
     }
 
+    const mensaje =
+      cambios.estado && cambios.cliente_correo
+        ? 'Cotización actualizada correctamente'
+        : cambios.estado
+          ? `Estado actualizado a ${ESTADOS[cambios.estado as keyof typeof ESTADOS].label}`
+          : 'Correo actualizado correctamente';
+
     return res.status(200).json({
       ok: true,
-      mensaje: `Estado actualizado a ${ESTADOS[estado].label}`,
+      mensaje,
       cotizacion: cotizacionActualizada,
     });
   }
