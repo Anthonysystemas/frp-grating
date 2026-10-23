@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { findProduct } from '../src/data/catalog.js';
-import { validarCliente } from '../src/lib/cotizacion.js';
+import { enviarAlertaLead, validarCliente } from '../src/lib/cotizacion.js';
 import { generarPdfCotizacion } from '../src/lib/pdf.js';
 import { supabase } from '../src/lib/supabase.js';
 
@@ -167,6 +167,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     return res.status(500).json({ ok: false, error: 'No se pudo guardar la cotización' });
   }
+
+  // Alerta interna de nuevo lead. Es best-effort: nunca bloquea la cotización.
+  await enviarAlertaLead({
+    codigo,
+    nombre,
+    empresa,
+    ruc: ruc || '—',
+    correo,
+    celular,
+    total: (totalCentavos / 100).toFixed(2),
+    items: validatedItems.length,
+  });
 
   const total = (totalCentavos / 100).toFixed(2);
   const pdfItems = validatedItems.map((item) => {

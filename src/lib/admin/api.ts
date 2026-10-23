@@ -96,6 +96,23 @@ function mensajeDesdeRespuesta(data: unknown): string | undefined {
   return undefined;
 }
 
+function redirigirSesionExpirada(): void {
+  if (typeof window !== "undefined") {
+    window.location.replace("/admin/login?expired=true");
+  }
+}
+
+async function fetchAdmin(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const respuesta = await fetch(input, init);
+
+  if (respuesta.status === 401) {
+    redirigirSesionExpirada();
+    throw new Error("Tu sesión expiró. Inicia sesión nuevamente.");
+  }
+
+  return respuesta;
+}
+
 async function leerJson(respuesta: Response): Promise<unknown> {
   const texto = await respuesta.text().catch(() => "");
   if (!texto) return {};
@@ -115,7 +132,7 @@ export async function fetchCotizaciones(estado?: "eliminada"): Promise<Cotizacio
   const url = estado ? `${API_LISTA}?estado=${encodeURIComponent(estado)}` : API_LISTA;
 
   try {
-    respuesta = await fetch(url, { headers: { Accept: "application/json" } });
+    respuesta = await fetchAdmin(url, { headers: { Accept: "application/json" } });
   } catch (error) {
     throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
   }
@@ -136,11 +153,11 @@ export async function fetchCotizaciones(estado?: "eliminada"): Promise<Cotizacio
 export async function cambiarEstadoCotizacion(
   id: string,
   estado: EstadoCotizacion,
-): Promise<void> {
+): Promise<Cotizacion | null> {
   let respuesta: Response;
 
   try {
-    respuesta = await fetch(API_LISTA, {
+    respuesta = await fetchAdmin(API_LISTA, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ id, estado }),
@@ -150,13 +167,26 @@ export async function cambiarEstadoCotizacion(
   }
 
   const data = await leerJson(respuesta);
-  const dataEstado = data as { ok?: boolean; error?: string };
+  const dataEstado = data as { ok?: boolean; error?: string; cotizacion?: Cotizacion };
 
   if (!respuesta.ok || dataEstado?.ok !== true) {
     throw new Error(
       mensajeDesdeRespuesta(data) ||
         `No se pudo actualizar el estado de la cotización (HTTP ${respuesta.status})`,
     );
+  }
+
+  return dataEstado.cotizacion ?? null;
+}
+
+export async function cerrarSesionAdmin(): Promise<void> {
+  try {
+    await fetch("/api/admin/logout", {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    });
+  } catch {
+    /* Si falla, igual redirigimos al login */
   }
 }
 
@@ -176,7 +206,7 @@ export async function actualizarCorreoCliente(
   let respuesta: Response;
 
   try {
-    respuesta = await fetch(API_LISTA, {
+    respuesta = await fetchAdmin(API_LISTA, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ id, cliente_correo: clienteCorreo }),
@@ -205,7 +235,7 @@ export async function enviarCotizacionCliente(
   let respuesta: Response;
 
   try {
-    respuesta = await fetch(`${API_LISTA}/enviar`, {
+    respuesta = await fetchAdmin(`${API_LISTA}/enviar`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ cotizacion_id: id, correo }),
@@ -231,7 +261,7 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
   let respuesta: Response;
 
   try {
-    respuesta = await fetch(API_APROBAR, {
+    respuesta = await fetchAdmin(API_APROBAR, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(payload),

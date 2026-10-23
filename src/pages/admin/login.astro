@@ -86,6 +86,13 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     errorBox.classList.remove("hidden");
   };
 
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("expired") === "true") {
+    mostrarError("Tu sesión expiró. Ingresa nuevamente.");
+  } else if (params.get("unauthorized") === "true") {
+    mostrarError("Tu correo no está autorizado para acceder al panel.");
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     errorBox.classList.add("hidden");

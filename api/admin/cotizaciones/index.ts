@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ESTADOS, esEstadoValido } from '../../../src/lib/admin/states.js';
+import {
+  ESTADOS,
+  esEstadoValido,
+  type EstadoCotizacion,
+} from '../../../src/lib/admin/states.js';
 import { supabaseAdmin as supabase } from '../../../src/lib/supabase.js';
+import { validarCorreo } from '../../../src/lib/utils/validation.js';
 
 interface VersionCotizacion {
   id: string;
@@ -16,7 +21,13 @@ interface VersionCotizacion {
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const TRANSICIONES: Record<EstadoCotizacion, EstadoCotizacion[]> = {
+  pendiente_revision: ['aprobada', 'eliminada'],
+  aprobada: ['pagada', 'eliminada'],
+  pagada: ['eliminada'],
+  eliminada: ['pendiente_revision'],
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // --- ACTUALIZACIÓN DE ESTADO Y/O CORREO ---
@@ -33,18 +44,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ ok: false, error: 'El id de la cotización no es válido' });
     }
 
-    const cambios: { estado?: string; cliente_correo?: string } = {};
+    const cambios: {
+      estado?: EstadoCotizacion;
+      estado_previo?: string | null;
+      cliente_correo?: string;
+    } = {};
+
+    // Se consulta el estado actual para validar la transición y restaurar.
+    const { data: estadoActual, error: errorEstadoActual } = await supabase
+      .from('cotizaciones')
+      .select('id, estado, estado_previo')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (errorEstadoActual) {
+      console.error('[Admin cotizaciones] Error al consultar el estado actual', errorEstadoActual);
+      return res.status(500).json({ ok: false, error: 'No se pudo consultar la cotización' });
+    }
+
+    if (!estadoActual) {
+      return res.status(404).json({ ok: false, error: 'La cotización no existe' });
+    }
 
     if (body.estado !== undefined) {
       if (!esEstadoValido(body.estado)) {
         return res.status(400).json({ ok: false, error: 'El estado solicitado no es válido' });
       }
-      cambios.estado = body.estado;
+
+      const estadoOrigen = estadoActual.estado;
+      if (!esEstadoValido(estadoOrigen)) {
+        return res.status(400).json({ ok: false, error: 'La cotización tiene un estado inválido' });
+      }
+
+      const transicionesPermitidas = TRANSICIONES[estadoOrigen] ?? [];
+      if (!transicionesPermitidas.includes(body.estado)) {
+        return res.status(400).json({
+          ok: false,
+          error: `Transición no permitida: ${estadoOrigen} → ${body.estado}`,
+        });
+      }
+
+      if (estadoOrigen === 'eliminada') {
+        // Restauración exacta al estado anterior.
+        const previo = estadoActual.estado_previo;
+        const destino = esEstadoValido(previo) && previo !== 'eliminada'
+          ? previo
+          : 'pendiente_revision';
+
+        cambios.estado = destino;
+        cambios.estado_previo = null;
+      } else if (body.estado === 'eliminada') {
+        cambios.estado = 'eliminada';
+        cambios.estado_previo = estadoOrigen;
+      } else {
+        cambios.estado = body.estado;
+      }
     }
 
     if (body.cliente_correo !== undefined) {
       const correo = typeof body.cliente_correo === 'string' ? body.cliente_correo.trim() : '';
-      if (!correo || !EMAIL_REGEX.test(correo)) {
+      if (!correo || !validarCorreo(correo)) {
         return res.status(400).json({ ok: false, error: 'El correo electrónico no es válido' });
       }
       cambios.cliente_correo = correo;
@@ -61,7 +120,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .from('cotizaciones')
       .update(cambios)
       .eq('id', id)
-      .select('id, codigo, estado, cliente_correo')
+      .select('id, codigo, estado, estado_previo, cliente_correo')
       .maybeSingle();
 
     if (errorActualizar) {

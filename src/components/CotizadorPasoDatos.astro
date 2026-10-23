@@ -206,6 +206,8 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
 </style>
 
 <script>
+  import { validarCorreo } from "../lib/utils/validation";
+
   type QuoteLine = { productId?: string; qty?: number; subtotal?: number };
 
   const root = document.getElementById("cotizador-panel");
@@ -250,9 +252,9 @@ const formattedTotal = `US$ ${total.toLocaleString("en-US", {
       },
       {
         input: form?.querySelector<HTMLInputElement>('input[name="correo"]') ?? null,
-        validar: (value) => value.includes("@"),
+        validar: (value) => validarCorreo(value),
         mensajeFalta: "Te faltó colocar tu correo electrónico",
-        mensajeInvalido: "El correo debe contener '@'",
+        mensajeInvalido: "El correo electrónico no es válido",
         errorEl: panel.querySelector<HTMLElement>("[data-correo-error]"),
       },
       {

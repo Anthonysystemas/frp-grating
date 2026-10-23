@@ -5,6 +5,7 @@ import {
   actualizarCorreoCliente,
   aprobarCotizacion,
   cambiarEstadoCotizacion,
+  cerrarSesionAdmin,
   enviarCotizacionCliente,
   fetchCotizaciones,
   mensajeError,
@@ -17,6 +18,7 @@ import {
   tarjeta,
 } from "./render";
 import { obtenerEstado } from "./states";
+import { validarCorreo } from "../utils/validation";
 import type {
   CatalogoCategoria,
   CatalogoOpcion,
@@ -46,6 +48,7 @@ export function initAdmin(): void {
   const emptyState = document.getElementById("empty-state") as HTMLElement;
   const emptyDetail = document.getElementById("empty-detail") as HTMLElement;
   const refreshBtn = document.getElementById("refresh") as HTMLButtonElement;
+  const logoutBtn = document.getElementById("logout") as HTMLButtonElement;
   const retryBtn = document.getElementById("retry") as HTMLButtonElement;
   const searchInput = document.getElementById("search") as HTMLInputElement;
   const filters = document.getElementById("filters") as HTMLElement;
@@ -193,6 +196,13 @@ export function initAdmin(): void {
       };
       emptyDetail.textContent = mensajes[filtro];
     }
+  };
+
+  const filtroParaEstado = (estado?: string): typeof filtro => {
+    if (estado === "aprobada") return "aprobada";
+    if (estado === "pagada") return "historial";
+    if (estado === "eliminada") return "eliminada";
+    return "pendiente_revision";
   };
 
   // ---------------------------------------------------------------------
@@ -517,8 +527,6 @@ export function initAdmin(): void {
     render();
   };
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
   const guardarCorreoCliente = async (): Promise<void> => {
     const cotizacion = cotizacionModal;
     if (!cotizacion) return;
@@ -527,7 +535,7 @@ export function initAdmin(): void {
     modalCorreoError.classList.add("hidden");
     modalCorreoError.textContent = "";
 
-    if (!correo || !EMAIL_REGEX.test(correo)) {
+    if (!correo || !validarCorreo(correo)) {
       modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
       modalCorreoError.classList.remove("hidden");
       modalClienteCorreo.focus();
@@ -567,7 +575,7 @@ export function initAdmin(): void {
     modalCorreoError.classList.add("hidden");
     modalCorreoError.textContent = "";
 
-    if (!correo || !EMAIL_REGEX.test(correo)) {
+    if (!correo || !validarCorreo(correo)) {
       modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
       modalCorreoError.classList.remove("hidden");
       modalClienteCorreo.focus();
@@ -627,9 +635,9 @@ export function initAdmin(): void {
     modalSubmit.textContent = estadoDestino === "pagada" ? "Marcando…" : "Restaurando…";
 
     try {
-      await cambiarEstadoCotizacion(cotizacion.id, estadoDestino);
-      cotizacion.estado = estadoDestino;
-      filtro = estadoDestino === "pagada" ? "historial" : "pendiente_revision";
+      const actualizada = await cambiarEstadoCotizacion(cotizacion.id, estadoDestino);
+      cotizacion.estado = actualizada?.estado ?? estadoDestino;
+      filtro = filtroParaEstado(cotizacion.estado);
       filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
         item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
       });
@@ -660,7 +668,7 @@ export function initAdmin(): void {
     modalCorreoError.textContent = "";
 
     const correo = modalClienteCorreo.value.trim();
-    if (enviarAlCliente && (!correo || !EMAIL_REGEX.test(correo))) {
+    if (enviarAlCliente && (!correo || !validarCorreo(correo))) {
       modalCorreoError.textContent = "Ingresa un correo electrónico válido.";
       modalCorreoError.classList.remove("hidden");
       modalClienteCorreo.focus();
@@ -825,8 +833,8 @@ export function initAdmin(): void {
     }
 
     try {
-      await cambiarEstadoCotizacion(cotizacion.id, "eliminada");
-      cotizacion.estado = "eliminada";
+      const actualizada = await cambiarEstadoCotizacion(cotizacion.id, "eliminada");
+      cotizacion.estado = actualizada?.estado ?? "eliminada";
       render();
       mostrarToast("Cotización eliminada correctamente.", "ok");
     } catch (error) {
@@ -840,11 +848,11 @@ export function initAdmin(): void {
     if (!cotizacion) return;
 
     try {
-      await cambiarEstadoCotizacion(id, "pendiente_revision");
-      cotizacion.estado = "pendiente_revision";
-      filtro = "pendiente_revision";
+      const actualizada = await cambiarEstadoCotizacion(id, "pendiente_revision");
+      cotizacion.estado = actualizada?.estado ?? "pendiente_revision";
+      filtro = filtroParaEstado(cotizacion.estado);
       filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
-        item.setAttribute("aria-pressed", String(item.dataset.filter === "pendiente_revision"));
+        item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
       });
       render();
       mostrarToast("Cotización restaurada correctamente.", "ok");
@@ -859,11 +867,11 @@ export function initAdmin(): void {
     if (!cotizacion) return;
 
     try {
-      await cambiarEstadoCotizacion(id, "pagada");
-      cotizacion.estado = "pagada";
-      filtro = "historial";
+      const actualizada = await cambiarEstadoCotizacion(id, "pagada");
+      cotizacion.estado = actualizada?.estado ?? "pagada";
+      filtro = filtroParaEstado(cotizacion.estado);
       filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((item) => {
-        item.setAttribute("aria-pressed", String(item.dataset.filter === "historial"));
+        item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
       });
       render();
       mostrarToast("Cotización marcada como pagada.", "ok");
@@ -885,6 +893,12 @@ export function initAdmin(): void {
 
   refreshBtn.addEventListener("click", () => void cargar());
   retryBtn.addEventListener("click", () => void cargar());
+
+  logoutBtn?.addEventListener("click", async () => {
+    logoutBtn.disabled = true;
+    await cerrarSesionAdmin();
+    window.location.replace("/admin/login");
+  });
 
   searchInput.addEventListener("input", () => {
     busqueda = searchInput.value;

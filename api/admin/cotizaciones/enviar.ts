@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { escaparHtml } from '../../../src/lib/cotizacion.js';
 import { generarPdfCotizacion } from '../../../src/lib/pdf.js';
 import { supabaseAdmin as supabase } from '../../../src/lib/supabase.js';
+import { validarCorreo } from '../../../src/lib/utils/validation.js';
 
 interface ItemVersion {
   id?: string;
@@ -18,7 +19,6 @@ interface ItemVersion {
 }
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function money(value: unknown): string {
   const numero = Number(value);
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ ok: false, error: 'El cotizacion_id no es válido' });
   }
 
-  if (!correoDestino || !EMAIL_REGEX.test(correoDestino)) {
+  if (!correoDestino || !validarCorreo(correoDestino)) {
     return res.status(400).json({ ok: false, error: 'El correo electrónico no es válido' });
   }
 

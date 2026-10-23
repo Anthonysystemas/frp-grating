@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { validarCorreo } from './utils/validation.js';
 
 export class EnvioError extends Error {
   status: number;
@@ -61,7 +62,7 @@ export function validarCliente(cliente: ClienteCotizacion | undefined | null): R
   if (empresa.length > 200) return { ok: false, error: 'Empresa excede los 200 caracteres' };
 
   // Solo se exige la presencia de "@"; no se restringe el dominio.
-  if (!correo || !correo.includes('@')) {
+  if (!correo || !validarCorreo(correo)) {
     return { ok: false, error: 'No es correo válido.' };
   }
 
@@ -122,5 +123,70 @@ export async function enviarCotizacion(params: {
 
   if (error) {
     throw new EnvioError(error.message || 'Resend rechazó el envío', 502);
+  }
+}
+
+/**
+ * Notificación interna de nuevo lead. Es best-effort: si falla o falta
+ * configuración, no debe romper la cotización pública.
+ */
+export async function enviarAlertaLead(params: {
+  codigo: string;
+  nombre: string;
+  empresa: string;
+  ruc: string;
+  correo: string;
+  celular: string;
+  total: string;
+  items: number;
+}): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const destinatarios = (process.env.COPIA_EMAIL || '')
+    .split(',')
+    .map((correo) => correo.trim())
+    .filter(Boolean);
+
+  if (!apiKey || destinatarios.length === 0) {
+    console.warn('[Cotización] Alerta de lead omitida: falta RESEND_API_KEY o COPIA_EMAIL');
+    return false;
+  }
+
+  const { codigo, nombre, empresa, ruc, correo, celular, total, items } = params;
+  const from = process.env.EMAIL_FROM || 'Maskel Perú <onboarding@resend.dev>';
+  const empresaSinSaltos = empresa.replace(/[\r\n]+/g, ' ').trim();
+
+  const html = `
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#1e293b;line-height:1.6;font-size:14px;max-width:560px">
+      <p><strong>Nuevo lead de cotización</strong></p>
+      <p>
+        Código: <strong>${escaparHtml(codigo)}</strong><br />
+        Cliente: ${escaparHtml(nombre)}<br />
+        Empresa: ${escaparHtml(empresaSinSaltos || '—')}<br />
+        RUC: ${escaparHtml(ruc || '—')}<br />
+        Correo: ${escaparHtml(correo)}<br />
+        Celular: ${escaparHtml(celular)}<br />
+        Ítems: ${items}<br />
+        Total estimado: <strong>US$ ${escaparHtml(total)}</strong>
+      </p>
+    </div>`;
+
+  try {
+    const resend = new Resend(apiKey);
+    const { error } = await resend.emails.send({
+      from,
+      to: destinatarios,
+      subject: `Nuevo lead ${codigo}${empresaSinSaltos ? ` — ${empresaSinSaltos}` : ''}`,
+      html,
+    });
+
+    if (error) {
+      console.error('[Cotización] Resend rechazó la alerta de lead', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('[Cotización] Error al enviar la alerta de lead', error);
+    return false;
   }
 }
