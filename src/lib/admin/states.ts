@@ -9,13 +9,13 @@ export const ESTADOS = {
   pendiente_revision: {
     label: "Pendiente",
     badgeBg: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    accionPrincipal: "Aprobar",
+    accionPrincipal: "Revisar",
     btnBg: "bg-blue-600 hover:bg-blue-500 text-white",
   },
   aprobada: {
     label: "Aprobada",
     badgeBg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    accionPrincipal: "Marcar pagada",
+    accionPrincipal: "Confirmar pago",
     btnBg: "bg-emerald-600 hover:bg-emerald-500 text-white",
   },
   pagada: {

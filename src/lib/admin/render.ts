@@ -35,11 +35,18 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
   const enviada =
     (cotizacion.estado === "aprobada" || cotizacion.estado === "pagada") &&
     Boolean(cotizacion.ultimo_envio_at);
-  const accionAttr = esEliminada
-    ? `data-restore="${escapeHtml(cotizacion.id)}"`
-    : cotizacion.estado === "aprobada"
-      ? `data-mark-paid="${escapeHtml(cotizacion.id)}"`
-      : `data-approve="${escapeHtml(cotizacion.id)}"`;
+  const esPagada = cotizacion.estado === "pagada";
+  const accionTarjeta =
+    cotizacion.estado === "pendiente_revision"
+      ? "Revisar"
+      : cotizacion.estado === "aprobada" || cotizacion.estado === "eliminada"
+        ? "Gestionar"
+        : "Ver detalle";
+  // Pendientes, aprobadas y eliminadas abren el modal de gestión. Las pagadas
+  // abren directamente el modo de solo lectura.
+  const accionAttr = esPagada
+    ? `data-detail="${escapeHtml(cotizacion.id)}"`
+    : `data-approve="${escapeHtml(cotizacion.id)}"`;
 
   return `
     <article
@@ -76,7 +83,7 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
           ${accionAttr}
           class="min-w-0 flex-1 rounded-lg px-3 py-2 text-center text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 ${configEstado.btnBg}"
         >
-          ${escapeHtml(configEstado.accionPrincipal)}
+          ${escapeHtml(accionTarjeta)}
         </button>
 
         <details class="relative shrink-0" data-card-menu>
@@ -89,7 +96,7 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
           <div class="absolute right-0 top-full z-30 mt-2 w-40 overflow-hidden rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-2xl">
             <button
               type="button"
-              data-approve="${escapeHtml(cotizacion.id)}"
+              data-detail="${escapeHtml(cotizacion.id)}"
               class="block w-full px-3 py-2 text-left text-xs font-medium text-slate-200 transition hover:bg-slate-800"
             >
               Ver detalle
