@@ -191,7 +191,7 @@ export function initAdmin(): void {
       const mensajes: Record<typeof filtro, string> = {
         pendiente_revision: "No hay cotizaciones pendientes.",
         aprobada: "No hay cotizaciones aprobadas.",
-        historial: "No hay cotizaciones en el historial.",
+        historial: "No hay cotizaciones pagadas.",
         eliminada: "No hay cotizaciones en la papelera.",
       };
       emptyDetail.textContent = mensajes[filtro];
@@ -645,7 +645,7 @@ export function initAdmin(): void {
       modal.close();
       mostrarToast(
         estadoDestino === "pagada"
-          ? "Cotización marcada como pagada."
+          ? "Cotización marcada como pagada. Movida a Pagadas."
           : "Cotización restaurada correctamente.",
         "ok",
       );
@@ -874,7 +874,7 @@ export function initAdmin(): void {
         item.setAttribute("aria-pressed", String(item.dataset.filter === filtro));
       });
       render();
-      mostrarToast("Cotización marcada como pagada.", "ok");
+      mostrarToast("Cotización marcada como pagada. Movida a Pagadas.", "ok");
     } catch (error) {
       console.error("[Admin] Error al marcar como pagada:", error);
       mostrarToast(mensajeError(error, "No se pudo marcar la cotización como pagada"), "error");
