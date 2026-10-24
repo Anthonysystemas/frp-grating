@@ -103,6 +103,7 @@ export function initAdmin(): void {
   let filtro: "pendiente_revision" | "aprobada" | "historial" | "eliminada" = "pendiente_revision";
   let busqueda = "";
   let cotizacionModal: Cotizacion | null = null;
+  let modoModal: "gestion" | "detalle" = "gestion";
   let pdfObjectUrl: string | null = null;
   let toastTimer: number | undefined;
   let contadorItemsNuevos = 0;
@@ -253,7 +254,8 @@ export function initAdmin(): void {
 
   const actualizarEstadoModal = (): void => {
     const hayItems = modalItems.querySelectorAll("[data-modal-item]").length > 0;
-    const editable = cotizacionModal?.estado === "pendiente_revision";
+    const esSoloLectura = modoModal === "detalle";
+    const editable = !esSoloLectura && cotizacionModal?.estado === "pendiente_revision";
 
     modalItemsEmpty.textContent = editable
       ? "No hay ítems en esta cotización. Agrega al menos uno para poder aprobarla."
@@ -297,6 +299,8 @@ export function initAdmin(): void {
   };
 
   const agregarDesdeCatalogo = (): void => {
+    if (modoModal === "detalle") return;
+
     modalError.classList.add("hidden");
     modalError.textContent = "";
 
@@ -366,7 +370,7 @@ export function initAdmin(): void {
     modalSubmit.textContent = "Aprobar y Enviar al Cliente";
     modalSubmitOnly.classList.add("hidden");
     modalSubmitOnly.disabled = false;
-    modalSubmitOnly.textContent = "Solo Aprobar";
+    modalSubmitOnly.textContent = "Aprobar sin enviar";
     modalStatus.innerHTML = "";
     modalDate.textContent = "";
     modalTotalSummary.textContent = "";
@@ -383,6 +387,20 @@ export function initAdmin(): void {
     modalEnviarLabel.textContent = "Enviar cotización final al cliente";
     modalGuardarCorreo.disabled = false;
     modalGuardarCorreo.textContent = "Guardar";
+    modalClienteCorreo.disabled = false;
+    modalClienteCorreo.readOnly = false;
+    modalGuardarCorreo.style.display = "";
+    catalogPanel.style.display = "";
+    toggleCatalogBtn.style.display = "";
+    modalFlete.disabled = false;
+    catalogCategory.disabled = false;
+    catalogProduct.disabled = false;
+    catalogQty.disabled = false;
+    catalogPrice.disabled = false;
+    catalogAddBtn.disabled = false;
+    adminName.disabled = false;
+    adminEmail.disabled = false;
+    modalCancel.textContent = "Cancelar";
     catalogPanel.classList.add("hidden");
     toggleCatalogBtn.setAttribute("aria-expanded", "false");
     catalogQty.value = "1";
@@ -392,7 +410,10 @@ export function initAdmin(): void {
     actualizarEstadoModal();
   };
 
-  const abrirModal = (id: string): void => {
+  const abrirModal = (
+    id: string,
+    modo: "gestion" | "detalle" = "gestion",
+  ): void => {
     const cotizacion = cotizaciones.find((item) => item.id === id);
     if (!cotizacion) return;
 
@@ -402,8 +423,11 @@ export function initAdmin(): void {
       return;
     }
 
+    const esSoloLectura = modo === "detalle";
+    modoModal = modo;
+
     const lineas = lineasDeVersion(version);
-    const editable = cotizacion.estado === "pendiente_revision";
+    const editable = !esSoloLectura && cotizacion.estado === "pendiente_revision";
     const configEstado = obtenerEstado(cotizacion.estado);
     const totales = totalesDeVersion(version);
     const nombre =
@@ -420,7 +444,7 @@ export function initAdmin(): void {
     cotizacionModal = cotizacion;
     resetModal();
 
-    modalTitle.textContent = "Gestionar cotización";
+    modalTitle.textContent = esSoloLectura ? "Detalle de cotización" : "Gestionar cotización";
     modalClient.textContent = [
       cotizacion.codigo,
       empresa ? `${nombre} — ${empresa}` : nombre,
@@ -435,6 +459,16 @@ export function initAdmin(): void {
     modalFlete.value = String(Number(version.flete ?? 0));
 
     modalClienteCorreo.value = cotizacion.cliente_correo ?? "";
+    modalClienteCorreo.disabled = esSoloLectura;
+    modalClienteCorreo.readOnly = esSoloLectura;
+    modalFlete.disabled = esSoloLectura;
+    catalogCategory.disabled = esSoloLectura;
+    catalogProduct.disabled = esSoloLectura;
+    catalogQty.disabled = esSoloLectura;
+    catalogPrice.disabled = esSoloLectura;
+    catalogAddBtn.disabled = esSoloLectura;
+    adminName.disabled = esSoloLectura;
+    adminEmail.disabled = esSoloLectura;
     modalCorreoError.classList.add("hidden");
     modalCorreoError.textContent = "";
     modalEnvioStatus.textContent =
@@ -443,18 +477,24 @@ export function initAdmin(): void {
         : "";
     modalEnviarCliente.classList.toggle(
       "hidden",
-      cotizacion.estado !== "aprobada" && cotizacion.estado !== "pagada",
+      esSoloLectura ||
+        (cotizacion.estado !== "aprobada" && cotizacion.estado !== "pagada"),
     );
     modalEnviarCliente.classList.toggle(
       "inline-flex",
-      cotizacion.estado === "aprobada" || cotizacion.estado === "pagada",
+      !esSoloLectura &&
+        (cotizacion.estado === "aprobada" || cotizacion.estado === "pagada"),
     );
 
-    modalGuardarCorreo.classList.toggle("hidden", editable);
+    modalGuardarCorreo.classList.toggle("hidden", editable || esSoloLectura);
+    modalGuardarCorreo.style.display = esSoloLectura ? "none" : "";
     toggleCatalogBtn.classList.toggle("hidden", !editable);
+    toggleCatalogBtn.style.display = esSoloLectura ? "none" : "";
     modalFleteWrapper.classList.toggle("hidden", !editable);
     modalAdminBlock.classList.toggle("hidden", !editable);
     catalogPanel.classList.add("hidden");
+    catalogPanel.style.display = esSoloLectura ? "none" : "";
+    modalCancel.textContent = esSoloLectura ? "Cerrar" : "Cancelar";
 
     modalItems.innerHTML = lineas.map((linea) => filaModal(linea, editable)).join("");
     actualizarEstadoModal();
@@ -470,11 +510,14 @@ export function initAdmin(): void {
 
     modalSubmit.textContent = editable ? "Aprobar y Enviar al Cliente" : configEstado.accionPrincipal;
     modalSubmit.className = `rounded-lg px-5 py-2.5 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-wait disabled:opacity-60 ${configEstado.btnBg}`;
-    modalSubmit.classList.toggle("hidden", cotizacion.estado === "pagada");
+    modalSubmit.classList.toggle(
+      "hidden",
+      esSoloLectura || cotizacion.estado === "pagada",
+    );
 
     modalSubmitOnly.classList.toggle("hidden", !editable);
     modalSubmitOnly.disabled = false;
-    modalSubmitOnly.textContent = "Solo Aprobar";
+    modalSubmitOnly.textContent = "Aprobar sin enviar";
 
     if (!modal.open) modal.showModal();
   };
@@ -528,6 +571,8 @@ export function initAdmin(): void {
   };
 
   const guardarCorreoCliente = async (): Promise<void> => {
+    if (modoModal === "detalle") return;
+
     const cotizacion = cotizacionModal;
     if (!cotizacion) return;
 
@@ -562,6 +607,8 @@ export function initAdmin(): void {
   };
 
   const enviarCotizacionFinal = async (): Promise<void> => {
+    if (modoModal === "detalle") return;
+
     const cotizacion = cotizacionModal;
     if (!cotizacion) return;
 
@@ -627,6 +674,8 @@ export function initAdmin(): void {
     cotizacion: Cotizacion,
     estadoDestino: "pagada" | "pendiente_revision",
   ): Promise<void> => {
+    if (modoModal === "detalle") return;
+
     modalError.classList.add("hidden");
     modalError.textContent = "";
 
@@ -659,6 +708,8 @@ export function initAdmin(): void {
   };
 
 ﻿  const ejecutarAprobacion = async (enviarAlCliente: boolean): Promise<void> => {
+    if (modoModal === "detalle") return;
+
     const cotizacionActual = cotizacionModal;
     if (!cotizacionActual || cotizacionActual.estado !== "pendiente_revision") return;
 
@@ -796,7 +847,7 @@ export function initAdmin(): void {
       modalSubmit.disabled = false;
       modalSubmitOnly.disabled = false;
       modalSubmit.textContent = "Aprobar y Enviar al Cliente";
-      modalSubmitOnly.textContent = "Solo Aprobar";
+      modalSubmitOnly.textContent = "Aprobar sin enviar";
       actualizarEstadoModal();
     }
   };
@@ -938,14 +989,24 @@ export function initAdmin(): void {
     );
     if (tarjeta && !elementoInteractivo) {
       const id = tarjeta.getAttribute("data-card-open");
-      if (id) abrirModal(id);
+      if (id) {
+        const cotizacion = cotizaciones.find((item) => item.id === id);
+        abrirModal(id, cotizacion?.estado === "pagada" ? "detalle" : "gestion");
+      }
+      return;
+    }
+
+    const botonDetalle = objetivo.closest<HTMLButtonElement>("[data-detail]");
+    if (botonDetalle) {
+      const id = botonDetalle.dataset.detail;
+      if (id) abrirModal(id, "detalle");
       return;
     }
 
     const botonAprobar = objetivo.closest<HTMLButtonElement>("[data-approve]");
     if (botonAprobar) {
       const id = botonAprobar.dataset.approve;
-      if (id) abrirModal(id);
+      if (id) abrirModal(id, "gestion");
       return;
     }
 
@@ -991,7 +1052,10 @@ export function initAdmin(): void {
 
     event.preventDefault();
     const id = tarjeta.getAttribute("data-card-open");
-    if (id) abrirModal(id);
+    if (id) {
+      const cotizacion = cotizaciones.find((item) => item.id === id);
+      abrirModal(id, cotizacion?.estado === "pagada" ? "detalle" : "gestion");
+    }
   });
 
   modalItems.addEventListener("input", recalcular);
@@ -1007,6 +1071,8 @@ export function initAdmin(): void {
   });
 
   modalItems.addEventListener("click", (event) => {
+    if (modoModal === "detalle") return;
+
     const boton = (event.target as Element).closest<HTMLButtonElement>("[data-remove-item]");
     if (!boton) return;
     boton.closest("[data-modal-item]")?.remove();
@@ -1027,6 +1093,7 @@ export function initAdmin(): void {
 
   modal.addEventListener("close", () => {
     cotizacionModal = null;
+    modoModal = "gestion";
     resetModal();
   });
 
