@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { next } from '@vercel/functions';
 
 const ADMIN_SESSION_COOKIE = 'admin_session';
 
@@ -63,7 +64,7 @@ export default async function middleware(request: Request) {
     pathname === '/api/admin/login' ||
     pathname === '/api/admin/logout'
   ) {
-    return;
+    return next();
   }
 
   const token = obtenerCookie(request, ADMIN_SESSION_COOKIE);
@@ -117,9 +118,10 @@ export default async function middleware(request: Request) {
     });
   }
 
-  return;
+  return next();
 }
 
 export const config = {
   matcher: ['/admin', '/admin/:path*', '/api/admin/:path*'],
+  runtime: 'nodejs',
 };
