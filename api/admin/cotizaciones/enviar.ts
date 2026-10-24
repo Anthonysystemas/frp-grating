@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Resend } from 'resend';
 import { escaparHtml } from '../../../src/lib/cotizacion.js';
 import { generarPdfCotizacion } from '../../../src/lib/pdf.js';
-import { supabaseAdmin as supabase } from '../../../src/lib/supabase.js';
+import { obtenerSupabaseAdmin } from '../../../src/lib/supabase.js';
 import { validarCorreo } from '../../../src/lib/utils/validation.js';
 
 interface ItemVersion {
@@ -39,6 +39,21 @@ function fechaLima(iso?: string): string {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' });
+  }
+
+  let supabase: ReturnType<typeof obtenerSupabaseAdmin>;
+
+  try {
+    supabase = obtenerSupabaseAdmin();
+  } catch (error) {
+    console.error('[Admin enviar] Error de configuración', error);
+    return res.status(500).json({
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Configuración administrativa incompleta',
+    });
   }
 
   const { cotizacion_id, correo } = (req.body || {}) as {

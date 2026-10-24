@@ -5,6 +5,8 @@ import AdminToolbar from "../../components/admin/AdminToolbar.astro";
 import AdminStates from "../../components/admin/AdminStates.astro";
 import ApproveModal from "../../components/admin/ApproveModal.astro";
 import Toast from "../../components/admin/Toast.astro";
+
+Astro.response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
 ---
 
 <AdminLayout>

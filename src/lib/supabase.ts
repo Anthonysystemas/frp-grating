@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // Estas variables se leen en funciones serverless de Vercel, donde
 // `import.meta.env` no existe. Acceder a `import.meta.env.X` directamente
@@ -13,11 +13,31 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Cliente para tareas administrativas (leer todas las cotizaciones, aprobar,
-// cambiar estados). Usa la service role key si está configurada; si no,
-// recurre al cliente anónimo y quedará sujeto a las políticas RLS.
+// cambiar estados). La service role key es obligatoria: no se debe degradar
+// silenciosamente al cliente anónimo, porque las operaciones quedarían
+// sujetas a RLS y podrían fallar de forma confusa.
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-export const supabaseAdmin = serviceRoleKey
-  ? createClient(supabaseUrl, serviceRoleKey, {
+let clienteAdmin: SupabaseClient | null = null;
+
+export function obtenerSupabaseAdmin(): SupabaseClient {
+  const urlAdmin = supabaseUrl;
+  const claveAdmin = serviceRoleKey;
+
+  if (!urlAdmin) {
+    throw new Error('Falta PUBLIC_SUPABASE_URL para usar las funciones administrativas.');
+  }
+
+  if (!claveAdmin) {
+    throw new Error(
+      'Falta SUPABASE_SERVICE_ROLE_KEY. Configúrala para usar las funciones administrativas.',
+    );
+  }
+
+  if (!clienteAdmin) {
+    clienteAdmin = createClient(urlAdmin, claveAdmin, {
       auth: { autoRefreshToken: false, persistSession: false },
-    })
-  : supabase;
+    });
+  }
+
+  return clienteAdmin;
+}

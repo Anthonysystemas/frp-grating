@@ -40,8 +40,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     password: clave,
   });
 
+  if (error) {
+    console.error('[Admin login] Error de Supabase Auth', {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+    });
+  }
+
   if (error || !data.session) {
     return res.status(401).json({ ok: false, error: 'Correo o contraseña incorrectos' });
+  }
+
+  const correosAutorizados = (process.env.ADMIN_EMAILS ?? '')
+    .split(',')
+    .map((correoAutorizado) => correoAutorizado.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (correosAutorizados.length === 0) {
+    console.error('[Admin login] ADMIN_EMAILS no está configurada');
+    return res.status(403).json({ ok: false, error: 'Correo no autorizado' });
+  }
+
+  const correoUsuario = (data.user?.email ?? correo).trim().toLowerCase();
+  if (!correoUsuario || !correosAutorizados.includes(correoUsuario)) {
+    console.error('[Admin login] Correo no autorizado', correoUsuario);
+    return res.status(403).json({ ok: false, error: 'Correo no autorizado' });
   }
 
   const maxAge = data.session.expires_in ?? 3600;
