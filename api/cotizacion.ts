@@ -36,7 +36,10 @@ function generarIdentificadores() {
     return resultado;
   }, {});
 
-  const codigo = `MSK-${partes.year}${partes.month}${partes.day}-${partes.hour}${partes.minute}${partes.second}`;
+  // Sufijo aleatorio para evitar colisiones cuando dos solicitudes coinciden
+  // en el mismo segundo.
+  const sufijo = Math.random().toString(36).slice(2, 5).toUpperCase().padEnd(3, '0');
+  const codigo = `MSK-${partes.year}${partes.month}${partes.day}-${partes.hour}${partes.minute}${partes.second}-${sufijo}`;
   const fecha = new Intl.DateTimeFormat('es-PE', {
     timeZone: 'America/Lima',
     day: 'numeric',

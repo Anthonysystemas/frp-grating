@@ -4,7 +4,7 @@ import {
   esEstadoValido,
   type EstadoCotizacion,
 } from '../../../src/lib/admin/states.js';
-import { supabaseAdmin as supabase } from '../../../src/lib/supabase.js';
+import { obtenerSupabaseAdmin } from '../../../src/lib/supabase.js';
 import { validarCorreo } from '../../../src/lib/utils/validation.js';
 
 interface VersionCotizacion {
@@ -23,13 +23,30 @@ interface VersionCotizacion {
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const TRANSICIONES: Record<EstadoCotizacion, EstadoCotizacion[]> = {
-  pendiente_revision: ['aprobada', 'eliminada'],
+  // La aprobación no se realiza por PATCH: debe pasar por /api/admin/aprobar
+  // para crear la versión oficial y el PDF.
+  pendiente_revision: ['eliminada'],
   aprobada: ['pagada', 'eliminada'],
   pagada: ['eliminada'],
   eliminada: ['pendiente_revision'],
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  let supabase: ReturnType<typeof obtenerSupabaseAdmin>;
+
+  try {
+    supabase = obtenerSupabaseAdmin();
+  } catch (error) {
+    console.error('[Admin cotizaciones] Error de configuración', error);
+    return res.status(500).json({
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Configuración administrativa incompleta',
+    });
+  }
+
   // --- ACTUALIZACIÓN DE ESTADO Y/O CORREO ---
   if (req.method === 'PATCH') {
     const body = (req.body || {}) as {

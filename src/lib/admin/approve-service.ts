@@ -1,6 +1,6 @@
 import { findProduct } from '../../data/catalog.js';
 import { generarPdfCotizacion } from '../pdf.js';
-import { supabaseAdmin as supabase } from '../supabase.js';
+import { obtenerSupabaseAdmin } from '../supabase.js';
 
 export class AprobarError extends Error {
   status: number;
@@ -161,6 +161,17 @@ function fechaLima(): string {
 }
 
 export async function aprobarCotizacion(payload: AprobarPayload): Promise<AprobarResultado> {
+  let supabase: ReturnType<typeof obtenerSupabaseAdmin>;
+
+  try {
+    supabase = obtenerSupabaseAdmin();
+  } catch (error) {
+    throw new AprobarError(
+      error instanceof Error ? error.message : 'Configuración administrativa incompleta',
+      500,
+    );
+  }
+
   const { cotizacion_id, items: ajustes, flete: fleteRaw, administrador } = payload;
 
   // --- VALIDACIONES DE ENTRADA ---
@@ -200,6 +211,13 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
   }
   if (!cotizacion) {
     throw new AprobarError('La cotización no existe', 404);
+  }
+
+  if (cotizacion.estado !== 'pendiente_revision') {
+    throw new AprobarError(
+      'Solo se pueden aprobar cotizaciones en estado pendiente de revisión',
+      409,
+    );
   }
 
   const { data: ultimaVersion, error: errorUltimaVersion } = await supabase
@@ -246,8 +264,18 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
     }
 
     const item = resultado.item;
+
+    // Un producto puede aparecer varias veces en la cotización. Se conserva
+    // cada línea y se le asigna una clave única sin agrupar precios distintos.
     if (idsFinales.has(item.id)) {
-      throw new AprobarError(`El ítem ${item.id} está repetido`, 400);
+      const idBase = item.id;
+      let sufijo = 2;
+      let idUnico = `${idBase}#${sufijo}`;
+      while (idsFinales.has(idUnico)) {
+        sufijo += 1;
+        idUnico = `${idBase}#${sufijo}`;
+      }
+      item.id = idUnico;
     }
     idsFinales.add(item.id);
 

@@ -32,7 +32,9 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
   const total = version ? money(totales.total) : "—";
   const configEstado = obtenerEstado(cotizacion.estado);
   const esEliminada = cotizacion.estado === "eliminada";
-  const enviada = cotizacion.estado === "aprobada" && Boolean(cotizacion.ultimo_envio_at);
+  const enviada =
+    (cotizacion.estado === "aprobada" || cotizacion.estado === "pagada") &&
+    Boolean(cotizacion.ultimo_envio_at);
   const accionAttr = esEliminada
     ? `data-restore="${escapeHtml(cotizacion.id)}"`
     : cotizacion.estado === "aprobada"

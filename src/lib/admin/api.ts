@@ -102,12 +102,23 @@ function redirigirSesionExpirada(): void {
   }
 }
 
+function redirigirNoAutorizado(): void {
+  if (typeof window !== "undefined") {
+    window.location.replace("/admin/login?unauthorized=true");
+  }
+}
+
 async function fetchAdmin(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const respuesta = await fetch(input, init);
 
   if (respuesta.status === 401) {
     redirigirSesionExpirada();
     throw new Error("Tu sesión expiró. Inicia sesión nuevamente.");
+  }
+
+  if (respuesta.status === 403) {
+    redirigirNoAutorizado();
+    throw new Error("Tu correo no está autorizado para acceder al panel.");
   }
 
   return respuesta;
