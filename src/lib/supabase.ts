@@ -1,8 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-// Estas variables se leen en funciones serverless de Vercel, donde
-// `import.meta.env` no existe. Acceder a `import.meta.env.X` directamente
-// provoca un TypeError en producción si falta la variable.
+// La URL y la anon key se leen de process.env porque estas funciones también
+// corren en serverless de Vercel, donde import.meta.env puede no existir.
 const supabaseUrl = process.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY;
 
@@ -16,7 +15,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // cambiar estados). La service role key es obligatoria: no se debe degradar
 // silenciosamente al cliente anónimo, porque las operaciones quedarían
 // sujetas a RLS y podrían fallar de forma confusa.
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Se lee de import.meta.env cuando está disponible (entorno Vite/Astro) y se
+// usa process.env como respaldo en funciones serverless de Vercel.
+const importMetaEnv =
+  typeof import.meta !== 'undefined'
+    ? (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env
+    : undefined;
+
+const serviceRoleKey =
+  importMetaEnv?.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
 let clienteAdmin: SupabaseClient | null = null;
 
 export function obtenerSupabaseAdmin(): SupabaseClient {
