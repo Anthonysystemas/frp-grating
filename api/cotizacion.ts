@@ -1,8 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { waitUntil } from '@vercel/functions';
 import { findProduct } from '../src/data/catalog.js';
 import { enviarAlertaLead, validarCliente } from '../src/lib/cotizacion.js';
 import { generarPdfCotizacion } from '../src/lib/pdf.js';
 import { supabase } from '../src/lib/supabase.js';
+
+export const maxDuration = 15;
 
 interface CotizacionItem {
   id: string;
@@ -370,18 +373,6 @@ async function procesarCotizacion(datos: DatosProcesamiento): Promise<ResultadoC
     return { status: 500, body: { ok: false, error: 'No se pudo guardar la cotización' } };
   }
 
-  // Alerta interna de nuevo lead. Es best-effort: nunca bloquea la cotización.
-  await enviarAlertaLead({
-    codigo,
-    nombre: datos.nombre,
-    empresa: datos.empresa,
-    ruc: datos.ruc || '—',
-    correo: datos.correo,
-    celular: datos.celular,
-    total: (datos.totalCentavos / 100).toFixed(2),
-    items: datos.validatedItems.length,
-  });
-
   const pdfItems = datos.validatedItems.map((item) => {
     const product = findProduct(item.id)!;
     return {
@@ -415,6 +406,26 @@ async function procesarCotizacion(datos: DatosProcesamiento): Promise<ResultadoC
       status: 500,
       body: { ok: false, error: 'No se pudo generar el PDF de la cotización' },
     };
+  }
+
+  // La alerta interna se ejecuta en segundo plano. La respuesta al cliente no
+  // espera a Resend y la función tiene un límite de 8 s para el correo.
+  const alertaLead = enviarAlertaLead({
+    codigo,
+    nombre: datos.nombre,
+    empresa: datos.empresa,
+    ruc: datos.ruc || '—',
+    correo: datos.correo,
+    celular: datos.celular,
+    total: (datos.totalCentavos / 100).toFixed(2),
+    items: datos.validatedItems.length,
+  });
+
+  try {
+    waitUntil(alertaLead);
+  } catch (error) {
+    console.error('[Cotización] No se pudo registrar la alerta en segundo plano', error);
+    void alertaLead;
   }
 
   console.log(

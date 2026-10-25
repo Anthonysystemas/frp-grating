@@ -11,6 +11,26 @@ export class EnvioError extends Error {
   }
 }
 
+const EMAIL_TIMEOUT_MS = 8000;
+
+/**
+ * Limita una llamada externa para que un proveedor lento no consuma todo el
+ * tiempo de ejecución de la función serverless.
+ */
+async function conTimeout<T>(promesa: Promise<T>, ms = EMAIL_TIMEOUT_MS): Promise<T> {
+  let temporizador: ReturnType<typeof setTimeout> | undefined;
+
+  const timeout = new Promise<never>((_, reject) => {
+    temporizador = setTimeout(() => {
+      reject(new EnvioError('El servicio de correo excedió el tiempo de espera', 504));
+    }, ms);
+  });
+
+  return Promise.race([promesa, timeout]).finally(() => {
+    if (temporizador) clearTimeout(temporizador);
+  });
+}
+
 export function escaparHtml(valor: string) {
   return valor
     .replace(/&/g, '&amp;')
@@ -113,13 +133,15 @@ export async function enviarCotizacion(params: {
     </div>`;
 
   const resend = new Resend(apiKey);
-  const { error } = await resend.emails.send({
-    from,
-    to: 'ventas@maskelperu.com',
-    subject: `Cotización ${codigo} – ${empresaSinSaltos}`,
-    html,
-    attachments: [{ filename: `${codigo}.pdf`, content: pdfBase64 }],
-  });
+  const { error } = await conTimeout(
+    resend.emails.send({
+      from,
+      to: 'ventas@maskelperu.com',
+      subject: `Cotización ${codigo} – ${empresaSinSaltos}`,
+      html,
+      attachments: [{ filename: `${codigo}.pdf`, content: pdfBase64 }],
+    }),
+  );
 
   if (error) {
     throw new EnvioError(error.message || 'Resend rechazó el envío', 502);
@@ -172,12 +194,14 @@ export async function enviarAlertaLead(params: {
 
   try {
     const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from,
-      to: destinatarios,
-      subject: `Nuevo lead ${codigo}${empresaSinSaltos ? ` — ${empresaSinSaltos}` : ''}`,
-      html,
-    });
+    const { error } = await conTimeout(
+      resend.emails.send({
+        from,
+        to: destinatarios,
+        subject: `Nuevo lead ${codigo}${empresaSinSaltos ? ` — ${empresaSinSaltos}` : ''}`,
+        html,
+      }),
+    );
 
     if (error) {
       console.error('[Cotización] Resend rechazó la alerta de lead', error);
