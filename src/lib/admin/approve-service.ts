@@ -320,6 +320,23 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
     throw new AprobarError('No se pudo generar el PDF oficial de la cotización', 500);
   }
 
+  // Revalidación justo antes de persistir: el PDF puede tardar y otra
+  // aprobación pudo completarse mientras la pantalla estaba abierta.
+  const { data: estadoAntesDeVersion, error: errorEstadoAntes } = await supabase
+    .from('cotizaciones')
+    .select('estado')
+    .eq('id', cotizacionId)
+    .maybeSingle();
+
+  if (errorEstadoAntes) {
+    console.error('[Admin aprobar] Error al revalidar el estado', errorEstadoAntes);
+    throw new AprobarError('No se pudo revalidar el estado de la cotización', 500);
+  }
+
+  if (estadoAntesDeVersion?.estado !== 'pendiente_revision') {
+    throw new AprobarError('La cotización ya ha sido aprobada previamente', 409);
+  }
+
   // --- NUEVA VERSIÓN OFICIAL ---
   // Solo puede quedar una versión oficial por cotización.
   const { data: oficialAnterior, error: errorOficialAnterior } = await supabase
@@ -343,6 +360,27 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
       .eq('id', oficialAnterior.id);
     if (error) {
       console.error('[Admin aprobar] No se pudo restaurar la versión oficial anterior', error);
+    }
+  };
+
+  // Si otra aprobación ya creó una versión oficial, no se debe restaurar la
+  // anterior sobre ella; eso dejaría dos versiones oficiales.
+  const restaurarOficialSiNoHayOtra = async () => {
+    const { data: oficialActual, error } = await supabase
+      .from('cotizacion_versiones')
+      .select('id')
+      .eq('cotizacion_id', cotizacionId)
+      .eq('es_oficial', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[Admin aprobar] Error al comprobar la versión oficial actual', error);
+      return;
+    }
+
+    if (!oficialActual?.id) {
+      await restaurarOficialAnterior();
     }
   };
 
@@ -374,15 +412,45 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
 
   if (errorVersion || !versionOficial) {
     console.error('[Admin aprobar] Error al guardar la versión oficial', errorVersion);
-    await restaurarOficialAnterior();
+
+    const detalleConflicto = `${errorVersion?.message ?? ''} ${errorVersion?.details ?? ''}`;
+    const esConflictoVersion =
+      errorVersion?.code === '23505' ||
+      /unique_cotizacion_version|duplicate key|version_numero/i.test(detalleConflicto);
+
+    if (esConflictoVersion) {
+      await restaurarOficialSiNoHayOtra();
+
+      const { data: estadoFinal } = await supabase
+        .from('cotizaciones')
+        .select('estado')
+        .eq('id', cotizacionId)
+        .maybeSingle();
+
+      if (estadoFinal?.estado === 'aprobada' || estadoFinal?.estado === 'pagada') {
+        throw new AprobarError('La cotización ya ha sido aprobada previamente', 409);
+      }
+
+      throw new AprobarError(
+        'La cotización está siendo aprobada por otro usuario. Recarga e intenta nuevamente.',
+        409,
+      );
+    }
+
+    await restaurarOficialSiNoHayOtra();
     throw new AprobarError('No se pudo guardar la versión oficial', 500);
   }
 
   // --- ESTADO DE LA CARÁTULA ---
-  const { error: errorEstado } = await supabase
+  // Solo se actualiza si sigue pendiente. Así se evita que dos aprobaciones
+  // simultáneas dejen estados inconsistentes.
+  const { data: estadoActualizado, error: errorEstado } = await supabase
     .from('cotizaciones')
     .update({ estado: 'aprobada' })
-    .eq('id', cotizacionId);
+    .eq('id', cotizacionId)
+    .eq('estado', 'pendiente_revision')
+    .select('id')
+    .maybeSingle();
 
   if (errorEstado) {
     console.error('[Admin aprobar] Error al actualizar el estado de la cotización', errorEstado);
@@ -394,9 +462,23 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
     if (errorRollback) {
       console.error('[Admin aprobar] No se pudo revertir la versión oficial', errorRollback);
     } else {
-      await restaurarOficialAnterior();
+      await restaurarOficialSiNoHayOtra();
     }
     throw new AprobarError('No se pudo actualizar el estado de la cotización', 500);
+  }
+
+  if (!estadoActualizado) {
+    // Otra aprobación ganó entre la revalidación y este update.
+    const { error: errorRollback } = await supabase
+      .from('cotizacion_versiones')
+      .delete()
+      .eq('id', versionOficial.id);
+    if (errorRollback) {
+      console.error('[Admin aprobar] No se pudo revertir la versión oficial duplicada', errorRollback);
+    } else {
+      await restaurarOficialSiNoHayOtra();
+    }
+    throw new AprobarError('La cotización ya ha sido aprobada previamente', 409);
   }
 
   console.log(
