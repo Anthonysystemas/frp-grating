@@ -641,20 +641,25 @@ export function initAdmin(): void {
       }
 
       const resultado = await enviarCotizacionCliente(cotizacion.id, correo);
-      const enviadoAt = resultado.enviado_at ?? new Date().toISOString();
       const correoEnviado = resultado.correo ?? correo;
 
-      cotizacion.ultimo_envio_at = enviadoAt;
-      cotizacion.ultimo_envio_correo = correoEnviado;
-      modalEnvioStatus.textContent = `Enviado el ${fechaLegible(enviadoAt)} a ${correoEnviado}`;
-      render();
+      if (resultado.iniciado) {
+        modalEnvioStatus.textContent = `${resultado.message ?? "Envío iniciado"} a ${correoEnviado}.`;
+        mostrarToast("Envío de cotización iniciado.", "ok");
+      } else {
+        const enviadoAt = resultado.enviado_at ?? new Date().toISOString();
+        cotizacion.ultimo_envio_at = enviadoAt;
+        cotizacion.ultimo_envio_correo = correoEnviado;
+        modalEnvioStatus.textContent = `Enviado el ${fechaLegible(enviadoAt)} a ${correoEnviado}`;
+        render();
 
-      mostrarToast(
-        resultado.advertencia
-          ? "Cotización enviada. No se pudo registrar el envío."
-          : "Cotización enviada al cliente.",
-        resultado.advertencia ? "error" : "ok",
-      );
+        mostrarToast(
+          resultado.advertencia
+            ? "Cotización enviada. No se pudo registrar el envío."
+            : "Cotización enviada al cliente.",
+          resultado.advertencia ? "error" : "ok",
+        );
+      }
     } catch (error) {
       console.error("[Admin] Error al enviar la cotización:", error);
       modalCorreoError.textContent = mensajeError(
@@ -820,14 +825,19 @@ export function initAdmin(): void {
         try {
           modalSubmit.textContent = "Enviando correo…";
           const envio = await enviarCotizacionCliente(cotizacionActual.id, correo);
-          const enviadoAt = envio.enviado_at ?? new Date().toISOString();
           const correoEnviado = envio.correo ?? correo;
 
-          cotizacionActual.ultimo_envio_at = enviadoAt;
-          cotizacionActual.ultimo_envio_correo = correoEnviado;
-          modalSuccessDetail.textContent = `${detalleVersion} · Enviada a ${correoEnviado}`;
-          render();
-          mostrarToast("Cotización aprobada y enviada al cliente.", "ok");
+          if (envio.iniciado) {
+            modalSuccessDetail.textContent = `${detalleVersion} · Envío iniciado a ${correoEnviado}`;
+            mostrarToast("Cotización aprobada. Envío iniciado.", "ok");
+          } else {
+            const enviadoAt = envio.enviado_at ?? new Date().toISOString();
+            cotizacionActual.ultimo_envio_at = enviadoAt;
+            cotizacionActual.ultimo_envio_correo = correoEnviado;
+            modalSuccessDetail.textContent = `${detalleVersion} · Enviada a ${correoEnviado}`;
+            render();
+            mostrarToast("Cotización aprobada y enviada al cliente.", "ok");
+          }
         } catch (error) {
           console.error("[Admin] Error al enviar la cotización aprobada:", error);
           modalSuccessDetail.textContent = `${detalleVersion} · Aprobada, pero no se pudo enviar el correo.`;

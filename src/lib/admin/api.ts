@@ -203,6 +203,9 @@ export async function cerrarSesionAdmin(): Promise<void> {
 
 export interface EnviarCotizacionResponse {
   ok: boolean;
+  success?: boolean;
+  iniciado?: boolean;
+  message?: string;
   mensaje?: string;
   correo?: string;
   enviado_at?: string;
