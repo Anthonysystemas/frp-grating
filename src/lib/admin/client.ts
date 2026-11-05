@@ -1,5 +1,5 @@
 import { CATALOG, categorias } from "../../data/catalog";
-import { fechaCorta, fechaLegible, money } from "./format";
+import { escapeHtml, fechaCorta, fechaLegible, money } from "./format";
 import { lineasDeVersion, normalizarRuc, totalesDeVersion } from "./quote";
 import {
   actualizarCorreoCliente,
@@ -8,16 +8,24 @@ import {
   cerrarSesionAdmin,
   enviarCotizacionCliente,
   fetchCotizaciones,
+  importarCotizacion,
   mensajeError,
 } from "./api";
+import {
+  parseWhatsAppMessage,
+  type ConfianzaItem,
+  type ParsedItem,
+} from "../importar/parse";
 import {
   badgeEstado,
   filaModal,
   opcionesCategoria,
   opcionesProducto,
   tarjeta,
+  tarjetaNuevaCotizacion,
 } from "./render";
 import { obtenerEstado } from "./states";
+import { initNuevaCotizacion } from "./nueva-cotizacion";
 import { validarCorreo } from "../utils/validation";
 import type {
   CatalogoCategoria,
@@ -26,6 +34,16 @@ import type {
   Linea,
   VersionCotizacion,
 } from "./types";
+
+const getRequiredElement = <T extends HTMLElement>(id: string): T => {
+  const element = document.getElementById(id);
+  if (!element) {
+    const message = `[Admin] No se encontró el elemento requerido #${id}`;
+    console.warn(message);
+    throw new Error(message);
+  }
+  return element as T;
+};
 
 export function initAdmin(): void {
   const catalogo: CatalogoCategoria[] = categorias.map((categoria) => ({
@@ -41,63 +59,93 @@ export function initAdmin(): void {
     })),
   }));
 
-  const list = document.getElementById("list") as HTMLElement;
-  const loading = document.getElementById("loading") as HTMLElement;
-  const errorState = document.getElementById("error-state") as HTMLElement;
-  const errorMessage = document.getElementById("error-message") as HTMLElement;
-  const emptyState = document.getElementById("empty-state") as HTMLElement;
-  const emptyDetail = document.getElementById("empty-detail") as HTMLElement;
-  const refreshBtn = document.getElementById("refresh") as HTMLButtonElement;
-  const logoutBtn = document.getElementById("logout") as HTMLButtonElement;
-  const retryBtn = document.getElementById("retry") as HTMLButtonElement;
-  const searchInput = document.getElementById("search") as HTMLInputElement;
-  const filters = document.getElementById("filters") as HTMLElement;
+  const list = getRequiredElement<HTMLElement>("list");
+  const loading = getRequiredElement<HTMLElement>("loading");
+  const errorState = getRequiredElement<HTMLElement>("error-state");
+  const errorMessage = getRequiredElement<HTMLElement>("error-message");
+  const emptyState = getRequiredElement<HTMLElement>("empty-state");
+  const emptyDetail = getRequiredElement<HTMLElement>("empty-detail");
+  const refreshBtn = getRequiredElement<HTMLButtonElement>("refresh");
+  const logoutBtn = getRequiredElement<HTMLButtonElement>("logout");
+  const retryBtn = getRequiredElement<HTMLButtonElement>("retry");
+  const searchInput = getRequiredElement<HTMLInputElement>("search");
+  const filters = getRequiredElement<HTMLElement>("filters");
 
-  const modal = document.getElementById("approve-modal") as HTMLDialogElement;
-  const modalTitle = document.getElementById("approve-title") as HTMLElement;
-  const modalClient = document.getElementById("modal-client") as HTMLElement;
-  const modalStatus = document.getElementById("modal-status") as HTMLElement;
-  const modalDate = document.getElementById("modal-date") as HTMLElement;
-  const modalTotalSummary = document.getElementById("modal-total-summary") as HTMLElement;
-  const modalItemsHint = document.getElementById("modal-items-hint") as HTMLElement;
-  const modalFleteWrapper = document.getElementById("modal-flete-wrapper") as HTMLElement;
-  const modalAdminBlock = document.getElementById("modal-admin-block") as HTMLElement;
-  const modalClienteCorreo = document.getElementById("modal-cliente-correo") as HTMLInputElement;
-  const modalGuardarCorreo = document.getElementById("modal-guardar-correo") as HTMLButtonElement;
-  const modalCorreoError = document.getElementById("modal-correo-error") as HTMLElement;
-  const modalEnvioStatus = document.getElementById("modal-envio-status") as HTMLElement;
-  const modalEnviarCliente = document.getElementById("modal-enviar-cliente") as HTMLButtonElement;
-  const modalEnviarSpinner = document.getElementById("modal-enviar-spinner") as HTMLElement;
-  const modalEnviarLabel = document.getElementById("modal-enviar-label") as HTMLElement;
-  const modalItems = document.getElementById("modal-items") as HTMLElement;
-  const modalItemsEmpty = document.getElementById("modal-items-empty") as HTMLElement;
-  const toggleCatalogBtn = document.getElementById("toggle-catalog") as HTMLButtonElement;
-  const catalogPanel = document.getElementById("catalog-panel") as HTMLElement;
-  const catalogCategory = document.getElementById("catalog-category") as HTMLSelectElement;
-  const catalogProduct = document.getElementById("catalog-product") as HTMLSelectElement;
-  const catalogQty = document.getElementById("catalog-qty") as HTMLInputElement;
-  const catalogPrice = document.getElementById("catalog-price") as HTMLInputElement;
-  const catalogAddBtn = document.getElementById("catalog-add") as HTMLButtonElement;
-  const modalFlete = document.getElementById("modal-flete") as HTMLInputElement;
-  const modalSubtotal = document.getElementById("modal-subtotal") as HTMLElement;
-  const modalIgv = document.getElementById("modal-igv") as HTMLElement;
-  const modalFleteLabel = document.getElementById("modal-flete-label") as HTMLElement;
-  const modalTotal = document.getElementById("modal-total") as HTMLElement;
-  const modalError = document.getElementById("modal-error") as HTMLElement;
-  const modalSubmit = document.getElementById("modal-submit") as HTMLButtonElement;
-  const modalSubmitOnly = document.getElementById("modal-submit-only") as HTMLButtonElement;
-  const modalForm = document.getElementById("approve-form") as HTMLFormElement;
-  const modalFormView = document.getElementById("modal-form-view") as HTMLElement;
-  const modalFormActions = document.getElementById("modal-form-actions") as HTMLElement;
-  const modalSuccess = document.getElementById("modal-success") as HTMLElement;
-  const modalSuccessDetail = document.getElementById("modal-success-detail") as HTMLElement;
-  const downloadPdf = document.getElementById("download-pdf") as HTMLAnchorElement;
-  const adminName = document.getElementById("modal-admin-name") as HTMLInputElement;
-  const adminEmail = document.getElementById("modal-admin-email") as HTMLInputElement;
-  const modalClose = document.getElementById("modal-close") as HTMLButtonElement;
-  const modalCancel = document.getElementById("modal-cancel") as HTMLButtonElement;
-  const successClose = document.getElementById("success-close") as HTMLButtonElement;
-  const toast = document.getElementById("toast") as HTMLElement;
+  const modal = getRequiredElement<HTMLDialogElement>("approve-modal");
+  const modalTitle = getRequiredElement<HTMLElement>("approve-title");
+  const modalClient = getRequiredElement<HTMLElement>("modal-client");
+  const modalStatus = getRequiredElement<HTMLElement>("modal-status");
+  const modalDate = getRequiredElement<HTMLElement>("modal-date");
+  const modalTotalSummary = getRequiredElement<HTMLElement>("modal-total-summary");
+  const modalItemsHint = getRequiredElement<HTMLElement>("modal-items-hint");
+  const modalFleteWrapper = getRequiredElement<HTMLElement>("modal-flete-wrapper");
+  const modalAdminBlock = getRequiredElement<HTMLElement>("modal-admin-block");
+  const modalClienteCorreo = getRequiredElement<HTMLInputElement>("modal-cliente-correo");
+  const modalGuardarCorreo = getRequiredElement<HTMLButtonElement>("modal-guardar-correo");
+  const modalCorreoError = getRequiredElement<HTMLElement>("modal-correo-error");
+  const modalEnvioStatus = getRequiredElement<HTMLElement>("modal-envio-status");
+  const modalEnvioBlock = getRequiredElement<HTMLDetailsElement>("modal-envio-block");
+  const modalEnviarCliente = getRequiredElement<HTMLButtonElement>("modal-enviar-cliente");
+  const modalEnviarSpinner = getRequiredElement<HTMLElement>("modal-enviar-spinner");
+  const modalEnviarLabel = getRequiredElement<HTMLElement>("modal-enviar-label");
+  const modalItems = getRequiredElement<HTMLElement>("modal-items");
+  const modalItemsEmpty = getRequiredElement<HTMLElement>("modal-items-empty");
+  const toggleCatalogBtn = getRequiredElement<HTMLButtonElement>("toggle-catalog");
+  const catalogPanel = getRequiredElement<HTMLElement>("catalog-panel");
+  const catalogCategory = getRequiredElement<HTMLSelectElement>("catalog-category");
+  const catalogProduct = getRequiredElement<HTMLSelectElement>("catalog-product");
+  const catalogQty = getRequiredElement<HTMLInputElement>("catalog-qty");
+  const catalogPrice = getRequiredElement<HTMLInputElement>("catalog-price");
+  const catalogAddBtn = getRequiredElement<HTMLButtonElement>("catalog-add");
+  const modalFlete = getRequiredElement<HTMLInputElement>("modal-flete");
+  const modalSubtotal = getRequiredElement<HTMLElement>("modal-subtotal");
+  const modalIgv = getRequiredElement<HTMLElement>("modal-igv");
+  const modalFleteLabel = getRequiredElement<HTMLElement>("modal-flete-label");
+  const modalTotal = getRequiredElement<HTMLElement>("modal-total");
+  const modalError = getRequiredElement<HTMLElement>("modal-error");
+  const modalSubmit = getRequiredElement<HTMLButtonElement>("modal-submit");
+  const modalSubmitOnly = getRequiredElement<HTMLButtonElement>("modal-submit-only");
+  const modalForm = getRequiredElement<HTMLFormElement>("approve-form");
+  const modalFormView = getRequiredElement<HTMLElement>("modal-form-view");
+  const modalFormActions = getRequiredElement<HTMLElement>("modal-form-actions");
+  const modalSuccess = getRequiredElement<HTMLElement>("modal-success");
+  const modalSuccessDetail = getRequiredElement<HTMLElement>("modal-success-detail");
+  const downloadPdf = getRequiredElement<HTMLAnchorElement>("download-pdf");
+  const adminName = getRequiredElement<HTMLInputElement>("modal-admin-name");
+  const adminEmail = getRequiredElement<HTMLInputElement>("modal-admin-email");
+  const modalClose = getRequiredElement<HTMLButtonElement>("modal-close");
+  const modalCancel = getRequiredElement<HTMLButtonElement>("modal-cancel");
+  const successClose = getRequiredElement<HTMLButtonElement>("success-close");
+  const toast = getRequiredElement<HTMLElement>("toast");
+
+  const importOpenBtn = document.getElementById("import-open") as HTMLButtonElement | null;
+  const importModal = document.getElementById("import-modal") as HTMLDialogElement | null;
+  const importForm = document.getElementById("import-form") as HTMLFormElement | null;
+  const importText = document.getElementById("import-text") as HTMLTextAreaElement | null;
+  const importStepPaste = document.getElementById("import-step-paste") as HTMLElement | null;
+  const importStepReview = document.getElementById("import-step-review") as HTMLElement | null;
+  const importPasteError = document.getElementById("import-paste-error") as HTMLElement | null;
+  const importAnalyzeBtn = document.getElementById("import-analyze") as HTMLButtonElement | null;
+  const importBackBtn = document.getElementById("import-back") as HTMLButtonElement | null;
+  const importCreateBtn = document.getElementById("import-create") as HTMLButtonElement | null;
+  const importCreateManualBtn = document.getElementById("import-create-manual") as HTMLButtonElement | null;
+  const importItems = document.getElementById("import-items") as HTMLElement | null;
+  const importItemsEmpty = document.getElementById("import-items-empty") as HTMLElement | null;
+  const importSubtotal = document.getElementById("import-subtotal") as HTMLElement | null;
+  const importIgv = document.getElementById("import-igv") as HTMLElement | null;
+  const importTotal = document.getElementById("import-total") as HTMLElement | null;
+  const importTotalWrap = document.getElementById("import-total-wrap") as HTMLElement | null;
+  const importLeftoverWrap = document.getElementById("import-leftover-wrap") as HTMLElement | null;
+  const importLeftover = document.getElementById("import-leftover") as HTMLElement | null;
+  const importError = document.getElementById("import-error") as HTMLElement | null;
+  const importCloseBtn = document.getElementById("import-close") as HTMLButtonElement | null;
+  const importCancelBtn = document.getElementById("import-cancel") as HTMLButtonElement | null;
+  const importNombre = document.getElementById("import-nombre") as HTMLInputElement | null;
+  const importEmpresa = document.getElementById("import-empresa") as HTMLInputElement | null;
+  const importRuc = document.getElementById("import-ruc") as HTMLInputElement | null;
+  const importCorreo = document.getElementById("import-correo") as HTMLInputElement | null;
+  const importTelefono = document.getElementById("import-telefono") as HTMLInputElement | null;
+  const importCiudad = document.getElementById("import-ciudad") as HTMLInputElement | null;
 
   let cotizaciones: Cotizacion[] = [];
   let filtro: "pendiente_revision" | "aprobada" | "historial" | "eliminada" = "pendiente_revision";
@@ -107,6 +155,11 @@ export function initAdmin(): void {
   let pdfObjectUrl: string | null = null;
   let toastTimer: number | undefined;
   let contadorItemsNuevos = 0;
+  let pasoImportacion: "pegar" | "revision" = "revision";
+  let leftoverImportacion: string[] = [];
+  let cargaId = 0;
+  let modalTrigger: HTMLElement | null = null;
+  let importTrigger: HTMLElement | null = null;
 
   // ---------------------------------------------------------------------
   // Utilidades
@@ -121,6 +174,290 @@ export function initAdmin(): void {
     toast.classList.remove("hidden");
     window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => toast.classList.add("hidden"), 3200);
+  };
+
+  // ---------------------------------------------------------------------
+  // Importación desde WhatsApp
+  // ---------------------------------------------------------------------
+  const CONFIANZA_UI: Record<ConfianzaItem, { label: string; clase: string }> = {
+    exacta: {
+      label: "Exacta",
+      clase: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    },
+    aproximada: {
+      label: "Aproximada",
+      clase: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+    },
+    manual: {
+      label: "Manual",
+      clase: "border-orange-500/30 bg-orange-500/10 text-orange-300",
+    },
+  };
+
+  const filaImportacion = (item: ParsedItem): string => {
+    const esCatalogo = Boolean(item.producto_id);
+    const badge = CONFIANZA_UI[item.confianza];
+    const nombreSeguro = escapeHtml(item.nombre);
+    const detalleSeguro = escapeHtml(item.detalle ?? "");
+    const unidadSeguro = escapeHtml(item.unidad);
+
+    return `
+      <div
+        data-import-item
+        data-producto-id="${escapeHtml(item.producto_id ?? "")}"
+        data-unidad="${unidadSeguro}"
+        data-nombre="${nombreSeguro}"
+        data-detalle="${detalleSeguro}"
+        data-catalogo="${esCatalogo}"
+        data-precio="${item.precio_unitario}"
+        class="rounded-xl border border-slate-800 bg-[#0B1120] p-3"
+      >
+        <div class="flex items-start justify-between gap-2">
+          <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${badge.clase}">${badge.label}</span>
+          <button
+            type="button"
+            data-import-remove
+            class="-mr-1 -mt-1 rounded p-1 text-slate-500 transition hover:bg-slate-800 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            aria-label="Quitar ítem"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_5rem_7rem] sm:items-end">
+          <div class="min-w-0">
+            ${
+              esCatalogo
+                ? `<p class="truncate text-sm font-bold text-white" title="${nombreSeguro}">${nombreSeguro}</p>
+                   ${detalleSeguro ? `<p class="mt-0.5 text-xs text-slate-400">${detalleSeguro}</p>` : ""}`
+                : `<label class="block">
+                     <span class="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">Producto</span>
+                     <input
+                       data-import-nombre
+                       type="text"
+                       value="${nombreSeguro}"
+                       class="mt-1 w-full rounded-lg border border-slate-700 bg-[#070B14] px-2.5 py-2 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                     />
+                   </label>`
+            }
+            <p class="mt-1 text-[10px] uppercase tracking-wide text-slate-500">${unidadSeguro}</p>
+          </div>
+
+          <label class="block">
+            <span class="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">Cant.</span>
+            <input
+              data-import-cantidad
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              value="${item.cantidad}"
+              class="mt-1 w-full rounded-lg border border-slate-700 bg-[#070B14] px-2 py-2 text-center font-mono text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            />
+          </label>
+
+          <div>
+            <span class="block text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">P. unit.</span>
+            ${
+              esCatalogo
+                ? `<div class="mt-1 rounded-lg border border-slate-800 bg-[#070B14] px-2 py-2 text-right font-mono text-sm text-slate-300">US$ ${item.precio_unitario.toFixed(2)}</div>`
+                : `<input
+                     data-import-precio
+                     type="number"
+                     min="0"
+                     step="0.01"
+                     inputmode="decimal"
+                     value="${item.precio_unitario.toFixed(2)}"
+                     class="mt-1 w-full rounded-lg border border-slate-700 bg-[#070B14] px-2 py-2 text-right font-mono text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                   />`
+            }
+          </div>
+        </div>
+      </div>`;
+  };
+
+  const filasImportacion = (): HTMLElement[] =>
+    Array.from(importItems?.querySelectorAll<HTMLElement>("[data-import-item]") ?? []);
+
+  const cantidadFilaImportacion = (fila: HTMLElement): number => {
+    const input = fila.querySelector<HTMLInputElement>("[data-import-cantidad]");
+    return Math.max(1, Math.floor(Number(input?.value) || 1));
+  };
+
+  const precioFilaImportacion = (fila: HTMLElement): number =>
+    Number(fila.dataset.precio) || 0;
+
+  const actualizarTotalImportacion = (): void => {
+    const filas = filasImportacion();
+    const subtotalCentavos = filas.reduce((suma, fila) => {
+      const precioCentavos = Math.round(precioFilaImportacion(fila) * 100);
+      return suma + precioCentavos * cantidadFilaImportacion(fila);
+    }, 0);
+    const igvCentavos = Math.round(subtotalCentavos * 0.18);
+    const totalCentavos = subtotalCentavos + igvCentavos;
+
+    if (importSubtotal) importSubtotal.textContent = money(subtotalCentavos / 100);
+    if (importIgv) importIgv.textContent = money(igvCentavos / 100);
+    if (importTotal) importTotal.textContent = money(totalCentavos / 100);
+    importTotalWrap?.classList.toggle("hidden", filas.length === 0);
+    importItemsEmpty?.classList.toggle("hidden", filas.length > 0);
+    if (importCreateBtn) importCreateBtn.disabled = filas.length === 0;
+    importCreateManualBtn?.classList.toggle("hidden", filas.length > 0);
+  };
+
+  const limpiarErroresImportacion = (): void => {
+    importPasteError?.classList.add("hidden");
+    if (importPasteError) importPasteError.textContent = "";
+    importError?.classList.add("hidden");
+    if (importError) importError.textContent = "";
+  };
+
+  const mostrarErrorImportacion = (mensaje: string): void => {
+    if (importError) {
+      importError.textContent = mensaje;
+      importError.classList.remove("hidden");
+    }
+  };
+
+  const actualizarVistaImportacion = (): void => {
+    const enRevision = pasoImportacion === "revision";
+
+    if (importStepPaste) importStepPaste.hidden = enRevision;
+    if (importStepReview) importStepReview.hidden = !enRevision;
+    if (importAnalyzeBtn) importAnalyzeBtn.hidden = enRevision;
+    if (importBackBtn) importBackBtn.hidden = !enRevision;
+    if (importCreateBtn) importCreateBtn.hidden = !enRevision;
+
+    const mostrarLeftover = leftoverImportacion.length > 0;
+    importLeftoverWrap?.classList.toggle("hidden", !mostrarLeftover);
+    if (importLeftover) {
+      importLeftover.textContent = mostrarLeftover ? leftoverImportacion.join("\n") : "";
+    }
+  };
+
+  const abrirImportacion = (): void => {
+    if (!importModal) return;
+
+    importTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    importForm?.reset();
+    limpiarErroresImportacion();
+    if (importText) importText.value = "";
+    if (importItems) importItems.innerHTML = "";
+    if (importLeftover) importLeftover.textContent = "";
+    leftoverImportacion = [];
+
+    actualizarTotalImportacion();
+    pasoImportacion = "pegar";
+    actualizarVistaImportacion();
+
+    importModal.showModal();
+    window.setTimeout(() => importText?.focus(), 50);
+  };
+
+  const analizarImportacion = (): void => {
+    const texto = importText?.value.trim() ?? "";
+    limpiarErroresImportacion();
+
+    if (!texto) {
+      if (importPasteError) {
+        importPasteError.textContent = "Pega el mensaje de WhatsApp antes de analizar.";
+        importPasteError.classList.remove("hidden");
+      }
+      importText?.focus();
+      return;
+    }
+
+    const parsed = parseWhatsAppMessage(texto);
+
+    if (importNombre) importNombre.value = parsed.cliente.nombre ?? "";
+    if (importEmpresa) importEmpresa.value = parsed.cliente.empresa ?? "";
+    if (importRuc) importRuc.value = parsed.cliente.ruc_dni ?? "";
+    if (importCorreo) importCorreo.value = parsed.cliente.correo ?? "";
+    if (importTelefono) importTelefono.value = parsed.cliente.telefono ?? "";
+    if (importCiudad) importCiudad.value = parsed.cliente.ciudad ?? "";
+
+    if (importItems) importItems.innerHTML = parsed.items.map(filaImportacion).join("");
+    leftoverImportacion = parsed.textoNoReconocido;
+
+    actualizarTotalImportacion();
+    pasoImportacion = "revision";
+    actualizarVistaImportacion();
+
+    if (parsed.items.length === 0) {
+      if (importItemsEmpty) {
+        importItemsEmpty.querySelector("p")!.textContent =
+          "No se encontraron productos en el texto. ¿Deseas crear la cotización desde cero?";
+      }
+    }
+  };
+
+  const crearImportacion = async (): Promise<void> => {
+    const filas = filasImportacion();
+    if (filas.length === 0) return;
+
+    limpiarErroresImportacion();
+
+    const items = filas.map((fila) => ({
+      producto_id: fila.dataset.productoId || undefined,
+      nombre: (fila.dataset.nombre ?? "").trim(),
+      detalle: (fila.dataset.detalle ?? "").trim() || undefined,
+      cantidad: cantidadFilaImportacion(fila),
+      unidad: fila.dataset.unidad || "unidad",
+      precio_unitario: precioFilaImportacion(fila),
+    }));
+
+    const indiceInvalido = items.findIndex((item) => !item.nombre || item.cantidad < 1);
+    if (indiceInvalido !== -1) {
+      mostrarErrorImportacion(
+        `Revisa el ítem ${indiceInvalido + 1}: nombre obligatorio y cantidad mayor a 0.`,
+      );
+      return;
+    }
+
+    const cliente = {
+      nombre: importNombre?.value.trim() || "Cliente manual",
+      empresa: importEmpresa?.value.trim() || undefined,
+      ruc_dni: importRuc?.value.replace(/\D/g, "") || undefined,
+      correo: importCorreo?.value.trim() || undefined,
+      telefono: importTelefono?.value.trim() || undefined,
+      ciudad: importCiudad?.value.trim() || undefined,
+    };
+
+    if (importCreateBtn) {
+      importCreateBtn.disabled = true;
+      importCreateBtn.textContent = "Creando…";
+    }
+
+    try {
+      const data = await importarCotizacion({
+        cliente,
+        items,
+        origen: "whatsapp",
+        texto_original: importText?.value.trim() ?? "",
+      });
+
+      importModal?.close();
+      mostrarToast(`Cotización ${data.codigo ?? ""} creada como pendiente.`, "ok");
+
+      filtro = "pendiente_revision";
+      filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((boton) => {
+        boton.setAttribute("aria-pressed", String(boton.dataset.filter === filtro));
+      });
+
+      await cargar();
+
+      if (data.id && cotizaciones.some((cotizacion) => cotizacion.id === data.id)) {
+        abrirModal(data.id, "gestion");
+      }
+    } catch (error) {
+      console.error("[Admin] Error al crear la cotización:", error);
+      mostrarErrorImportacion(mensajeError(error, "No se pudo crear la cotización"));
+    } finally {
+      if (importCreateBtn) importCreateBtn.textContent = "Crear Cotización Pendiente";
+      actualizarTotalImportacion();
+    }
   };
 
   // ---------------------------------------------------------------------
@@ -185,9 +522,13 @@ export function initAdmin(): void {
       return coincideTexto || coincideRuc;
     });
 
-    list.innerHTML = visibles.map(tarjeta).join("");
-    list.classList.toggle("hidden", visibles.length === 0);
-    emptyState.classList.toggle("hidden", visibles.length > 0);
+    const mostrarCrear =
+      !termino && (filtro === "pendiente_revision" || filtro === "aprobada");
+
+    list.innerHTML =
+      (mostrarCrear ? tarjetaNuevaCotizacion() : "") + visibles.map(tarjeta).join("");
+    list.classList.toggle("hidden", visibles.length === 0 && !mostrarCrear);
+    emptyState.classList.toggle("hidden", visibles.length > 0 || mostrarCrear);
     if (visibles.length === 0) {
       const mensajes: Record<typeof filtro, string> = {
         pendiente_revision: "No hay cotizaciones pendientes.",
@@ -211,6 +552,7 @@ export function initAdmin(): void {
   // ---------------------------------------------------------------------
   const setCargando = (cargando: boolean): void => {
     refreshBtn.disabled = cargando;
+    refreshBtn.classList.toggle("opacity-50", cargando);
     loading.classList.toggle("hidden", !cargando);
     if (cargando) {
       list.classList.add("hidden");
@@ -220,16 +562,19 @@ export function initAdmin(): void {
   };
 
   const cargar = async (): Promise<void> => {
+    const idActual = ++cargaId;
     setCargando(true);
     try {
       const [activas, eliminadas] = await Promise.all([
         fetchCotizaciones(),
         fetchCotizaciones("eliminada"),
       ]);
+      if (idActual !== cargaId) return;
       cotizaciones = [...activas, ...eliminadas];
       errorState.classList.add("hidden");
       render();
     } catch (error) {
+      if (idActual !== cargaId) return;
       console.error("[Admin] Error al cargar cotizaciones:", error);
       const mensaje = mensajeError(error, "No se pudieron cargar las cotizaciones");
       errorMessage.textContent = mensaje;
@@ -237,7 +582,7 @@ export function initAdmin(): void {
       list.classList.add("hidden");
       emptyState.classList.add("hidden");
     } finally {
-      setCargando(false);
+      if (idActual === cargaId) setCargando(false);
     }
   };
 
@@ -380,6 +725,7 @@ export function initAdmin(): void {
     modalCorreoError.classList.add("hidden");
     modalCorreoError.textContent = "";
     modalEnvioStatus.textContent = "";
+    modalEnvioBlock.open = false;
     modalEnviarCliente.classList.add("hidden");
     modalEnviarCliente.classList.remove("inline-flex");
     modalEnviarCliente.disabled = false;
@@ -475,6 +821,7 @@ export function initAdmin(): void {
       cotizacion.ultimo_envio_at && cotizacion.ultimo_envio_correo
         ? `Enviado el ${fechaLegible(cotizacion.ultimo_envio_at)} a ${cotizacion.ultimo_envio_correo}`
         : "";
+    modalEnvioBlock.open = editable;
     modalEnviarCliente.classList.toggle(
       "hidden",
       esSoloLectura ||
@@ -519,7 +866,10 @@ export function initAdmin(): void {
     modalSubmitOnly.disabled = false;
     modalSubmitOnly.textContent = "Aprobar sin enviar";
 
-    if (!modal.open) modal.showModal();
+    if (!modal.open) {
+      modalTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      modal.showModal();
+    }
   };
 
   const recalcular = (): void => {
@@ -945,6 +1295,21 @@ export function initAdmin(): void {
   // ---------------------------------------------------------------------
   // Eventos
   // ---------------------------------------------------------------------
+  const abrirNuevaCotizacion = initNuevaCotizacion(catalogo, async (data) => {
+    mostrarToast(`Cotización ${data.codigo ?? ""} creada como pendiente.`, "ok");
+
+    filtro = "pendiente_revision";
+    filters.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((boton) => {
+      boton.setAttribute("aria-pressed", String(boton.dataset.filter === filtro));
+    });
+
+    await cargar();
+
+    if (data.id && cotizaciones.some((cotizacion) => cotizacion.id === data.id)) {
+      abrirModal(data.id, "gestion");
+    }
+  });
+
   document.addEventListener("click", (event) => {
     if ((event.target as Element).closest("[data-card-menu]")) return;
     list.querySelectorAll<HTMLDetailsElement>("details[data-card-menu][open]").forEach((menu) => {
@@ -954,6 +1319,43 @@ export function initAdmin(): void {
 
   refreshBtn.addEventListener("click", () => void cargar());
   retryBtn.addEventListener("click", () => void cargar());
+
+  importOpenBtn?.addEventListener("click", abrirImportacion);
+  importAnalyzeBtn?.addEventListener("click", analizarImportacion);
+  importBackBtn?.addEventListener("click", () => {
+    pasoImportacion = "pegar";
+    actualizarVistaImportacion();
+    importText?.focus();
+  });
+  importCreateBtn?.addEventListener("click", () => void crearImportacion());
+  importCreateManualBtn?.addEventListener("click", () => {
+    importModal?.close();
+    abrirNuevaCotizacion();
+  });
+  importCloseBtn?.addEventListener("click", () => importModal?.close());
+  importCancelBtn?.addEventListener("click", () => importModal?.close());
+  importModal?.addEventListener("click", (event) => {
+    if (event.target === importModal) importModal.close();
+  });
+  importModal?.addEventListener("close", () => {
+    limpiarErroresImportacion();
+    pasoImportacion = "revision";
+    actualizarVistaImportacion();
+    importTrigger?.focus();
+    importTrigger = null;
+  });
+  importForm?.addEventListener("submit", (event) => event.preventDefault());
+
+  importItems?.addEventListener("click", (event) => {
+    const boton = (event.target as Element).closest<HTMLElement>("[data-import-remove]");
+    if (!boton) return;
+    boton.closest<HTMLElement>("[data-import-item]")?.remove();
+    actualizarTotalImportacion();
+  });
+
+  importItems?.addEventListener("input", () => {
+    actualizarTotalImportacion();
+  });
 
   logoutBtn?.addEventListener("click", async () => {
     logoutBtn.disabled = true;
@@ -987,6 +1389,13 @@ export function initAdmin(): void {
 
   list.addEventListener("click", (event) => {
     const objetivo = event.target as Element;
+
+    const botonCrear = objetivo.closest<HTMLElement>("[data-create-quote]");
+    if (botonCrear) {
+      abrirNuevaCotizacion();
+      return;
+    }
+
     if (!objetivo.closest("summary")) {
       list.querySelectorAll<HTMLDetailsElement>("details[data-card-menu][open]").forEach((menu) => {
         menu.open = false;
@@ -1105,6 +1514,8 @@ export function initAdmin(): void {
     cotizacionModal = null;
     modoModal = "gestion";
     resetModal();
+    modalTrigger?.focus();
+    modalTrigger = null;
   });
 
   // Inicializa los selectores del catálogo oficial.

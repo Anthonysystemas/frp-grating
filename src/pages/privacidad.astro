@@ -3,6 +3,7 @@
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import Layout from "../layouts/Layout.astro";
+import { CONTACTO } from "../data/contacto";
 ---
 
 <Layout
@@ -36,7 +37,7 @@ import Layout from "../layouts/Layout.astro";
                         1. Responsable del Tratamiento
                     </h2>
                     <p class="text-slate-300 leading-relaxed">
-                        El responsable del tratamiento de sus datos personales es <strong class="text-slate-100">MASKEL PERÚ S.A.C.</strong>, con <strong class="text-slate-200">RUC 20616213246</strong> y domicilio en 5X87+8C8, Av. Huarangal, Carabayllo, Lima - Perú. Para cualquier consulta sobre esta política puede contactarnos en <strong class="text-slate-200">ventas@maskelperu.com</strong> o al teléfono <strong class="text-slate-200">+51 984 649 227</strong>.
+                        El responsable del tratamiento de sus datos personales es <strong class="text-slate-100">MASKEL PERÚ S.A.C.</strong>, con <strong class="text-slate-200">RUC 20616213246</strong> y domicilio en 5X87+8C8, Av. Huarangal, Carabayllo, Lima - Perú. Para cualquier consulta sobre esta política puede contactarnos en <strong class="text-slate-200">ventas@maskelperu.com</strong> o al teléfono <strong class="text-slate-200">{CONTACTO.telefonoFormateado}</strong>.
                     </p>
                 </div>
 
@@ -177,7 +178,7 @@ import Layout from "../layouts/Layout.astro";
                             <strong class="text-slate-200">Correo:</strong> ventas@maskelperu.com
                         </li>
                         <li class="text-slate-300 text-sm">
-                            <strong class="text-slate-200">Teléfono:</strong> +51 984 649 227
+                            <strong class="text-slate-200">Teléfono:</strong> {CONTACTO.telefonoFormateado}
                         </li>
                         <li class="text-slate-300 text-sm">
                             <strong class="text-slate-200">Dirección:</strong> 5X87+8C8, Av. Huarangal, Carabayllo, Lima - Perú

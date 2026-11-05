@@ -1,5 +1,6 @@
 ---
 // src/components/Footer.astro
+import { CONTACTO } from "../data/contacto";
 ---
 
 <footer
@@ -116,10 +117,10 @@
                             Ventas Corporativas
                         </span>
                         <a
-                            href="tel:+51984649227"
+                            href={`tel:+${CONTACTO.telefono}`}
                             class="text-slate-100 hover:text-blue-400 font-bold transition-colors"
                         >
-                            +51 984 649 227
+                            {CONTACTO.telefonoFormateado}
                         </a>
                     </div>
                 </li>

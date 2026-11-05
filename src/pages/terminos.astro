@@ -3,6 +3,7 @@
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import Layout from "../layouts/Layout.astro";
+import { CONTACTO } from "../data/contacto";
 ---
 
 <Layout
@@ -39,7 +40,7 @@ import Layout from "../layouts/Layout.astro";
                             <strong class="text-slate-200">Correo:</strong> ventas@maskelperu.com
                         </li>
                         <li class="text-slate-300 text-sm">
-                            <strong class="text-slate-200">Teléfono:</strong> +51 984 649 227
+                            <strong class="text-slate-200">Teléfono:</strong> {CONTACTO.telefonoFormateado}
                         </li>
                         <li class="text-slate-300 text-sm">
                             <strong class="text-slate-200">Horario de atención:</strong> Lun - Vie: 8:00 AM - 5:00 PM · Sáb: 8:00 AM - 1:00 PM
@@ -160,7 +161,7 @@ import Layout from "../layouts/Layout.astro";
                             <strong class="text-slate-200">Correo Central:</strong> ventas@maskelperu.com
                         </li>
                         <li class="text-slate-300 text-sm">
-                            <strong class="text-slate-200">Teléfono:</strong> +51 984 649 227
+                            <strong class="text-slate-200">Teléfono:</strong> {CONTACTO.telefonoFormateado}
                         </li>
                         <li class="text-slate-300 text-sm">
                             <strong class="text-slate-200">Operaciones Planta:</strong> Av. Huarangal, Carabayllo, Lima.

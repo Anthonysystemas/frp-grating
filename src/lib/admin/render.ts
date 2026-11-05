@@ -143,6 +143,23 @@ export const tarjeta = (cotizacion: Cotizacion): string => {
     </article>`;
 };
 
+/**
+ * Tarjeta de creación rápida que encabeza el listado. Abre el modal de
+ * creación desde cero (solo catálogo oficial).
+ */
+export const tarjetaNuevaCotizacion = (): string => `
+  <article class="flex h-full min-h-[12rem] flex-col rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/40 p-3 transition hover:border-blue-500/60 hover:bg-blue-500/5">
+    <button
+      type="button"
+      data-create-quote
+      class="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg px-2 py-4 text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+    >
+      <span class="flex h-10 w-10 items-center justify-center rounded-full border border-blue-500/30 bg-blue-500/10 text-xl font-bold text-blue-300" aria-hidden="true">+</span>
+      <span class="text-sm font-bold text-white">Nueva cotización</span>
+      <span class="text-xs text-slate-400">Crear desde cero</span>
+    </button>
+  </article>`;
+
 export const filaModal = (linea: Linea, editable = true): string => `
   <div
     class="rounded-lg border border-slate-800 bg-[#0B1120] p-3"

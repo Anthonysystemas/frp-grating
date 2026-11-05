@@ -15,7 +15,7 @@ export const ESTADOS = {
   aprobada: {
     label: "Aprobada",
     badgeBg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    accionPrincipal: "Confirmar pago",
+    accionPrincipal: "Marcar como pagada",
     btnBg: "bg-emerald-600 hover:bg-emerald-500 text-white",
   },
   pagada: {
