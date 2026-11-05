@@ -1,3 +1,4 @@
+import { CONTACTO } from "../../data/contacto";
 import { money } from "./format";
 import type { Cotizacion, ItemCotizacion, Linea, VersionCotizacion } from "./types";
 
@@ -57,7 +58,7 @@ export const numeroWhatsApp = (cotizacion: Cotizacion): string => {
   if (digitos.length === 9 && digitos.startsWith("9")) return `51${digitos}`;
   if (digitos.length === 11 && digitos.startsWith("51")) return digitos;
   if (digitos.length > 0) return digitos;
-  return "51984649227";
+  return CONTACTO.telefono;
 };
 
 export const enlaceWhatsApp = (cotizacion: Cotizacion): string => {

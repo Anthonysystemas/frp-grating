@@ -4,6 +4,8 @@ import AdminHeader from "../../components/admin/AdminHeader.astro";
 import AdminToolbar from "../../components/admin/AdminToolbar.astro";
 import AdminStates from "../../components/admin/AdminStates.astro";
 import ApproveModal from "../../components/admin/ApproveModal.astro";
+import NuevaCotizacionModal from "../../components/admin/NuevaCotizacionModal.astro";
+import ImportarWhatsAppModal from "../../components/admin/ImportarWhatsAppModal.astro";
 import Toast from "../../components/admin/Toast.astro";
 
 Astro.response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
@@ -19,6 +21,8 @@ Astro.response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidat
   </main>
 
   <ApproveModal />
+  <NuevaCotizacionModal />
+  <ImportarWhatsAppModal />
   <Toast />
 </AdminLayout>
 

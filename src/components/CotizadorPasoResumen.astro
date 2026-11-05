@@ -116,6 +116,8 @@ const { embedded = false } = Astro.props;
 </div>
 
 <script>
+  import { CONTACTO } from "../data/contacto";
+
   type QuoteResult = {
     codigo: string;
     total: string;
@@ -184,7 +186,7 @@ const { embedded = false } = Astro.props;
       "",
       "Quedo atento para coordinar.",
     ].join("\n");
-    window.location.href = "https://wa.me/51984649227?text=" + encodeURIComponent(mensaje);
+    window.location.href = `${CONTACTO.whatsappUrl}?text=${encodeURIComponent(mensaje)}`;
   };
 
   const whatsappBtn = panel?.querySelector<HTMLButtonElement>("[data-send-whatsapp]");

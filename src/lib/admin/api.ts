@@ -1,5 +1,6 @@
 import type { EstadoCotizacion } from "./states";
 import type { Cotizacion, VersionCotizacion } from "./types";
+import type { ParsedQuote } from "../importar/parse";
 
 const API_LISTA = "/api/admin/cotizaciones";
 const API_APROBAR = "/api/admin/aprobar";
@@ -295,4 +296,56 @@ export async function aprobarCotizacion(payload: AprobarPayload): Promise<Aproba
   }
 
   return dataAprobar;
+}
+
+export interface ImportarItemPayload {
+  producto_id?: string;
+  nombre: string;
+  detalle?: string;
+  cantidad: number;
+  unidad: string;
+  precio_unitario: number;
+}
+
+export interface ImportarCotizacionPayload {
+  cliente: ParsedQuote["cliente"];
+  items: ImportarItemPayload[];
+  texto_original?: string;
+  origen?: "whatsapp" | "manual";
+}
+
+export interface ImportarCotizacionResponse {
+  success?: boolean;
+  ok?: boolean;
+  id?: string;
+  codigo?: string;
+  error?: string;
+}
+
+export async function importarCotizacion(
+  payload: ImportarCotizacionPayload,
+): Promise<ImportarCotizacionResponse> {
+  let respuesta: Response;
+
+  try {
+    respuesta = await fetchAdmin("/api/admin/cotizaciones/importar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    throw new Error(mensajeError(error, "No se pudo conectar con el servidor"));
+  }
+
+  const data = await leerJson(respuesta);
+  const dataImportar = data as ImportarCotizacionResponse;
+
+  if (!respuesta.ok || dataImportar?.success !== true || !dataImportar.id) {
+    throw new Error(
+      mensajeDesdeRespuesta(data) ||
+        `No se pudo crear la cotización importada (HTTP ${respuesta.status})`,
+    );
+  }
+
+  return dataImportar;
 }
